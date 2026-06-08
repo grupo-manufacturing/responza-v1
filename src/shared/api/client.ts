@@ -1,7 +1,9 @@
 import axios from 'axios'
 
+import { getApiBaseUrl } from '@/shared/config/api'
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: getApiBaseUrl(),
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
