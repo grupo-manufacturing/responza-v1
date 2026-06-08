@@ -1,0 +1,65 @@
+import { lazy } from 'react'
+import { Navigate, createBrowserRouter } from 'react-router-dom'
+
+import { ProtectedRoute } from '@/app/guards/ProtectedRoute'
+import { PageSuspense } from '@/components/ui/Spinner'
+import { AppLayout } from '@/layouts/AppLayout'
+
+const LandingPage = lazy(() =>
+  import('@/modules/landing/pages/LandingPage').then((m) => ({ default: m.LandingPage })),
+)
+const AuthPage = lazy(() => import('@/modules/auth/pages/AuthPage').then((m) => ({ default: m.AuthPage })))
+const BusinessDetailsPanel = lazy(() =>
+  import('@/components/common/BusinessDetailsPanel').then((m) => ({ default: m.BusinessDetailsPanel })),
+)
+const DashboardPage = lazy(() =>
+  import('@/modules/dashboard/pages/DashboardPage').then((m) => ({ default: m.DashboardPage })),
+)
+const IntegrationsPage = lazy(() =>
+  import('@/modules/integrations/pages/IntegrationsPage').then((m) => ({ default: m.IntegrationsPage })),
+)
+const InboxPage = lazy(() =>
+  import('@/modules/inbox/pages/InboxPage').then((m) => ({ default: m.InboxPage })),
+)
+const LeadsPage = lazy(() =>
+  import('@/modules/leads/pages/LeadsPage').then((m) => ({ default: m.LeadsPage })),
+)
+const SettingsPage = lazy(() =>
+  import('@/modules/settings/pages/SettingsPage').then((m) => ({ default: m.SettingsPage })),
+)
+
+function suspense(element: React.ReactNode, label?: string) {
+  return <PageSuspense label={label}>{element}</PageSuspense>
+}
+
+export const router = createBrowserRouter([
+  { path: '/', element: suspense(<LandingPage />, 'Loading...') },
+  { path: '/auth', element: suspense(<AuthPage />, 'Loading sign in...') },
+  { path: '/login', element: <Navigate to="/auth?mode=login" replace /> },
+  { path: '/register', element: <Navigate to="/auth?mode=register" replace /> },
+  { path: '/subscription', element: <Navigate to="/settings?tab=subscription" replace /> },
+
+  {
+    element: <ProtectedRoute />,
+    children: [
+      {
+        path: '/business-details',
+        element: suspense(<BusinessDetailsPanel />, 'Preparing your setup...'),
+      },
+      {
+        element: <AppLayout />,
+        children: [
+          { path: '/dashboard', element: <DashboardPage /> },
+          { path: '/inbox', element: <InboxPage /> },
+          { path: '/leads', element: <LeadsPage /> },
+          { path: '/leads/new', element: <Navigate to="/leads" replace /> },
+          { path: '/leads/:id', element: <Navigate to="/leads" replace /> },
+          { path: '/integrations', element: <IntegrationsPage /> },
+          { path: '/settings', element: <SettingsPage /> },
+        ],
+      },
+    ],
+  },
+
+  { path: '*', element: <Navigate to="/" replace /> },
+])
