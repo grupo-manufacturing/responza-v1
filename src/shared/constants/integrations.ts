@@ -10,9 +10,9 @@ export const INTEGRATION_PLATFORM_LABELS: Record<IntegrationPlatform, string> = 
 }
 
 export const INTEGRATION_PLATFORM_LOGOS: Record<IntegrationPlatform, string> = {
-  whatsapp: '/whatsapp.png',
-  instagram: '/instagram.png',
-  indiamart: '/indiamart.png',
+  whatsapp: '/whatsapp.svg',
+  instagram: '/instagram.svg',
+  indiamart: '/indiamart.svg',
 }
 
 export const INTEGRATION_PLATFORM_DESCRIPTIONS: Record<IntegrationPlatform, string> = {

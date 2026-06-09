@@ -14,12 +14,27 @@ export interface WhatsAppConnectSummary {
   business_id: string | null
 }
 
+export interface InstagramConnectSummary {
+  business_account_id: string
+  user_id: string
+  username: string | null
+}
+
 export interface ConnectWhatsAppPayload {
   code: string
   session_info: {
     phone_number_id: string
     waba_id: string
     business_id?: string
+  }
+}
+
+export interface ConnectInstagramPayload {
+  code: string
+  session_info: {
+    business_account_id: string
+    user_id: string
+    username?: string
   }
 }
 
@@ -30,6 +45,7 @@ export interface ListIntegrationsResponse {
 export interface ConnectIntegrationResponse {
   integration: Integration & { id: string }
   whatsapp?: WhatsAppConnectSummary
+  instagram?: InstagramConnectSummary
 }
 
 export interface DisconnectIntegrationResponse {
@@ -41,6 +57,11 @@ export interface WhatsAppStatusResponse {
   whatsapp: WhatsAppConnectSummary | null
 }
 
+export interface InstagramStatusResponse {
+  connected: boolean
+  instagram: InstagramConnectSummary | null
+}
+
 export class IntegrationsService {
   static async listIntegrations(): Promise<ListIntegrationsResponse> {
     const response = await api.get<ListIntegrationsResponse>('/integrations')
@@ -49,7 +70,7 @@ export class IntegrationsService {
 
   static async connectIntegration(
     platform: IntegrationPlatform,
-    payload: ConnectWhatsAppPayload | Record<string, never> = {},
+    payload: ConnectWhatsAppPayload | ConnectInstagramPayload | Record<string, never> = {},
   ): Promise<ConnectIntegrationResponse> {
     const response = await api.post<ConnectIntegrationResponse>(
       `/integrations/${platform}/connect`,
@@ -67,6 +88,11 @@ export class IntegrationsService {
 
   static async getWhatsAppStatus(): Promise<WhatsAppStatusResponse> {
     const response = await api.get<WhatsAppStatusResponse>('/integrations/whatsapp/status')
+    return response.data
+  }
+
+  static async getInstagramStatus(): Promise<InstagramStatusResponse> {
+    const response = await api.get<InstagramStatusResponse>('/integrations/instagram/status')
     return response.data
   }
 }

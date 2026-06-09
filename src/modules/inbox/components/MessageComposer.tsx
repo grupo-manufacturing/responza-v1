@@ -46,6 +46,10 @@ function sendButtonClass(canSend: boolean, platform: IntegrationPlatform | null 
     return 'bg-[#128C7E] text-white hover:bg-[#0f7a6d]'
   }
 
+  if (platform === 'instagram') {
+    return 'bg-gradient-to-r from-[#405DE6] to-[#E1306C] text-white hover:from-[#405DE6]/90 hover:to-[#E1306C]/90'
+  }
+
   return 'bg-neutral-900 text-white hover:bg-neutral-800'
 }
 
@@ -77,6 +81,7 @@ export function MessageComposer({ disabled, sending, platform = null, onSend }: 
           'flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-1.5 transition-colors focus-within:border-neutral-900',
           disabled || sending ? 'bg-neutral-50' : '',
           platform === 'whatsapp' ? 'focus-within:border-[#128C7E]' : '',
+          platform === 'instagram' ? 'focus-within:border-[#E1306C]' : '',
         ].join(' ')}
       >
         <textarea

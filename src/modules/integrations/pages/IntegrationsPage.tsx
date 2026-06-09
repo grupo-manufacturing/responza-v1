@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { Spinner } from '@/components/ui/Spinner'
 import { startWhatsAppEmbeddedSignup } from '@/modules/integrations/lib/whatsappEmbeddedSignup'
-import { isWhatsAppEmbeddedSignupConfigured } from '@/shared/config/meta'
+import { startInstagramOAuth } from '@/modules/integrations/lib/instagramOAuth'
+import { isWhatsAppEmbeddedSignupConfigured, isInstagramOAuthConfigured } from '@/shared/config/meta'
 import {
   INTEGRATION_PLATFORM_DESCRIPTIONS,
   INTEGRATION_PLATFORM_LOGOS,
@@ -14,6 +15,7 @@ import {
 import IntegrationsService, {
   type Integration,
   type WhatsAppConnectSummary,
+  type InstagramConnectSummary,
 } from '@/shared/services/integrations.service'
 import { getApiErrorCode, getApiErrorMessage } from '@/shared/utils/api-error'
 
@@ -26,6 +28,7 @@ type PlatformCardProps = {
   status: IntegrationStatus
   busy: boolean
   whatsappDetails: WhatsAppConnectSummary | null
+  instagramDetails: InstagramConnectSummary | null
   onConnect: (platform: IntegrationPlatform) => void
   onDisconnect: (platform: IntegrationPlatform) => void
 }
@@ -54,11 +57,36 @@ function WhatsAppDetailsPanel({ details }: { details: WhatsAppConnectSummary }) 
   )
 }
 
+function InstagramDetailsPanel({ details }: { details: InstagramConnectSummary }) {
+  return (
+    <div className="mt-4 rounded-xl border border-[#E1306C]/20 bg-gradient-to-br from-[#405DE6]/5 to-[#E1306C]/5 px-4 py-3 text-sm text-neutral-700">
+      <p className="font-medium text-[#E1306C]">Connected Instagram Business</p>
+      <dl className="mt-2 space-y-1 text-xs">
+        <div className="flex justify-between gap-3">
+          <dt className="text-neutral-500">Business account ID</dt>
+          <dd className="truncate font-mono text-neutral-800">{details.business_account_id}</dd>
+        </div>
+        <div className="flex justify-between gap-3">
+          <dt className="text-neutral-500">User ID</dt>
+          <dd className="truncate font-mono text-neutral-800">{details.user_id}</dd>
+        </div>
+        {details.username !== null && (
+          <div className="flex justify-between gap-3">
+            <dt className="text-neutral-500">Username</dt>
+            <dd className="truncate font-mono text-neutral-800">@{details.username}</dd>
+          </div>
+        )}
+      </dl>
+    </div>
+  )
+}
+
 function PlatformCard({
   platform,
   status,
   busy,
   whatsappDetails,
+  instagramDetails,
   onConnect,
   onDisconnect,
 }: PlatformCardProps) {
@@ -66,11 +94,15 @@ function PlatformCard({
   const connectLabel =
     platform === 'whatsapp' && busy && !isConnected
       ? 'Opening signup…'
-      : busy && !isConnected
-        ? 'Connecting…'
-        : isConnected && platform === 'whatsapp'
-          ? 'Reconnect'
-          : 'Connect'
+      : platform === 'instagram' && busy && !isConnected
+        ? 'Opening OAuth…'
+        : busy && !isConnected
+          ? 'Connecting…'
+          : isConnected && platform === 'whatsapp'
+            ? 'Reconnect'
+            : isConnected && platform === 'instagram'
+              ? 'Reconnect'
+              : 'Connect'
 
   return (
     <article className="flex flex-col rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
@@ -105,6 +137,10 @@ function PlatformCard({
         <WhatsAppDetailsPanel details={whatsappDetails} />
       )}
 
+      {platform === 'instagram' && isConnected && instagramDetails !== null && (
+        <InstagramDetailsPanel details={instagramDetails} />
+      )}
+
       <div className="mt-auto flex flex-wrap gap-2 border-t border-neutral-100 pt-4">
         <button
           type="button"
@@ -113,6 +149,7 @@ function PlatformCard({
           className={[
             'inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50',
             platform === 'whatsapp' ? 'bg-[#128C7E] hover:bg-[#0f7a6d]' : 'bg-neutral-900 hover:bg-neutral-800',
+            platform === 'instagram' ? 'bg-gradient-to-r from-[#405DE6] to-[#E1306C] hover:from-[#405DE6]/90 hover:to-[#E1306C]/90' : 'bg-neutral-900 hover:bg-neutral-800',
           ].join(' ')}
         >
           {connectLabel}
@@ -133,6 +170,7 @@ function PlatformCard({
 export function IntegrationsPage() {
   const [integrations, setIntegrations] = useState<Integration[]>([])
   const [whatsappDetails, setWhatsappDetails] = useState<WhatsAppConnectSummary | null>(null)
+  const [instagramDetails, setInstagramDetails] = useState<InstagramConnectSummary | null>(null)
   const [loading, setLoading] = useState(true)
   const [busyPlatform, setBusyPlatform] = useState<IntegrationPlatform | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -147,6 +185,15 @@ export function IntegrationsPage() {
     }
   }, [])
 
+  const loadInstagramStatus = useCallback(async () => {
+    try {
+      const status = await IntegrationsService.getInstagramStatus()
+      setInstagramDetails(status.connected ? status.instagram : null)
+    } catch {
+      setInstagramDetails(null)
+    }
+  }, [])
+
   const loadIntegrations = useCallback(async () => {
     setLoading(true)
     setError(null)
@@ -155,14 +202,16 @@ export function IntegrationsPage() {
       const result = await IntegrationsService.listIntegrations()
       setIntegrations(result.integrations)
       await loadWhatsAppStatus()
+      await loadInstagramStatus()
     } catch (err) {
       setError(getApiErrorMessage(err, 'Could not load integrations. Please try again.'))
       setIntegrations([])
       setWhatsappDetails(null)
+      setInstagramDetails(null)
     } finally {
       setLoading(false)
     }
-  }, [loadWhatsAppStatus])
+  }, [loadWhatsAppStatus, loadInstagramStatus])
 
   useEffect(() => {
     void loadIntegrations()
@@ -192,6 +241,24 @@ export function IntegrationsPage() {
         return
       }
 
+      if (platform === 'instagram') {
+        if (!isInstagramOAuthConfigured()) {
+          throw new Error(
+            'Instagram OAuth is not configured. Set VITE_INSTAGRAM_APP_ID and VITE_INSTAGRAM_REDIRECT_URI.',
+          )
+        }
+
+        const oauth = await startInstagramOAuth()
+        const result = await IntegrationsService.connectIntegration(platform, {
+          code: oauth.code,
+          // session_info is not needed for Instagram as backend fetches user info
+        })
+        setIntegrations((current) => upsertIntegration(current, result.integration))
+        setInstagramDetails(result.instagram ?? null)
+        setSuccess('Instagram connected successfully. Open Inbox to view conversations.')
+        return
+      }
+
       await IntegrationsService.connectIntegration(platform)
     } catch (err) {
       if (getApiErrorCode(err) === 'NOT_IMPLEMENTED') {
@@ -215,6 +282,9 @@ export function IntegrationsPage() {
       if (platform === 'whatsapp') {
         setWhatsappDetails(null)
       }
+      if (platform === 'instagram') {
+        setInstagramDetails(null)
+      }
       setSuccess(`${integrationPlatformLabel(platform)} disconnected.`)
     } catch (err) {
       setError(getApiErrorMessage(err, 'Could not disconnect integration. Please try again.'))
@@ -224,6 +294,7 @@ export function IntegrationsPage() {
   }
 
   const whatsappConfigured = isWhatsAppEmbeddedSignupConfigured()
+  const instagramConfigured = isInstagramOAuthConfigured()
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -238,6 +309,13 @@ export function IntegrationsPage() {
         <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
           WhatsApp Embedded Signup env vars are missing. Add `VITE_META_APP_ID` and
           `VITE_WHATSAPP_EMBEDDED_CONFIG_ID` to enable WhatsApp connect.
+        </p>
+      )}
+
+      {!instagramConfigured && (
+        <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          Instagram OAuth env vars are missing. Add `VITE_INSTAGRAM_APP_ID` and
+          `VITE_INSTAGRAM_REDIRECT_URI` to enable Instagram connect.
         </p>
       )}
 
@@ -268,6 +346,7 @@ export function IntegrationsPage() {
               status={integration.status}
               busy={busyPlatform === integration.platform}
               whatsappDetails={integration.platform === 'whatsapp' ? whatsappDetails : null}
+              instagramDetails={integration.platform === 'instagram' ? instagramDetails : null}
               onConnect={handleConnect}
               onDisconnect={handleDisconnect}
             />

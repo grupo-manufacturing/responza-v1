@@ -24,6 +24,9 @@ const InboxPage = lazy(() =>
 const IntegrationsPage = lazy(() =>
   import('@/modules/integrations/pages/IntegrationsPage').then((m) => ({ default: m.IntegrationsPage })),
 )
+const InstagramOAuthCallbackPage = lazy(() =>
+  import('@/modules/integrations/pages/InstagramOAuthCallbackPage').then((m) => ({ default: m.InstagramOAuthCallbackPage })),
+)
 const SettingsPage = lazy(() =>
   import('@/modules/settings/pages/SettingsPage').then((m) => ({ default: m.SettingsPage })),
 )
@@ -38,6 +41,7 @@ export const router = createBrowserRouter([
   { path: '/login', element: <Navigate to="/auth?mode=login" replace /> },
   { path: '/register', element: <Navigate to="/auth?mode=register" replace /> },
   { path: '/subscription', element: <Navigate to="/settings?tab=subscription" replace /> },
+  { path: '/oauth/instagram/callback', element: suspense(<InstagramOAuthCallbackPage />, 'Completing Instagram OAuth...') },
 
   {
     element: <ProtectedRoute />,
