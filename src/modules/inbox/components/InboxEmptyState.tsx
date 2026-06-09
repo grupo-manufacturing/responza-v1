@@ -1,4 +1,26 @@
-export function InboxEmptyState() {
+import { inboxPlatformFilterLabel, type InboxPlatformFilter } from '@/shared/constants/inbox'
+
+type InboxEmptyStateProps = {
+  readonly platformFilter?: InboxPlatformFilter
+}
+
+function emptyStateMessage(platformFilter: InboxPlatformFilter): string {
+  if (platformFilter === 'instagram') {
+    return 'Instagram DMs will appear here once someone messages your connected account.'
+  }
+
+  if (platformFilter === 'whatsapp') {
+    return 'WhatsApp messages will appear here once your connected number receives traffic.'
+  }
+
+  if (platformFilter !== 'all') {
+    return `New ${inboxPlatformFilterLabel(platformFilter)} conversations will appear here once your channel is active.`
+  }
+
+  return 'New messages will appear here once your connected platforms start receiving traffic.'
+}
+
+export function InboxEmptyState({ platformFilter = 'all' }: InboxEmptyStateProps) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 text-center">
       <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100">
@@ -12,9 +34,7 @@ export function InboxEmptyState() {
         </svg>
       </div>
       <p className="text-sm font-medium text-neutral-900">No conversations yet</p>
-      <p className="mt-1 max-w-xs text-sm text-neutral-500">
-        New messages will appear here once your connected platforms start receiving traffic.
-      </p>
+      <p className="mt-1 max-w-xs text-sm text-neutral-500">{emptyStateMessage(platformFilter)}</p>
     </div>
   )
 }

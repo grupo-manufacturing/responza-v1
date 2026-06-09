@@ -13,3 +13,11 @@ export function getGraphApiVersion(): string {
 export function isWhatsAppEmbeddedSignupConfigured(): boolean {
   return getMetaAppId().length > 0 && getWhatsAppEmbeddedConfigId().length > 0
 }
+
+export function getInstagramAppId(): string {
+  return import.meta.env.VITE_INSTAGRAM_APP_ID?.trim() ?? ''
+}
+
+export function isInstagramOAuthConfigured(): boolean {
+  return getInstagramAppId().length > 0
+}

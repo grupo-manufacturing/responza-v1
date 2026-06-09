@@ -25,6 +25,10 @@ type SendMessageErrorDetails = {
   message?: Message
 }
 
+type IntegrationsRequiredDetails = {
+  connectedPlatforms?: IntegrationPlatform[]
+}
+
 export function InboxPage() {
   const [platformFilter, setPlatformFilter] = useState<InboxPlatformFilter>('all')
   const [conversations, setConversations] = useState<ConversationListItem[]>([])
@@ -36,6 +40,7 @@ export function InboxPage() {
   const [threadLoading, setThreadLoading] = useState(false)
   const [sending, setSending] = useState(false)
   const [integrationsRequired, setIntegrationsRequired] = useState(false)
+  const [connectedPlatforms, setConnectedPlatforms] = useState<IntegrationPlatform[]>([])
   const [error, setError] = useState<string | null>(null)
   const [mobileShowThread, setMobileShowThread] = useState(false)
 
@@ -45,6 +50,7 @@ export function InboxPage() {
     }
     setError(null)
     setIntegrationsRequired(false)
+    setConnectedPlatforms([])
 
     try {
       const result = await InboxService.listConversations({
@@ -53,6 +59,8 @@ export function InboxPage() {
       setConversations(result.conversations)
     } catch (err) {
       if (getApiErrorCode(err) === 'INTEGRATIONS_REQUIRED') {
+        const details = getApiErrorDetails<IntegrationsRequiredDetails>(err)
+        setConnectedPlatforms(details?.connectedPlatforms ?? [])
         setIntegrationsRequired(true)
         setConversations([])
         return
@@ -82,6 +90,8 @@ export function InboxPage() {
       setMessages(result.messages)
     } catch (err) {
       if (getApiErrorCode(err) === 'INTEGRATIONS_REQUIRED') {
+        const details = getApiErrorDetails<IntegrationsRequiredDetails>(err)
+        setConnectedPlatforms(details?.connectedPlatforms ?? [])
         setIntegrationsRequired(true)
         return
       }
@@ -192,7 +202,7 @@ export function InboxPage() {
   const activePlatform: IntegrationPlatform | null = selectedListItem?.platform ?? null
 
   if (integrationsRequired) {
-    return <IntegrationsRequired />
+    return <IntegrationsRequired connectedPlatforms={connectedPlatforms} />
   }
 
   return (
@@ -224,6 +234,7 @@ export function InboxPage() {
             <ConversationThreadHeader
               conversation={activeConversation}
               participants={participants}
+              platform={activePlatform}
               pendingContact={
                 threadLoading && selectedListItem !== undefined
                   ? {
@@ -253,6 +264,7 @@ export function InboxPage() {
               <ConversationList
                 conversations={conversations}
                 selectedId={selectedConversationId}
+                platformFilter={platformFilter}
                 onSelect={handleSelectConversation}
               />
             )}

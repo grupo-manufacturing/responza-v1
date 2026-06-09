@@ -41,6 +41,21 @@ export interface WhatsAppStatusResponse {
   whatsapp: WhatsAppConnectSummary | null
 }
 
+export interface InstagramConnectSummary {
+  ig_user_id: string
+  ig_username: string
+  messaging_account_id: string | null
+}
+
+export interface InstagramStatusResponse {
+  connected: boolean
+  instagram: InstagramConnectSummary | null
+}
+
+export interface InstagramConnectUrlResponse {
+  url: string
+}
+
 export class IntegrationsService {
   static async listIntegrations(): Promise<ListIntegrationsResponse> {
     const response = await api.get<ListIntegrationsResponse>('/integrations')
@@ -67,6 +82,16 @@ export class IntegrationsService {
 
   static async getWhatsAppStatus(): Promise<WhatsAppStatusResponse> {
     const response = await api.get<WhatsAppStatusResponse>('/integrations/whatsapp/status')
+    return response.data
+  }
+
+  static async getInstagramStatus(): Promise<InstagramStatusResponse> {
+    const response = await api.get<InstagramStatusResponse>('/integrations/instagram/status')
+    return response.data
+  }
+
+  static async getInstagramConnectUrl(): Promise<InstagramConnectUrlResponse> {
+    const response = await api.get<InstagramConnectUrlResponse>('/integrations/instagram/connect-url')
     return response.data
   }
 }
