@@ -16,7 +16,7 @@ export const INTEGRATION_PLATFORM_LOGOS: Record<IntegrationPlatform, string> = {
 }
 
 export const INTEGRATION_PLATFORM_DESCRIPTIONS: Record<IntegrationPlatform, string> = {
-  whatsapp: 'Connect your WhatsApp Business account to receive and reply to messages.',
+  whatsapp: 'Use Meta Embedded Signup to connect your WhatsApp Business number for inbox messaging.',
   instagram: 'Connect Instagram Direct to manage conversations in one place.',
   indiamart: 'Connect IndiaMART to capture buyer inquiries from your listings.',
 }

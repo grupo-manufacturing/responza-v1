@@ -1,10 +1,13 @@
 import { useState } from 'react'
 
 import { Spinner } from '@/components/ui/Spinner'
+import { inboxPlatformLabel } from '@/shared/constants/inbox'
+import type { IntegrationPlatform } from '@/shared/constants/integrations'
 
 type MessageComposerProps = {
   readonly disabled: boolean
   readonly sending: boolean
+  readonly platform?: IntegrationPlatform | null
   readonly onSend: (content: string) => Promise<void>
 }
 
@@ -27,7 +30,31 @@ function SendIcon() {
   )
 }
 
-export function MessageComposer({ disabled, sending, onSend }: MessageComposerProps) {
+function composerPlaceholder(disabled: boolean, platform: IntegrationPlatform | null | undefined): string {
+  if (disabled) {
+    return 'Select a conversation to reply'
+  }
+
+  if (platform !== null && platform !== undefined) {
+    return `Message on ${inboxPlatformLabel(platform)}…`
+  }
+
+  return 'Type a message…'
+}
+
+function sendButtonClass(canSend: boolean, platform: IntegrationPlatform | null | undefined): string {
+  if (!canSend) {
+    return 'bg-neutral-200 text-neutral-400'
+  }
+
+  if (platform === 'whatsapp') {
+    return 'bg-[#128C7E] text-white hover:bg-[#0f7a6d]'
+  }
+
+  return 'bg-neutral-900 text-white hover:bg-neutral-800'
+}
+
+export function MessageComposer({ disabled, sending, platform = null, onSend }: MessageComposerProps) {
   const [content, setContent] = useState('')
   const canSend = !disabled && !sending && content.trim().length > 0
 
@@ -54,12 +81,13 @@ export function MessageComposer({ disabled, sending, onSend }: MessageComposerPr
         className={[
           'flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-1.5 transition-colors focus-within:border-neutral-900',
           disabled || sending ? 'bg-neutral-50' : '',
+          platform === 'whatsapp' ? 'focus-within:border-[#128C7E]' : '',
         ].join(' ')}
       >
         <textarea
           value={content}
           onChange={(event) => setContent(event.target.value)}
-          placeholder={disabled ? 'Select a conversation to reply' : 'Type a message...'}
+          placeholder={composerPlaceholder(disabled, platform)}
           disabled={disabled || sending}
           rows={1}
           className="min-h-[36px] max-h-28 flex-1 resize-none border-0 bg-transparent py-1.5 text-sm text-neutral-900 outline-none placeholder:text-neutral-400 disabled:cursor-not-allowed"
@@ -70,9 +98,7 @@ export function MessageComposer({ disabled, sending, onSend }: MessageComposerPr
           aria-label={sending ? 'Sending message' : 'Send message'}
           className={[
             'inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors',
-            canSend
-              ? 'bg-neutral-900 text-white hover:bg-neutral-800'
-              : 'bg-neutral-200 text-neutral-400',
+            sendButtonClass(canSend, platform),
             'disabled:cursor-not-allowed',
           ].join(' ')}
         >

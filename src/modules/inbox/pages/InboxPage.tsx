@@ -8,15 +8,22 @@ import { MessageComposer } from '@/modules/inbox/components/MessageComposer'
 import { PlatformTabs } from '@/modules/inbox/components/PlatformTabs'
 import { Spinner } from '@/components/ui/Spinner'
 import type { InboxPlatformFilter } from '@/shared/constants/inbox'
+import type { IntegrationPlatform } from '@/shared/constants/integrations'
 import InboxService, {
   type Conversation,
   type ConversationListItem,
   type Message,
   type Participant,
 } from '@/shared/services/inbox.service'
-import { getApiErrorCode, getApiErrorMessage } from '@/shared/utils/api-error'
+import { getApiErrorCode, getApiErrorDetails, getApiErrorMessage } from '@/shared/utils/api-error'
 
 const LIST_COLUMN_CLASS = 'w-full lg:w-[280px] lg:shrink-0'
+const LIST_REFRESH_MS = 8000
+const THREAD_REFRESH_MS = 5000
+
+type SendMessageErrorDetails = {
+  message?: Message
+}
 
 export function InboxPage() {
   const [platformFilter, setPlatformFilter] = useState<InboxPlatformFilter>('all')
@@ -32,8 +39,10 @@ export function InboxPage() {
   const [error, setError] = useState<string | null>(null)
   const [mobileShowThread, setMobileShowThread] = useState(false)
 
-  const loadConversations = useCallback(async (filter: InboxPlatformFilter) => {
-    setListLoading(true)
+  const loadConversations = useCallback(async (filter: InboxPlatformFilter, options?: { silent?: boolean }) => {
+    if (!options?.silent) {
+      setListLoading(true)
+    }
     setError(null)
     setIntegrationsRequired(false)
 
@@ -49,15 +58,21 @@ export function InboxPage() {
         return
       }
 
-      setError(getApiErrorMessage(err, 'Could not load conversations. Please try again.'))
-      setConversations([])
+      if (!options?.silent) {
+        setError(getApiErrorMessage(err, 'Could not load conversations. Please try again.'))
+        setConversations([])
+      }
     } finally {
-      setListLoading(false)
+      if (!options?.silent) {
+        setListLoading(false)
+      }
     }
   }, [])
 
-  const loadConversation = useCallback(async (conversationId: string) => {
-    setThreadLoading(true)
+  const loadConversation = useCallback(async (conversationId: string, options?: { silent?: boolean }) => {
+    if (!options?.silent) {
+      setThreadLoading(true)
+    }
     setError(null)
 
     try {
@@ -71,12 +86,16 @@ export function InboxPage() {
         return
       }
 
-      setError(getApiErrorMessage(err, 'Could not load conversation. Please try again.'))
-      setActiveConversation(null)
-      setParticipants([])
-      setMessages([])
+      if (!options?.silent) {
+        setError(getApiErrorMessage(err, 'Could not load conversation. Please try again.'))
+        setActiveConversation(null)
+        setParticipants([])
+        setMessages([])
+      }
     } finally {
-      setThreadLoading(false)
+      if (!options?.silent) {
+        setThreadLoading(false)
+      }
     }
   }, [])
 
@@ -96,6 +115,34 @@ export function InboxPage() {
 
     void loadConversation(selectedConversationId)
   }, [loadConversation, selectedConversationId])
+
+  useEffect(() => {
+    if (integrationsRequired) {
+      return
+    }
+
+    const intervalId = window.setInterval(() => {
+      void loadConversations(platformFilter, { silent: true })
+    }, LIST_REFRESH_MS)
+
+    return () => {
+      window.clearInterval(intervalId)
+    }
+  }, [integrationsRequired, loadConversations, platformFilter])
+
+  useEffect(() => {
+    if (selectedConversationId === null || integrationsRequired) {
+      return
+    }
+
+    const intervalId = window.setInterval(() => {
+      void loadConversation(selectedConversationId, { silent: true })
+    }, THREAD_REFRESH_MS)
+
+    return () => {
+      window.clearInterval(intervalId)
+    }
+  }, [integrationsRequired, loadConversation, selectedConversationId])
 
   const handleSelectConversation = (conversation: ConversationListItem) => {
     setThreadLoading(true)
@@ -126,6 +173,11 @@ export function InboxPage() {
         ),
       )
     } catch (err) {
+      const details = getApiErrorDetails<SendMessageErrorDetails>(err)
+      if (details?.message) {
+        setMessages((current) => [...current, details.message!])
+      }
+
       setError(getApiErrorMessage(err, 'Could not send message. Please try again.'))
     } finally {
       setSending(false)
@@ -136,6 +188,8 @@ export function InboxPage() {
     selectedConversationId !== null
       ? conversations.find((item) => item.id === selectedConversationId)
       : undefined
+
+  const activePlatform: IntegrationPlatform | null = selectedListItem?.platform ?? null
 
   if (integrationsRequired) {
     return <IntegrationsRequired />
@@ -170,6 +224,7 @@ export function InboxPage() {
             <ConversationThreadHeader
               conversation={activeConversation}
               participants={participants}
+              platform={activePlatform}
               pendingContact={
                 threadLoading && selectedListItem !== undefined
                   ? {
@@ -214,10 +269,12 @@ export function InboxPage() {
               conversation={activeConversation}
               messages={messages}
               loading={threadLoading}
+              platform={activePlatform}
             />
             <MessageComposer
               disabled={selectedConversationId === null || threadLoading}
               sending={sending}
+              platform={activePlatform}
               onSend={handleSendMessage}
             />
           </section>

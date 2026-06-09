@@ -1,8 +1,10 @@
 import {
   INBOX_PLATFORM_FILTERS,
   inboxPlatformFilterLabel,
+  inboxPlatformLogo,
   type InboxPlatformFilter,
 } from '@/shared/constants/inbox'
+import { platformTabActiveClass } from '@/modules/inbox/components/PlatformBadge'
 
 type PlatformTabsProps = {
   readonly value: InboxPlatformFilter
@@ -23,13 +25,19 @@ export function PlatformTabs({ value, onChange }: PlatformTabsProps) {
             aria-pressed={isActive}
             onClick={() => onChange(filter)}
             className={[
-              'flex flex-1 items-center justify-center rounded-lg px-1 py-2 text-xs font-medium transition-colors',
-              isActive
-                ? 'bg-neutral-900 text-white'
-                : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200 hover:text-neutral-900',
+              'flex flex-1 items-center justify-center gap-1 rounded-lg px-1 py-2 text-xs font-medium transition-colors',
+              platformTabActiveClass(filter, isActive),
             ].join(' ')}
           >
-            {label}
+            {filter !== 'all' && (
+              <img
+                src={inboxPlatformLogo(filter)}
+                alt=""
+                className="h-3.5 w-3.5 shrink-0 object-contain"
+                aria-hidden
+              />
+            )}
+            <span className="truncate">{label}</span>
           </button>
         )
       })}

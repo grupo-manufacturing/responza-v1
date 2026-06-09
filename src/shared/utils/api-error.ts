@@ -4,6 +4,7 @@ type ApiErrorBody = {
   error?: {
     code?: string
     message?: string
+    details?: unknown
   }
 }
 
@@ -27,4 +28,18 @@ export function getApiErrorMessage(error: unknown, fallback: string): string {
   }
 
   return fallback
+}
+
+export function getApiErrorDetails<T>(error: unknown): T | null {
+  if (!axios.isAxiosError(error)) {
+    return null
+  }
+
+  const data = error.response?.data as ApiErrorBody | undefined
+  const details = data?.error?.details
+  if (details === undefined || details === null) {
+    return null
+  }
+
+  return details as T
 }

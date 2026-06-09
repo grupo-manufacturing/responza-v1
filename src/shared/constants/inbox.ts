@@ -23,6 +23,10 @@ export function inboxPlatformFilterLabel(filter: InboxPlatformFilter): string {
   return INTEGRATION_PLATFORM_LABELS[filter]
 }
 
+export function inboxPlatformLabel(platform: IntegrationPlatform): string {
+  return INTEGRATION_PLATFORM_LABELS[platform]
+}
+
 export function inboxPlatformLogo(platform: IntegrationPlatform): string {
   return INTEGRATION_PLATFORM_LOGOS[platform]
 }

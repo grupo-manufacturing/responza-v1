@@ -1,3 +1,5 @@
+import { PlatformBadge } from '@/modules/inbox/components/PlatformBadge'
+import type { IntegrationPlatform } from '@/shared/constants/integrations'
 import type { Conversation, Participant } from '@/shared/services/inbox.service'
 
 type PendingContact = {
@@ -8,6 +10,7 @@ type PendingContact = {
 type ConversationThreadHeaderProps = {
   readonly conversation: Conversation | null
   readonly participants: Participant[]
+  readonly platform?: IntegrationPlatform | null
   readonly pendingContact?: PendingContact | null
   readonly onBack?: () => void
 }
@@ -31,6 +34,7 @@ function contactDisplayName(
 export function ConversationThreadHeader({
   conversation,
   participants,
+  platform = null,
   pendingContact,
   onBack,
 }: ConversationThreadHeaderProps) {
@@ -51,7 +55,14 @@ export function ConversationThreadHeader({
         </button>
       )}
 
-      <p className="min-w-0 truncate text-base font-bold text-neutral-900">{displayName}</p>
+      {platform !== null && <PlatformBadge platform={platform} size="md" />}
+
+      <div className="min-w-0">
+        <p className="truncate text-base font-bold text-neutral-900">{displayName}</p>
+        {platform === 'whatsapp' && conversation !== null && (
+          <p className="truncate text-xs text-[#128C7E]">WhatsApp conversation</p>
+        )}
+      </div>
     </div>
   )
 }

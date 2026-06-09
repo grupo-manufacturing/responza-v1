@@ -1,0 +1,15 @@
+export function getMetaAppId(): string {
+  return import.meta.env.VITE_META_APP_ID?.trim() ?? ''
+}
+
+export function getWhatsAppEmbeddedConfigId(): string {
+  return import.meta.env.VITE_WHATSAPP_EMBEDDED_CONFIG_ID?.trim() ?? ''
+}
+
+export function getGraphApiVersion(): string {
+  return import.meta.env.VITE_GRAPH_API_VERSION?.trim() || 'v25.0'
+}
+
+export function isWhatsAppEmbeddedSignupConfigured(): boolean {
+  return getMetaAppId().length > 0 && getWhatsAppEmbeddedConfigId().length > 0
+}
