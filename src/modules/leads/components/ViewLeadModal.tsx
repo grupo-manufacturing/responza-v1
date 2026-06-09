@@ -2,8 +2,6 @@ import { Modal } from '@/components/ui/Modal'
 import { leadStatusLabel } from '@/shared/constants/leads'
 import type { Lead } from '@/shared/services/leads.service'
 
-import { formatLeadSource } from './lead-form'
-
 type ViewLeadModalProps = {
   open: boolean
   lead: Lead | null
@@ -39,16 +37,6 @@ export function ViewLeadModal({ open, lead, onClose, onDelete }: ViewLeadModalPr
           <dt className="font-medium text-neutral-500">Notes</dt>
           <dd className="mt-1 whitespace-pre-wrap text-neutral-900">{lead.notes ?? '—'}</dd>
         </div>
-        <div>
-          <dt className="font-medium text-neutral-500">Source</dt>
-          <dd className="mt-1 text-neutral-900">{formatLeadSource(lead.source)}</dd>
-        </div>
-        {lead.conversationId !== null && (
-          <div>
-            <dt className="font-medium text-neutral-500">Conversation</dt>
-            <dd className="mt-1 font-mono text-xs text-neutral-700">{lead.conversationId}</dd>
-          </div>
-        )}
         <div>
           <dt className="font-medium text-neutral-500">Created</dt>
           <dd className="mt-1 text-neutral-900">{new Date(lead.createdAt).toLocaleString()}</dd>

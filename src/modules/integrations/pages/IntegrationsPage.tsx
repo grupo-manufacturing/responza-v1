@@ -1,33 +1,91 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
-import { PlatformCard } from '@/modules/integrations/components/PlatformCard'
-import { runWhatsAppEmbeddedSignup } from '@/modules/integrations/whatsapp/embedded-signup'
-import { SpinnerSection } from '@/components/ui/Spinner'
+import { Spinner } from '@/components/ui/Spinner'
 import {
-  PLATFORM_DEFINITIONS,
+  INTEGRATION_PLATFORM_DESCRIPTIONS,
+  INTEGRATION_PLATFORM_LOGOS,
+  integrationPlatformLabel,
+  integrationStatusLabel,
   type IntegrationPlatform,
+  type IntegrationStatus,
 } from '@/shared/constants/integrations'
-import { isWhatsAppConnectConfigured } from '@/shared/config/meta'
 import IntegrationsService, { type Integration } from '@/shared/services/integrations.service'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
 
 function upsertIntegration(integrations: Integration[], updated: Integration): Integration[] {
-  const index = integrations.findIndex((entry) => entry.platform === updated.platform)
-  if (index === -1) {
-    return [...integrations, updated]
-  }
+  return integrations.map((item) => (item.platform === updated.platform ? { ...item, ...updated } : item))
+}
 
-  return integrations.map((entry) => (entry.platform === updated.platform ? updated : entry))
+type PlatformCardProps = {
+  platform: IntegrationPlatform
+  status: IntegrationStatus
+  busy: boolean
+  onConnect: (platform: IntegrationPlatform) => void
+  onDisconnect: (platform: IntegrationPlatform) => void
+}
+
+function PlatformCard({ platform, status, busy, onConnect, onDisconnect }: PlatformCardProps) {
+  const isConnected = status === 'connected'
+
+  return (
+    <article className="flex flex-col rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
+      <div className="mb-5 flex items-start gap-4">
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-neutral-100 bg-neutral-50 p-2">
+          <img
+            src={INTEGRATION_PLATFORM_LOGOS[platform]}
+            alt={integrationPlatformLabel(platform)}
+            className="h-full w-full object-contain"
+          />
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-3">
+            <h2 className="text-lg font-semibold text-neutral-900">{integrationPlatformLabel(platform)}</h2>
+            <span
+              className={[
+                'shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium',
+                isConnected ? 'bg-green-100 text-green-800' : 'bg-neutral-100 text-neutral-600',
+              ].join(' ')}
+            >
+              {integrationStatusLabel(status)}
+            </span>
+          </div>
+          <p className="mt-2 text-sm leading-relaxed text-neutral-600">
+            {INTEGRATION_PLATFORM_DESCRIPTIONS[platform]}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-auto flex flex-wrap gap-2 border-t border-neutral-100 pt-4">
+        <button
+          type="button"
+          disabled={busy || isConnected}
+          onClick={() => onConnect(platform)}
+          className="inline-flex items-center justify-center rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {busy && !isConnected ? 'Connecting…' : 'Connect'}
+        </button>
+        <button
+          type="button"
+          disabled={busy || !isConnected}
+          onClick={() => onDisconnect(platform)}
+          className="inline-flex items-center justify-center rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-900 transition-colors hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {busy && isConnected ? 'Disconnecting…' : 'Disconnect'}
+        </button>
+      </div>
+    </article>
+  )
 }
 
 export function IntegrationsPage() {
   const [integrations, setIntegrations] = useState<Integration[]>([])
   const [loading, setLoading] = useState(true)
+  const [busyPlatform, setBusyPlatform] = useState<IntegrationPlatform | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [connectingPlatform, setConnectingPlatform] = useState<IntegrationPlatform | null>(null)
-  const [disconnectingPlatform, setDisconnectingPlatform] = useState<IntegrationPlatform | null>(null)
 
   const loadIntegrations = useCallback(async () => {
+    setLoading(true)
     setError(null)
 
     try {
@@ -35,132 +93,79 @@ export function IntegrationsPage() {
       setIntegrations(result.integrations)
     } catch (err) {
       setError(getApiErrorMessage(err, 'Could not load integrations. Please try again.'))
+      setIntegrations([])
+    } finally {
+      setLoading(false)
     }
   }, [])
 
   useEffect(() => {
-    let cancelled = false
-
-    void loadIntegrations().finally(() => {
-      if (!cancelled) {
-        setLoading(false)
-      }
-    })
-
-    return () => {
-      cancelled = true
-    }
+    void loadIntegrations()
   }, [loadIntegrations])
 
-  const integrationByPlatform = useMemo(() => {
-    return new Map(integrations.map((integration) => [integration.platform, integration]))
-  }, [integrations])
-
-  const connectedCount = useMemo(
-    () => integrations.filter((integration) => integration.status === 'connected').length,
-    [integrations],
-  )
-
   const handleConnect = async (platform: IntegrationPlatform) => {
+    setBusyPlatform(platform)
     setError(null)
-    setConnectingPlatform(platform)
 
     try {
-      if (platform === 'whatsapp') {
-        if (!isWhatsAppConnectConfigured()) {
-          throw new Error(
-            'WhatsApp is not configured for this environment. Add VITE_META_APP_ID and VITE_WHATSAPP_EMBEDDED_CONFIG_ID.',
-          )
-        }
-
-        const signup = await runWhatsAppEmbeddedSignup()
-        const { integration } = await IntegrationsService.connectWhatsApp(signup)
-        setIntegrations((current) => upsertIntegration(current, integration))
-        return
-      }
-
-      const { integration } = await IntegrationsService.connectIntegration(platform)
-      setIntegrations((current) => upsertIntegration(current, integration))
+      const result = await IntegrationsService.connectIntegration(platform)
+      setIntegrations((current) => upsertIntegration(current, result.integration))
     } catch (err) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : getApiErrorMessage(err, 'Could not connect this platform. Please try again.')
-      setError(message)
+      setError(getApiErrorMessage(err, 'Could not connect integration. Please try again.'))
     } finally {
-      setConnectingPlatform(null)
+      setBusyPlatform(null)
     }
   }
 
   const handleDisconnect = async (platform: IntegrationPlatform) => {
+    setBusyPlatform(platform)
     setError(null)
-    setDisconnectingPlatform(platform)
 
     try {
-      const { integration } = await IntegrationsService.disconnectIntegration(platform)
-      setIntegrations((current) => upsertIntegration(current, integration))
+      const result = await IntegrationsService.disconnectIntegration(platform)
+      setIntegrations((current) => upsertIntegration(current, result.integration))
     } catch (err) {
-      setError(getApiErrorMessage(err, 'Could not disconnect this platform. Please try again.'))
+      setError(getApiErrorMessage(err, 'Could not disconnect integration. Please try again.'))
     } finally {
-      setDisconnectingPlatform(null)
+      setBusyPlatform(null)
     }
   }
 
-  if (loading) {
-    return <SpinnerSection label="Loading integrations..." minHeightClassName="min-h-[50vh]" />
-  }
-
   return (
-    <div className="mx-auto max-w-6xl">
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-neutral-900">Integrations</h1>
-          <p className="mt-2 max-w-2xl text-sm text-neutral-600">
-            Connect the platforms your customers use. WhatsApp uses Meta Embedded Signup; Instagram
-            and IndiaMART use placeholder connect until those channels ship.
-          </p>
-        </div>
-        <div className="rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm shadow-sm">
-          <p className="text-xs font-medium uppercase tracking-wide text-neutral-500">Connected</p>
-          <p className="mt-0.5 text-lg font-semibold text-neutral-900">
-            {connectedCount}
-            <span className="text-sm font-normal text-neutral-500">
-              {' '}
-              / {PLATFORM_DEFINITIONS.length}
-            </span>
-          </p>
-        </div>
+    <div className="mx-auto max-w-4xl">
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold text-neutral-900">Integrations</h1>
+        <p className="mt-1 text-sm text-neutral-600">
+          Connect messaging platforms to use inbox features when they become available.
+        </p>
       </div>
 
-      {error !== null && (
-        <p className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+      {loading && (
+        <div className="flex justify-center py-16">
+          <Spinner />
+        </div>
+      )}
+
+      {!loading && error !== null && (
+        <p className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </p>
       )}
 
-      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-        {PLATFORM_DEFINITIONS.map((definition) => {
-          const integration = integrationByPlatform.get(definition.platform) ?? {
-            platform: definition.platform,
-            status: 'disconnected' as const,
-            connectedAt: null,
-            disconnectedAt: null,
-            updatedAt: null,
-          }
-
-          return (
+      {!loading && (
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          {integrations.map((integration) => (
             <PlatformCard
-              key={definition.platform}
-              definition={definition}
-              integration={integration}
-              connecting={connectingPlatform === definition.platform}
-              disconnecting={disconnectingPlatform === definition.platform}
-              onConnect={() => void handleConnect(definition.platform)}
-              onDisconnect={() => void handleDisconnect(definition.platform)}
+              key={integration.platform}
+              platform={integration.platform}
+              status={integration.status}
+              busy={busyPlatform === integration.platform}
+              onConnect={handleConnect}
+              onDisconnect={handleDisconnect}
             />
-          )
-        })}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

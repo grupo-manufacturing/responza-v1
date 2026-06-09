@@ -1,20 +1,47 @@
-import type { IntegrationPlatform } from '@/shared/constants/integrations'
+import {
+  INTEGRATION_PLATFORM_LABELS,
+  INTEGRATION_PLATFORM_LOGOS,
+  type IntegrationPlatform,
+} from '@/shared/constants/integrations'
 
-export type InboxPlatform = IntegrationPlatform
+export type InboxPlatformFilter = IntegrationPlatform | 'all'
 
-export type InboxPlatformFilter = InboxPlatform | 'all'
+export type MessageDirection = 'inbound' | 'outbound'
 
-export const INBOX_PLATFORM_FILTERS: { value: InboxPlatformFilter; label: string }[] = [
-  { value: 'all', label: 'All' },
-  { value: 'whatsapp', label: 'WhatsApp' },
-  { value: 'instagram', label: 'Instagram' },
-  { value: 'indiamart', label: 'IndiaMART' },
+export const INBOX_PLATFORM_FILTERS: InboxPlatformFilter[] = [
+  'all',
+  'whatsapp',
+  'instagram',
+  'indiamart',
 ]
 
-export function platformLabel(platform: InboxPlatform | null | undefined): string {
-  if (platform === null || platform === undefined) {
-    return 'Unknown'
+export function inboxPlatformFilterLabel(filter: InboxPlatformFilter): string {
+  if (filter === 'all') {
+    return 'All'
   }
 
-  return INBOX_PLATFORM_FILTERS.find((entry) => entry.value === platform)?.label ?? platform
+  return INTEGRATION_PLATFORM_LABELS[filter]
+}
+
+export function inboxPlatformLogo(platform: IntegrationPlatform): string {
+  return INTEGRATION_PLATFORM_LOGOS[platform]
+}
+
+export function formatInboxTimestamp(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return ''
+  }
+
+  const now = new Date()
+  const isToday =
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate()
+
+  if (isToday) {
+    return date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+  }
+
+  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 }

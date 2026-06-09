@@ -10,20 +10,12 @@ type ApiErrorBody = {
 export function getApiErrorCode(error: unknown): string | null {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data as ApiErrorBody | undefined
-    if (typeof data?.error?.code === 'string') {
+    if (typeof data?.error?.code === 'string' && data.error.code.length > 0) {
       return data.error.code
     }
   }
 
   return null
-}
-
-export function isIntegrationsRequiredError(error: unknown): boolean {
-  if (axios.isAxiosError(error) && error.response?.status === 402) {
-    return true
-  }
-
-  return getApiErrorCode(error) === 'INTEGRATIONS_REQUIRED'
 }
 
 export function getApiErrorMessage(error: unknown, fallback: string): string {

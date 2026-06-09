@@ -8,7 +8,6 @@ import {
   type LeadsFilterState,
   type LeadsLayoutMode,
 } from '@/modules/leads/components/LeadsSearchBar'
-import { formatLeadSource } from '@/modules/leads/components/lead-form'
 import { ViewLeadModal } from '@/modules/leads/components/ViewLeadModal'
 import { Spinner } from '@/components/ui/Spinner'
 import { leadStatusLabel } from '@/shared/constants/leads'
@@ -21,7 +20,7 @@ function matchesSearchQuery(lead: Lead, query: string): boolean {
     return true
   }
 
-  const haystack = [lead.name, lead.email, lead.phone, lead.notes, lead.source]
+  const haystack = [lead.name, lead.email, lead.phone, lead.notes]
     .filter((value): value is string => typeof value === 'string' && value.length > 0)
     .join(' ')
     .toLowerCase()
@@ -114,9 +113,7 @@ export function LeadsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [layoutMode, setLayoutMode] = useState<LeadsLayoutMode>('table')
-  const [nextCursor, setNextCursor] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
-  const [loadingMore, setLoadingMore] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const [createOpen, setCreateOpen] = useState(false)
@@ -126,31 +123,21 @@ export function LeadsPage() {
 
   const statusFilter = filters.status
 
-  const loadLeads = useCallback(async (cursor?: string, append = false) => {
-    if (append) {
-      setLoadingMore(true)
-    } else {
-      setLoading(true)
-      setError(null)
-    }
+  const loadLeads = useCallback(async () => {
+    setLoading(true)
+    setError(null)
 
     try {
       const result = await LeadsService.listLeads({
-        limit: 20,
-        cursor,
         status: statusFilter === '' ? undefined : statusFilter,
       })
 
-      setLeads((current) => (append ? [...current, ...result.leads] : result.leads))
-      setNextCursor(result.page.nextCursor)
+      setLeads(result.leads)
     } catch (err) {
       setError(getApiErrorMessage(err, 'Could not load leads. Please try again.'))
-      if (!append) {
-        setLeads([])
-      }
+      setLeads([])
     } finally {
       setLoading(false)
-      setLoadingMore(false)
     }
   }, [statusFilter])
 
@@ -277,7 +264,6 @@ export function LeadsPage() {
                 <th className="px-4 py-3 text-left font-medium text-neutral-700">Name</th>
                 <th className="px-4 py-3 text-left font-medium text-neutral-700">Email</th>
                 <th className="px-4 py-3 text-left font-medium text-neutral-700">Phone</th>
-                <th className="px-4 py-3 text-left font-medium text-neutral-700">Source</th>
                 <th className="px-4 py-3 text-left font-medium text-neutral-700">Status</th>
                 <th className="px-4 py-3 text-right font-medium text-neutral-700">Actions</th>
               </tr>
@@ -288,7 +274,6 @@ export function LeadsPage() {
                   <td className="px-4 py-3 font-medium text-neutral-900">{lead.name}</td>
                   <td className="px-4 py-3 text-neutral-600">{lead.email ?? '—'}</td>
                   <td className="px-4 py-3 text-neutral-600">{lead.phone ?? '—'}</td>
-                  <td className="px-4 py-3 text-neutral-600">{formatLeadSource(lead.source)}</td>
                   <td className="px-4 py-3">
                     <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs font-medium text-neutral-800">
                       {leadStatusLabel(lead.status)}
@@ -345,18 +330,6 @@ export function LeadsPage() {
         </div>
       )}
 
-      {!loading && error === null && displayedLeads.length > 0 && nextCursor !== null && !hasSearch && (
-        <div className="mt-4 flex justify-center">
-          <button
-            type="button"
-            disabled={loadingMore}
-            onClick={() => void loadLeads(nextCursor, true)}
-            className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-900 transition-colors hover:bg-neutral-50 disabled:opacity-50"
-          >
-            {loadingMore ? 'Loading…' : 'Load more'}
-          </button>
-        </div>
-      )}
 
       <CreateLeadModal
         open={createOpen}

@@ -14,8 +14,9 @@ import {
 import { Spinner, SpinnerOverlay } from '@/components/ui/Spinner'
 import AuthService from '@/shared/services/auth.service'
 import BusinessDetailsService, {
-  type BusinessDetailsUpdatePayload,
+  type CompleteBusinessDetailsPayload,
 } from '@/shared/services/business-details.service'
+import { getApiErrorMessage } from '@/shared/utils/api-error'
 
 type BusinessDetailsFormData = {
   brandAndProducts: string
@@ -122,14 +123,7 @@ const STEPS: FormStep[] = [
   },
 ]
 
-function getApiErrorMessage(err: unknown): string | undefined {
-  if (err && typeof err === 'object' && 'response' in err) {
-    return (err as { response?: { data?: { message?: string } } }).response?.data?.message
-  }
-  return undefined
-}
-
-function buildFullPayload(formData: BusinessDetailsFormData): BusinessDetailsUpdatePayload {
+function buildCompletePayload(formData: BusinessDetailsFormData): CompleteBusinessDetailsPayload {
   return {
     brandAndProducts: formData.brandAndProducts.trim(),
     customerTone: formData.customerTone as CustomerTone,
@@ -147,26 +141,6 @@ function canProceedStep(step: FormStep, formData: BusinessDetailsFormData): bool
   }
 
   return formData[step.field] !== ''
-}
-
-function profileToFormData(profile: {
-  brandAndProducts: string | null
-  customerTone: CustomerTone | null
-  sampleCustomerReply: string | null
-  commonConversationTypes: CommonConversationTypes | null
-  customerMessageLanguage: CustomerMessageLanguage | null
-  signaturePhrases: string | null
-  aiRestrictions: AiRestrictions | null
-}): BusinessDetailsFormData {
-  return {
-    brandAndProducts: profile.brandAndProducts ?? '',
-    customerTone: profile.customerTone ?? '',
-    sampleCustomerReply: profile.sampleCustomerReply ?? '',
-    commonConversationTypes: profile.commonConversationTypes ?? '',
-    customerMessageLanguage: profile.customerMessageLanguage ?? '',
-    signaturePhrases: profile.signaturePhrases ?? '',
-    aiRestrictions: profile.aiRestrictions ?? '',
-  }
 }
 
 const inputClassName =
@@ -193,10 +167,7 @@ export function BusinessDetailsPanel() {
 
         if (profile.completed) {
           setAlreadyCompleted(true)
-          return
         }
-
-        setFormData(profileToFormData(profile))
       })
       .catch(() => {
         // New account — show empty form.
@@ -224,12 +195,11 @@ export function BusinessDetailsPanel() {
     setError(null)
 
     try {
-      await BusinessDetailsService.updateBusinessDetails(buildFullPayload(formData))
-      await BusinessDetailsService.completeBusinessDetails(false)
+      await BusinessDetailsService.completeBusinessDetails(buildCompletePayload(formData))
       AuthService.setBusinessDetailsCompleted(true)
       navigate('/dashboard', { replace: true })
     } catch (err: unknown) {
-      setError(getApiErrorMessage(err) ?? 'Something went wrong. Please try again.')
+      setError(getApiErrorMessage(err, 'Something went wrong. Please try again.'))
     } finally {
       setIsLoading(false)
     }

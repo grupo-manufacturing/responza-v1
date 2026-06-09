@@ -22,14 +22,14 @@ export interface BusinessDetailsProfile {
   updatedAt: string
 }
 
-export interface BusinessDetailsUpdatePayload {
-  brandAndProducts?: string
-  customerTone?: CustomerTone
-  sampleCustomerReply?: string
-  commonConversationTypes?: CommonConversationTypes
-  customerMessageLanguage?: CustomerMessageLanguage
-  signaturePhrases?: string
-  aiRestrictions?: AiRestrictions
+export interface CompleteBusinessDetailsPayload {
+  brandAndProducts: string
+  customerTone: CustomerTone
+  sampleCustomerReply: string
+  commonConversationTypes: CommonConversationTypes
+  customerMessageLanguage: CustomerMessageLanguage
+  signaturePhrases: string
+  aiRestrictions: AiRestrictions
 }
 
 export interface BusinessDetailsResponse {
@@ -42,15 +42,10 @@ export class BusinessDetailsService {
     return response.data
   }
 
-  static async updateBusinessDetails(
-    data: BusinessDetailsUpdatePayload,
+  static async completeBusinessDetails(
+    data: CompleteBusinessDetailsPayload,
   ): Promise<BusinessDetailsResponse> {
-    const response = await api.put<BusinessDetailsResponse>('/business-details', data)
-    return response.data
-  }
-
-  static async completeBusinessDetails(skip?: boolean): Promise<BusinessDetailsResponse> {
-    const response = await api.post<BusinessDetailsResponse>('/business-details/complete', { skip })
+    const response = await api.post<BusinessDetailsResponse>('/business-details/complete', data)
     return response.data
   }
 }

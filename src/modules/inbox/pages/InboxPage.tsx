@@ -1,207 +1,226 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 
 import { ConversationList } from '@/modules/inbox/components/ConversationList'
-import { MessageThread } from '@/modules/inbox/components/MessageThread'
-import { SpinnerSection } from '@/components/ui/Spinner'
+import { ConversationThread } from '@/modules/inbox/components/ConversationThread'
+import { ConversationThreadHeader } from '@/modules/inbox/components/ConversationThreadHeader'
+import { IntegrationsRequired } from '@/modules/inbox/components/IntegrationsRequired'
+import { MessageComposer } from '@/modules/inbox/components/MessageComposer'
+import { PlatformTabs } from '@/modules/inbox/components/PlatformTabs'
+import { Spinner } from '@/components/ui/Spinner'
 import type { InboxPlatformFilter } from '@/shared/constants/inbox'
-import InboxService, { type Conversation, type Message } from '@/shared/services/inbox.service'
-import { getApiErrorMessage, isIntegrationsRequiredError } from '@/shared/utils/api-error'
+import InboxService, {
+  type Conversation,
+  type ConversationListItem,
+  type Message,
+  type Participant,
+} from '@/shared/services/inbox.service'
+import { getApiErrorCode, getApiErrorMessage } from '@/shared/utils/api-error'
 
-function upsertConversation(conversations: Conversation[], updated: Conversation): Conversation[] {
-  const index = conversations.findIndex((entry) => entry.id === updated.id)
-  if (index === -1) {
-    return [updated, ...conversations]
-  }
-
-  return conversations.map((entry) => (entry.id === updated.id ? { ...entry, ...updated } : entry))
-}
+const LIST_COLUMN_CLASS = 'w-full lg:w-[280px] lg:shrink-0'
 
 export function InboxPage() {
-  const [conversations, setConversations] = useState<Conversation[]>([])
-  const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [messages, setMessages] = useState<Message[]>([])
   const [platformFilter, setPlatformFilter] = useState<InboxPlatformFilter>('all')
-  const [nextCursor, setNextCursor] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [loadingMore, setLoadingMore] = useState(false)
-  const [loadingMessages, setLoadingMessages] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [conversations, setConversations] = useState<ConversationListItem[]>([])
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null)
+  const [activeConversation, setActiveConversation] = useState<Conversation | null>(null)
+  const [participants, setParticipants] = useState<Participant[]>([])
+  const [messages, setMessages] = useState<Message[]>([])
+  const [listLoading, setListLoading] = useState(true)
+  const [threadLoading, setThreadLoading] = useState(false)
+  const [sending, setSending] = useState(false)
   const [integrationsRequired, setIntegrationsRequired] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [mobileShowThread, setMobileShowThread] = useState(false)
 
-  const selectedConversation =
-    conversations.find((conversation) => conversation.id === selectedId) ?? null
+  const loadConversations = useCallback(async (filter: InboxPlatformFilter) => {
+    setListLoading(true)
+    setError(null)
+    setIntegrationsRequired(false)
 
-  const loadConversations = useCallback(
-    async (options: { append?: boolean; cursor?: string } = {}) => {
-      setError(null)
-      setIntegrationsRequired(false)
-
-      try {
-        const result = await InboxService.listInbox({
-          limit: 20,
-          cursor: options.cursor,
-          platform: platformFilter === 'all' ? undefined : platformFilter,
-        })
-
-        setConversations((current) =>
-          options.append ? [...current, ...result.conversations] : result.conversations,
-        )
-        setNextCursor(result.page.nextCursor)
-      } catch (err) {
-        if (isIntegrationsRequiredError(err)) {
-          setIntegrationsRequired(true)
-          return
-        }
-
-        setError(getApiErrorMessage(err, 'Could not load inbox. Please try again.'))
-      }
-    },
-    [platformFilter],
-  )
-
-  useEffect(() => {
-    let cancelled = false
-    setLoading(true)
-    setSelectedId(null)
-    setMobileShowThread(false)
-
-    void loadConversations().finally(() => {
-      if (!cancelled) {
-        setLoading(false)
-      }
-    })
-
-    return () => {
-      cancelled = true
-    }
-  }, [loadConversations])
-
-  useEffect(() => {
-    if (selectedId === null) {
-      setMessages([])
-      return
-    }
-
-    let cancelled = false
-    setLoadingMessages(true)
-
-    void InboxService.listMessages(selectedId, { limit: 50 })
-      .then((result) => {
-        if (!cancelled) {
-          setMessages(result.messages)
-        }
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          setError(getApiErrorMessage(err, 'Could not load messages.'))
-        }
-      })
-      .finally(() => {
-        if (!cancelled) {
-          setLoadingMessages(false)
-        }
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [selectedId])
-
-  const handleSelectConversation = (conversation: Conversation) => {
-    setSelectedId(conversation.id)
-    setMobileShowThread(true)
-
-    void InboxService.getConversation(conversation.id)
-      .then(({ conversation: full }) => {
-        setConversations((current) => upsertConversation(current, full))
-      })
-      .catch(() => {
-        /* list entry is enough */
-      })
-  }
-
-  const handleMessageSent = (message: Message) => {
-    setMessages((current) => [message, ...current])
-    void loadConversations()
-  }
-
-  const handleLoadMore = async () => {
-    if (nextCursor === null || loadingMore) {
-      return
-    }
-
-    setLoadingMore(true)
     try {
-      await loadConversations({ append: true, cursor: nextCursor })
+      const result = await InboxService.listConversations({
+        platform: filter === 'all' ? undefined : filter,
+      })
+      setConversations(result.conversations)
+    } catch (err) {
+      if (getApiErrorCode(err) === 'INTEGRATIONS_REQUIRED') {
+        setIntegrationsRequired(true)
+        setConversations([])
+        return
+      }
+
+      setError(getApiErrorMessage(err, 'Could not load conversations. Please try again.'))
+      setConversations([])
     } finally {
-      setLoadingMore(false)
+      setListLoading(false)
+    }
+  }, [])
+
+  const loadConversation = useCallback(async (conversationId: string) => {
+    setThreadLoading(true)
+    setError(null)
+
+    try {
+      const result = await InboxService.getConversation(conversationId)
+      setActiveConversation(result.conversation)
+      setParticipants(result.participants)
+      setMessages(result.messages)
+    } catch (err) {
+      if (getApiErrorCode(err) === 'INTEGRATIONS_REQUIRED') {
+        setIntegrationsRequired(true)
+        return
+      }
+
+      setError(getApiErrorMessage(err, 'Could not load conversation. Please try again.'))
+      setActiveConversation(null)
+      setParticipants([])
+      setMessages([])
+    } finally {
+      setThreadLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    setSelectedConversationId(null)
+    setActiveConversation(null)
+    setParticipants([])
+    setMessages([])
+    setMobileShowThread(false)
+    void loadConversations(platformFilter)
+  }, [loadConversations, platformFilter])
+
+  useEffect(() => {
+    if (selectedConversationId === null) {
+      return
+    }
+
+    void loadConversation(selectedConversationId)
+  }, [loadConversation, selectedConversationId])
+
+  const handleSelectConversation = (conversation: ConversationListItem) => {
+    setThreadLoading(true)
+    setSelectedConversationId(conversation.id)
+    setMobileShowThread(true)
+  }
+
+  const handleSendMessage = async (content: string) => {
+    if (selectedConversationId === null) {
+      return
+    }
+
+    setSending(true)
+    setError(null)
+
+    try {
+      const result = await InboxService.sendMessage(selectedConversationId, { content })
+      setMessages((current) => [...current, result.message])
+      setConversations((current) =>
+        current.map((item) =>
+          item.id === selectedConversationId
+            ? {
+                ...item,
+                lastMessage: result.message.content,
+                lastMessageAt: result.message.createdAt,
+              }
+            : item,
+        ),
+      )
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Could not send message. Please try again.'))
+    } finally {
+      setSending(false)
     }
   }
 
-  if (loading) {
-    return <SpinnerSection label="Loading inbox..." minHeightClassName="min-h-[50vh]" />
-  }
+  const selectedListItem =
+    selectedConversationId !== null
+      ? conversations.find((item) => item.id === selectedConversationId)
+      : undefined
 
   if (integrationsRequired) {
-    return (
-      <div className="mx-auto max-w-lg rounded-xl border border-neutral-200 bg-white p-8 text-center shadow-sm">
-        <h1 className="text-xl font-semibold text-neutral-900">Connect a platform first</h1>
-        <p className="mt-2 text-sm text-neutral-600">
-          Inbox is available after you connect at least one integration (WhatsApp, Instagram, or
-          IndiaMART).
-        </p>
-        <Link
-          to="/integrations"
-          className="mt-6 inline-flex rounded-lg bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-neutral-800"
-        >
-          Go to Integrations
-        </Link>
-      </div>
-    )
+    return <IntegrationsRequired />
   }
 
   return (
-    <div className="mx-auto flex h-[calc(100vh-7rem)] max-w-6xl flex-col">
-      <div className="mb-4 shrink-0">
-        <h1 className="text-2xl font-semibold text-neutral-900">Inbox</h1>
-        <p className="mt-1 text-sm text-neutral-600">
-          Conversations from your connected channels in one place.
-        </p>
-      </div>
-
+    <div className="flex h-[calc(100vh-7rem)] flex-col">
       {error !== null && (
-        <p className="mb-4 shrink-0 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <p className="mb-3 shrink-0 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </p>
       )}
 
-      <div className="min-h-0 flex-1 overflow-hidden rounded-xl border border-neutral-200 shadow-sm">
-        <div className="grid h-full grid-cols-1 lg:grid-cols-[320px_1fr]">
-          <div className={mobileShowThread ? 'hidden lg:block' : 'block h-full min-h-0'}>
-            <ConversationList
-              conversations={conversations}
-              selectedId={selectedId}
-              loading={loading}
-              loadingMore={loadingMore}
-              hasMore={nextCursor !== null}
-              platformFilter={platformFilter}
-              onPlatformFilterChange={setPlatformFilter}
-              onSelect={handleSelectConversation}
-              onLoadMore={() => void handleLoadMore()}
-            />
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
+        <div className="flex shrink-0 border-b border-neutral-200">
+          <div
+            className={[
+              LIST_COLUMN_CLASS,
+              'flex w-full items-center border-neutral-200 px-3 py-2.5 lg:border-r',
+              mobileShowThread ? 'hidden lg:flex' : 'flex',
+            ].join(' ')}
+          >
+            <PlatformTabs value={platformFilter} onChange={setPlatformFilter} />
           </div>
 
-          <div className={mobileShowThread ? 'block h-full min-h-0' : 'hidden lg:block'}>
-            <MessageThread
-              conversation={selectedConversation}
-              messages={messages}
-              loadingMessages={loadingMessages}
+          <div
+            className={[
+              'flex min-w-0 flex-1 items-center px-4 py-2.5',
+              mobileShowThread ? 'flex' : 'hidden lg:flex',
+            ].join(' ')}
+          >
+            <ConversationThreadHeader
+              conversation={activeConversation}
+              participants={participants}
+              pendingContact={
+                threadLoading && selectedListItem !== undefined
+                  ? {
+                      displayName: selectedListItem.displayName,
+                      avatarUrl: selectedListItem.avatarUrl,
+                    }
+                  : null
+              }
               onBack={() => setMobileShowThread(false)}
-              onMessageSent={handleMessageSent}
             />
           </div>
+        </div>
+
+        <div className="flex min-h-0 flex-1">
+          <section
+            className={[
+              LIST_COLUMN_CLASS,
+              'flex min-h-0 flex-col border-neutral-200 lg:border-r',
+              mobileShowThread ? 'hidden lg:flex' : 'flex',
+            ].join(' ')}
+          >
+            {listLoading ? (
+              <div className="flex flex-1 items-center justify-center py-16">
+                <Spinner />
+              </div>
+            ) : (
+              <ConversationList
+                conversations={conversations}
+                selectedId={selectedConversationId}
+                onSelect={handleSelectConversation}
+              />
+            )}
+          </section>
+
+          <section
+            className={[
+              'flex min-h-0 min-w-0 flex-1 flex-col',
+              mobileShowThread ? 'flex' : 'hidden lg:flex',
+            ].join(' ')}
+          >
+            <ConversationThread
+              conversation={activeConversation}
+              messages={messages}
+              loading={threadLoading}
+            />
+            <MessageComposer
+              disabled={selectedConversationId === null || threadLoading}
+              sending={sending}
+              onSend={handleSendMessage}
+            />
+          </section>
         </div>
       </div>
     </div>

@@ -1,5 +1,7 @@
 import api from '@/shared/api/client'
 
+import type { SubscriptionDetails } from '@/shared/services/subscription.service'
+
 export interface AuthFormData {
   email: string
   password: string
@@ -16,12 +18,10 @@ interface AuthApiResponse {
     name: string
     plan: string
   }
-  subscription: {
-    status: string
-    trialEndsAt: string | null
-  }
+  subscription: SubscriptionDetails
   businessDetails: {
     completed: boolean
+    completedAt: string | null
   }
 }
 
@@ -30,12 +30,8 @@ export interface AuthSession {
   refreshToken: string
   expiresIn: number
   organization: AuthApiResponse['organization']
-  subscription: AuthApiResponse['subscription']
+  subscription: SubscriptionDetails
   businessDetails: AuthApiResponse['businessDetails']
-}
-
-function toAuthSession(data: AuthApiResponse): AuthSession {
-  return data
 }
 
 export interface LoginRequest {
@@ -55,19 +51,19 @@ const BUSINESS_DETAILS_COMPLETED_KEY = 'businessDetailsCompleted'
 
 export interface MeResponse {
   organization: AuthSession['organization']
-  subscription: AuthSession['subscription']
+  subscription: SubscriptionDetails
   businessDetails: AuthSession['businessDetails']
 }
 
 export class AuthService {
   static async login(data: LoginRequest): Promise<AuthSession> {
     const response = await api.post<AuthApiResponse>('/auth/login', data)
-    return toAuthSession(response.data)
+    return response.data
   }
 
   static async register(data: RegisterRequest): Promise<AuthSession> {
     const response = await api.post<AuthApiResponse>('/auth/register', data)
-    return toAuthSession(response.data)
+    return response.data
   }
 
   static async getMe(): Promise<MeResponse> {
@@ -106,11 +102,11 @@ export class AuthService {
     }
   }
 
-  static getStoredSubscription(): AuthSession['subscription'] | null {
+  static getStoredSubscription(): SubscriptionDetails | null {
     const raw = localStorage.getItem(SUBSCRIPTION_STORAGE_KEY)
     if (!raw) return null
     try {
-      return JSON.parse(raw) as AuthSession['subscription']
+      return JSON.parse(raw) as SubscriptionDetails
     } catch {
       return null
     }
@@ -124,12 +120,8 @@ export class AuthService {
     localStorage.removeItem(BUSINESS_DETAILS_COMPLETED_KEY)
   }
 
-  static getAccessToken(): string | null {
-    return localStorage.getItem('accessToken')
-  }
-
   static isAuthenticated(): boolean {
-    return !!this.getAccessToken()
+    return localStorage.getItem('accessToken') !== null
   }
 }
 

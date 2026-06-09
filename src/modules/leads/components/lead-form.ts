@@ -31,10 +31,3 @@ export function emptyLeadFormValues(status: LeadStatus = 'new'): LeadFormValues 
     status,
   }
 }
-
-export function formatLeadSource(source: string): string {
-  if (source === 'manual') {
-    return 'Manual'
-  }
-  return source.charAt(0).toUpperCase() + source.slice(1)
-}

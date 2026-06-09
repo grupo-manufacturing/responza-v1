@@ -1,119 +1,93 @@
 import api from '@/shared/api/client'
 
-import type { InboxPlatform } from '@/shared/constants/inbox'
+import type { IntegrationPlatform } from '@/shared/constants/integrations'
+import type { MessageDirection } from '@/shared/constants/inbox'
 
-export interface MessageSnippet {
+export interface ConversationListItem {
   id: string
-  direction: 'inbound' | 'outbound'
-  contentType: string
-  body: string | null
-  status: string
-  createdAt: string
-}
-
-export interface Participant {
-  id: string
-  conversationId: string
-  platformUserId: string
-  displayName: string | null
+  organizationId: string
+  channelId: string
+  platform: IntegrationPlatform
+  channelDisplayName: string
+  externalId: string
+  displayName: string
   avatarUrl: string | null
-  metadata: Record<string, unknown>
-  firstMessageAt: string | null
-  lastMessageAt: string | null
+  lastMessage: string | null
+  lastMessageAt: string
   createdAt: string
-  updatedAt: string
 }
 
 export interface Conversation {
   id: string
   organizationId: string
   channelId: string
-  platform: InboxPlatform | null
   externalId: string
-  lastMessageAt: string | null
-  unreadCount: number
-  metadata: Record<string, unknown>
+  lastMessageAt: string
   createdAt: string
-  updatedAt: string
-  participants?: Participant[]
-  latestMessage?: MessageSnippet | null
+}
+
+export interface Participant {
+  id: string
+  organizationId: string
+  conversationId: string
+  platformUserId: string
+  displayName: string
+  avatarUrl: string | null
+  createdAt: string
 }
 
 export interface Message {
   id: string
+  organizationId: string
   conversationId: string
   participantId: string | null
-  direction: 'inbound' | 'outbound'
+  direction: MessageDirection
   platformMessageId: string | null
-  contentType: string
-  body: string | null
-  fileUrl: string | null
-  metadata: Record<string, unknown>
-  status: string
+  content: string
+  status: 'pending' | 'sent' | 'failed'
   createdAt: string
-  updatedAt: string
 }
 
-export interface ListInboxParams {
-  limit?: number
-  cursor?: string
-  platform?: InboxPlatform
+export interface ListConversationsParams {
+  platform?: IntegrationPlatform
 }
 
-export interface ListInboxResponse {
-  conversations: Conversation[]
-  page: {
-    nextCursor: string | null
-    limit: number
-  }
+export interface ListConversationsResponse {
+  conversations: ConversationListItem[]
 }
 
-export interface ListMessagesParams {
-  limit?: number
-  cursor?: string
-  direction?: 'inbound' | 'outbound'
-}
-
-export interface ListMessagesResponse {
+export interface ConversationDetailResponse {
+  conversation: Conversation
+  participants: Participant[]
   messages: Message[]
-  page: {
-    nextCursor: string | null
-    limit: number
-  }
 }
 
-export interface CreateMessagePayload {
-  body?: string
-  contentType?: 'text' | 'image' | 'video' | 'audio' | 'document'
-  fileUrl?: string
+export interface SendMessagePayload {
+  content: string
+}
+
+export interface SendMessageResponse {
+  message: Message
 }
 
 export class InboxService {
-  static async listInbox(params: ListInboxParams = {}): Promise<ListInboxResponse> {
-    const response = await api.get<ListInboxResponse>('/inbox', { params })
+  static async listConversations(
+    params: ListConversationsParams = {},
+  ): Promise<ListConversationsResponse> {
+    const response = await api.get<ListConversationsResponse>('/inbox', { params })
     return response.data
   }
 
-  static async getConversation(id: string): Promise<{ conversation: Conversation }> {
-    const response = await api.get<{ conversation: Conversation }>(`/conversations/${id}`)
-    return response.data
-  }
-
-  static async listMessages(
-    conversationId: string,
-    params: ListMessagesParams = {},
-  ): Promise<ListMessagesResponse> {
-    const response = await api.get<ListMessagesResponse>(`/conversations/${conversationId}/messages`, {
-      params,
-    })
+  static async getConversation(id: string): Promise<ConversationDetailResponse> {
+    const response = await api.get<ConversationDetailResponse>(`/conversations/${id}`)
     return response.data
   }
 
   static async sendMessage(
     conversationId: string,
-    payload: CreateMessagePayload,
-  ): Promise<{ message: Message }> {
-    const response = await api.post<{ message: Message }>(
+    payload: SendMessagePayload,
+  ): Promise<SendMessageResponse> {
+    const response = await api.post<SendMessageResponse>(
       `/conversations/${conversationId}/messages`,
       payload,
     )

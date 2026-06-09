@@ -5,31 +5,21 @@ import type { LeadStatus } from '@/shared/constants/leads'
 export interface Lead {
   id: string
   organizationId: string
-  conversationId: string | null
-  assignedTo: string | null
   name: string
   email: string | null
   phone: string | null
   notes: string | null
-  source: string
   status: LeadStatus
-  metadata: Record<string, unknown>
   createdAt: string
   updatedAt: string
 }
 
 export interface ListLeadsParams {
-  limit?: number
-  cursor?: string
   status?: LeadStatus
 }
 
 export interface ListLeadsResponse {
   leads: Lead[]
-  page: {
-    nextCursor: string | null
-    limit: number
-  }
 }
 
 export interface LeadResponse {
@@ -42,7 +32,6 @@ export interface CreateLeadPayload {
   phone?: string
   notes?: string
   status?: LeadStatus
-  metadata?: Record<string, unknown>
 }
 
 export interface UpdateLeadPayload {
@@ -51,17 +40,11 @@ export interface UpdateLeadPayload {
   phone?: string
   notes?: string
   status?: LeadStatus
-  metadata?: Record<string, unknown>
 }
 
 export class LeadsService {
   static async listLeads(params: ListLeadsParams = {}): Promise<ListLeadsResponse> {
     const response = await api.get<ListLeadsResponse>('/leads', { params })
-    return response.data
-  }
-
-  static async getLead(id: string): Promise<LeadResponse> {
-    const response = await api.get<LeadResponse>(`/leads/${id}`)
     return response.data
   }
 

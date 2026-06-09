@@ -15,14 +15,14 @@ const BusinessDetailsPanel = lazy(() =>
 const DashboardPage = lazy(() =>
   import('@/modules/dashboard/pages/DashboardPage').then((m) => ({ default: m.DashboardPage })),
 )
-const IntegrationsPage = lazy(() =>
-  import('@/modules/integrations/pages/IntegrationsPage').then((m) => ({ default: m.IntegrationsPage })),
+const LeadsPage = lazy(() =>
+  import('@/modules/leads/pages/LeadsPage').then((m) => ({ default: m.LeadsPage })),
 )
 const InboxPage = lazy(() =>
   import('@/modules/inbox/pages/InboxPage').then((m) => ({ default: m.InboxPage })),
 )
-const LeadsPage = lazy(() =>
-  import('@/modules/leads/pages/LeadsPage').then((m) => ({ default: m.LeadsPage })),
+const IntegrationsPage = lazy(() =>
+  import('@/modules/integrations/pages/IntegrationsPage').then((m) => ({ default: m.IntegrationsPage })),
 )
 const SettingsPage = lazy(() =>
   import('@/modules/settings/pages/SettingsPage').then((m) => ({ default: m.SettingsPage })),
@@ -50,10 +50,8 @@ export const router = createBrowserRouter([
         element: <AppLayout />,
         children: [
           { path: '/dashboard', element: <DashboardPage /> },
-          { path: '/inbox', element: <InboxPage /> },
           { path: '/leads', element: <LeadsPage /> },
-          { path: '/leads/new', element: <Navigate to="/leads" replace /> },
-          { path: '/leads/:id', element: <Navigate to="/leads" replace /> },
+          { path: '/inbox', element: <InboxPage /> },
           { path: '/integrations', element: <IntegrationsPage /> },
           { path: '/settings', element: <SettingsPage /> },
         ],

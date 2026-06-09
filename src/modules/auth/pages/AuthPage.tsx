@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import { Spinner } from '@/components/ui/Spinner'
 import AuthService, { type AuthFormData } from '@/shared/services/auth.service'
+import { getApiErrorMessage } from '@/shared/utils/api-error'
 
 const inputClassName =
   'w-full rounded-lg border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition-all duration-200 placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-2 focus:ring-neutral-900/10'
@@ -50,11 +51,7 @@ export function AuthPage() {
         navigate(from, { replace: true })
       }
     } catch (err: unknown) {
-      const message =
-        err && typeof err === 'object' && 'response' in err
-          ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
-          : undefined
-      setError(message ?? 'Something went wrong. Please try again.')
+      setError(getApiErrorMessage(err, 'Something went wrong. Please try again.'))
     } finally {
       setIsLoading(false)
     }
@@ -100,7 +97,7 @@ export function AuthPage() {
             )}
           </h1>
           <p className="mt-1 text-sm text-neutral-500">
-            {isLogin ? 'Pick up where you left off.' : 'One inbox for every customer conversation.'}
+            {isLogin ? 'Pick up where you left off.' : 'Start managing your sales leads in one place.'}
           </p>
         </div>
 
