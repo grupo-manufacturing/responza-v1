@@ -251,7 +251,6 @@ export function IntegrationsPage() {
         const oauth = await startInstagramOAuth()
         const result = await IntegrationsService.connectIntegration(platform, {
           code: oauth.code,
-          // session_info is not needed for Instagram as backend fetches user info
         })
         setIntegrations((current) => upsertIntegration(current, result.integration))
         setInstagramDetails(result.instagram ?? null)

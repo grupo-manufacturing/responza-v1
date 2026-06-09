@@ -4,29 +4,8 @@ import {
   isInstagramOAuthConfigured,
 } from '@/shared/config/meta'
 
-export type InstagramSessionInfo = {
-  business_account_id: string
-  user_id: string
-  username?: string
-}
-
-type InstagramUserResponse = {
-  id: string
-  username?: string
-  account_type?: string
-  media_count?: number
-}
-
-type InstagramBusinessAccountsResponse = {
-  data: Array<{
-    id: string
-    name?: string
-    username?: string
-  }>
-}
-
 let oauthPopup: Window | null = null
-let oauthResolve: ((result: { code: string; sessionInfo: InstagramSessionInfo }) => void) | null = null
+let oauthResolve: ((result: { code: string }) => void) | null = null
 let oauthReject: ((error: Error) => void) | null = null
 
 function bindInstagramOAuthListener(): void {
@@ -39,14 +18,7 @@ function bindInstagramOAuthListener(): void {
       const payload = typeof event.data === 'object' ? event.data : null
       if (payload?.type === 'INSTAGRAM_OAUTH_SUCCESS') {
         if (oauthResolve) {
-          oauthResolve({
-            code: payload.code,
-            sessionInfo: {
-              business_account_id: '',
-              user_id: '',
-              username: ''
-            }
-          })
+          oauthResolve({ code: payload.code })
           oauthResolve = null
           oauthReject = null
         }
@@ -63,51 +35,7 @@ function bindInstagramOAuthListener(): void {
   })
 }
 
-async function fetchInstagramUserInfo(accessToken: string): Promise<InstagramSessionInfo> {
-  // Get basic user info
-  const userResponse = await fetch(`https://graph.instagram.com/me?fields=id,username,account_type&access_token=${accessToken}`)
-  
-  if (!userResponse.ok) {
-    throw new Error('Failed to fetch Instagram user info')
-  }
-  
-  const user: InstagramUserResponse = await userResponse.json()
-  
-  // For Instagram Business accounts, try to get business account info
-  let businessAccountId = user.id
-  
-  if (user.account_type === 'BUSINESS') {
-    try {
-      // Try to get Instagram business accounts
-      const businessResponse = await fetch(`https://graph.facebook.com/v25.0/me/accounts?fields=instagram_business_account&access_token=${accessToken}`)
-      
-      if (businessResponse.ok) {
-        const businessData: InstagramBusinessAccountsResponse = await businessResponse.json()
-        
-        // Find the business account that matches our user
-        for (const account of businessData.data) {
-          if (account.id) {
-            businessAccountId = account.id
-            break
-          }
-        }
-      }
-    } catch {
-      // Fall back to using the user ID as business account ID
-    }
-  }
-  
-  return {
-    business_account_id: businessAccountId,
-    user_id: user.id,
-    username: user.username
-  }
-}
-
-export async function startInstagramOAuth(): Promise<{
-  code: string
-  sessionInfo: InstagramSessionInfo
-}> {
+export async function startInstagramOAuth(): Promise<{ code: string }> {
   if (!isInstagramOAuthConfigured()) {
     throw new Error('Instagram OAuth is not configured for this app')
   }

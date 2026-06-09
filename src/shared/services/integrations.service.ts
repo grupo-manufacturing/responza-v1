@@ -31,7 +31,7 @@ export interface ConnectWhatsAppPayload {
 
 export interface ConnectInstagramPayload {
   code: string
-  session_info: {
+  session_info?: {
     business_account_id: string
     user_id: string
     username?: string
