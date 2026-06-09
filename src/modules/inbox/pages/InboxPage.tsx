@@ -224,7 +224,6 @@ export function InboxPage() {
             <ConversationThreadHeader
               conversation={activeConversation}
               participants={participants}
-              platform={activePlatform}
               pendingContact={
                 threadLoading && selectedListItem !== undefined
                   ? {

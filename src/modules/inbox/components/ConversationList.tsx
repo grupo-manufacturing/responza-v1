@@ -1,6 +1,5 @@
 import { ContactAvatar } from '@/modules/inbox/components/ContactAvatar'
 import { InboxEmptyState } from '@/modules/inbox/components/InboxEmptyState'
-import { PlatformBadge } from '@/modules/inbox/components/PlatformBadge'
 import { formatInboxTimestamp } from '@/shared/constants/inbox'
 import type { ConversationListItem } from '@/shared/services/inbox.service'
 
@@ -39,12 +38,9 @@ export function ConversationList({ conversations, selectedId, onSelect }: Conver
 
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <div className="flex min-w-0 items-center gap-2">
-                    <p className="truncate text-sm font-medium text-neutral-900">
-                      {conversation.displayName}
-                    </p>
-                    <PlatformBadge platform={conversation.platform} />
-                  </div>
+                  <p className="truncate text-sm font-medium text-neutral-900">
+                    {conversation.displayName}
+                  </p>
                   <span className="shrink-0 text-xs text-neutral-500">
                     {formatInboxTimestamp(conversation.lastMessageAt)}
                   </span>

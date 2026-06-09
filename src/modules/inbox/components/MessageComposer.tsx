@@ -1,7 +1,6 @@
 import { useState } from 'react'
 
 import { Spinner } from '@/components/ui/Spinner'
-import { inboxPlatformLabel } from '@/shared/constants/inbox'
 import type { IntegrationPlatform } from '@/shared/constants/integrations'
 
 type MessageComposerProps = {
@@ -30,13 +29,9 @@ function SendIcon() {
   )
 }
 
-function composerPlaceholder(disabled: boolean, platform: IntegrationPlatform | null | undefined): string {
+function composerPlaceholder(disabled: boolean): string {
   if (disabled) {
     return 'Select a conversation to reply'
-  }
-
-  if (platform !== null && platform !== undefined) {
-    return `Message on ${inboxPlatformLabel(platform)}…`
   }
 
   return 'Type a message…'
@@ -87,7 +82,7 @@ export function MessageComposer({ disabled, sending, platform = null, onSend }: 
         <textarea
           value={content}
           onChange={(event) => setContent(event.target.value)}
-          placeholder={composerPlaceholder(disabled, platform)}
+          placeholder={composerPlaceholder(disabled)}
           disabled={disabled || sending}
           rows={1}
           className="min-h-[36px] max-h-28 flex-1 resize-none border-0 bg-transparent py-1.5 text-sm text-neutral-900 outline-none placeholder:text-neutral-400 disabled:cursor-not-allowed"
