@@ -3,7 +3,11 @@ import { useCallback, useEffect, useState } from 'react'
 import { Spinner } from '@/components/ui/Spinner'
 import { startWhatsAppEmbeddedSignup } from '@/modules/integrations/lib/whatsappEmbeddedSignup'
 import { startInstagramOAuth } from '@/modules/integrations/lib/instagramOAuth'
-import { isWhatsAppEmbeddedSignupConfigured, isInstagramOAuthConfigured } from '@/shared/config/meta'
+import {
+  getInstagramRedirectUri,
+  isWhatsAppEmbeddedSignupConfigured,
+  isInstagramOAuthConfigured,
+} from '@/shared/config/meta'
 import {
   INTEGRATION_PLATFORM_DESCRIPTIONS,
   INTEGRATION_PLATFORM_LOGOS,
@@ -249,8 +253,10 @@ export function IntegrationsPage() {
         }
 
         const oauth = await startInstagramOAuth()
+        const redirectUri = getInstagramRedirectUri()
         const result = await IntegrationsService.connectIntegration(platform, {
           code: oauth.code,
+          redirect_uri: redirectUri,
         })
         setIntegrations((current) => upsertIntegration(current, result.integration))
         setInstagramDetails(result.instagram ?? null)
