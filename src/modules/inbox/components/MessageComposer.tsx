@@ -1,10 +1,6 @@
 import { useState } from 'react'
 
 import { Spinner } from '@/components/ui/Spinner'
-import {
-  composerFocusRingClass,
-  composerSendButtonClass,
-} from '@/modules/inbox/lib/inboxPlatformUi'
 import type { IntegrationPlatform } from '@/shared/constants/integrations'
 
 type MessageComposerProps = {
@@ -41,6 +37,18 @@ function composerPlaceholder(disabled: boolean): string {
   return 'Type a message…'
 }
 
+function sendButtonClass(canSend: boolean, platform: IntegrationPlatform | null | undefined): string {
+  if (!canSend) {
+    return 'bg-neutral-200 text-neutral-400'
+  }
+
+  if (platform === 'whatsapp') {
+    return 'bg-[#128C7E] text-white hover:bg-[#0f7a6d]'
+  }
+
+  return 'bg-neutral-900 text-white hover:bg-neutral-800'
+}
+
 export function MessageComposer({ disabled, sending, platform = null, onSend }: MessageComposerProps) {
   const [content, setContent] = useState('')
   const canSend = !disabled && !sending && content.trim().length > 0
@@ -66,9 +74,9 @@ export function MessageComposer({ disabled, sending, platform = null, onSend }: 
     >
       <div
         className={[
-          'flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-1.5 transition-colors',
+          'flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-1.5 transition-colors focus-within:border-neutral-900',
           disabled || sending ? 'bg-neutral-50' : '',
-          composerFocusRingClass(platform),
+          platform === 'whatsapp' ? 'focus-within:border-[#128C7E]' : '',
         ].join(' ')}
       >
         <textarea
@@ -85,7 +93,7 @@ export function MessageComposer({ disabled, sending, platform = null, onSend }: 
           aria-label={sending ? 'Sending message' : 'Send message'}
           className={[
             'inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors',
-            composerSendButtonClass(canSend, platform),
+            sendButtonClass(canSend, platform),
             'disabled:cursor-not-allowed',
           ].join(' ')}
         >

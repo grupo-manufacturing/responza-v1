@@ -14,19 +14,6 @@ function collapsePathSlashes(url: string): string {
   return origin + path.replace(/\/{2,}/g, '/')
 }
 
-export function getBackendOrigin(): string {
-  const configured = import.meta.env.VITE_API_URL?.trim() ?? ''
-  if (configured.length > 0) {
-    try {
-      return new URL(configured).origin
-    } catch {
-      // fall through to local default
-    }
-  }
-
-  return 'http://localhost:4000'
-}
-
 export function getApiBaseUrl(): string {
   const configured = import.meta.env.VITE_API_URL?.trim() ?? ''
   if (configured.length === 0) {

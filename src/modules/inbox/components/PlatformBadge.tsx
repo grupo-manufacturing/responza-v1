@@ -23,11 +23,7 @@ export function PlatformBadge({ platform, size = 'sm', showLabel = false }: Plat
     <span
       className={[
         'inline-flex items-center gap-1.5',
-        platform === 'whatsapp'
-          ? 'text-[#128C7E]'
-          : platform === 'instagram'
-            ? 'text-[#E1306C]'
-            : 'text-neutral-600',
+        platform === 'whatsapp' ? 'text-[#128C7E]' : 'text-neutral-600',
       ].join(' ')}
       title={label}
     >

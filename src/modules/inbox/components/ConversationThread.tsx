@@ -1,5 +1,4 @@
 import { Spinner } from '@/components/ui/Spinner'
-import { outboundBubbleClass, outboundMetaClass } from '@/modules/inbox/lib/inboxPlatformUi'
 import { formatInboxTimestamp } from '@/shared/constants/inbox'
 import type { IntegrationPlatform } from '@/shared/constants/integrations'
 import type { Conversation, Message } from '@/shared/services/inbox.service'
@@ -11,6 +10,22 @@ type ConversationThreadProps = {
   readonly messages: Message[]
   readonly loading: boolean
   readonly platform?: IntegrationPlatform | null
+}
+
+function outboundBubbleClass(platform: IntegrationPlatform | null | undefined): string {
+  if (platform === 'whatsapp') {
+    return 'bg-[#DCF8C6] text-neutral-900'
+  }
+
+  return 'bg-neutral-900 text-white'
+}
+
+function outboundMetaClass(platform: IntegrationPlatform | null | undefined): string {
+  if (platform === 'whatsapp') {
+    return 'text-neutral-500'
+  }
+
+  return 'text-neutral-300'
 }
 
 function messageStatusLabel(status: Message['status']): string | null {
@@ -82,15 +97,7 @@ export function ConversationThread({
                       ].join(' ')}
                     >
                       {statusLabel !== null && (
-                        <span
-                          className={
-                            message.status === 'failed'
-                              ? 'font-medium text-red-600'
-                              : platform === 'instagram' && isOutbound
-                                ? 'text-white/90'
-                                : ''
-                          }
-                        >
+                        <span className={message.status === 'failed' ? 'font-medium text-red-600' : ''}>
                           {statusLabel}
                         </span>
                       )}

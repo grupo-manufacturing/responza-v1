@@ -1,38 +1,23 @@
 import { ContactAvatar } from '@/modules/inbox/components/ContactAvatar'
 import { InboxEmptyState } from '@/modules/inbox/components/InboxEmptyState'
-import {
-  conversationListSelectedBorderClass,
-  formatInboxContactDisplayName,
-} from '@/modules/inbox/lib/contactDisplay'
-import type { InboxPlatformFilter } from '@/shared/constants/inbox'
 import { formatInboxTimestamp } from '@/shared/constants/inbox'
 import type { ConversationListItem } from '@/shared/services/inbox.service'
 
 type ConversationListProps = {
   readonly conversations: ConversationListItem[]
   readonly selectedId: string | null
-  readonly platformFilter?: InboxPlatformFilter
   readonly onSelect: (conversation: ConversationListItem) => void
 }
 
-export function ConversationList({
-  conversations,
-  selectedId,
-  platformFilter = 'all',
-  onSelect,
-}: ConversationListProps) {
+export function ConversationList({ conversations, selectedId, onSelect }: ConversationListProps) {
   if (conversations.length === 0) {
-    return <InboxEmptyState platformFilter={platformFilter} />
+    return <InboxEmptyState />
   }
 
   return (
     <ul className="divide-y divide-neutral-100 overflow-y-auto">
       {conversations.map((conversation) => {
         const isSelected = conversation.id === selectedId
-        const contactName = formatInboxContactDisplayName(
-          conversation.platform,
-          conversation.displayName,
-        )
 
         return (
           <li key={conversation.id}>
@@ -42,18 +27,20 @@ export function ConversationList({
               className={[
                 'flex w-full items-start gap-3 px-4 py-3 text-left transition-colors',
                 isSelected ? 'bg-neutral-100' : 'hover:bg-neutral-50',
-                conversationListSelectedBorderClass(conversation.platform, isSelected),
+                conversation.platform === 'whatsapp' && isSelected ? 'border-l-2 border-[#25D366]' : '',
               ].join(' ')}
             >
               <ContactAvatar
-                displayName={contactName}
+                displayName={conversation.displayName}
                 avatarUrl={conversation.avatarUrl}
                 platform={conversation.platform}
               />
 
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="truncate text-sm font-medium text-neutral-900">{contactName}</p>
+                  <p className="truncate text-sm font-medium text-neutral-900">
+                    {conversation.displayName}
+                  </p>
                   <span className="shrink-0 text-xs text-neutral-500">
                     {formatInboxTimestamp(conversation.lastMessageAt)}
                   </span>
