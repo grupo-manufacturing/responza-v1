@@ -1,5 +1,6 @@
 import {
   getInstagramAppId,
+  getInstagramOAuthAllowedOrigins,
   getInstagramRedirectUri,
   isInstagramOAuthConfigured,
 } from '@/shared/config/meta'
@@ -9,8 +10,10 @@ let oauthResolve: ((result: { code: string }) => void) | null = null
 let oauthReject: ((error: Error) => void) | null = null
 
 function bindInstagramOAuthListener(): void {
+  const allowedOrigins = getInstagramOAuthAllowedOrigins()
+
   window.addEventListener('message', (event) => {
-    if (!event.origin || !event.origin.includes(window.location.hostname)) {
+    if (!event.origin || !allowedOrigins.includes(event.origin)) {
       return
     }
 
@@ -47,6 +50,7 @@ export async function startInstagramOAuth(): Promise<{ code: string }> {
   authUrl.searchParams.set('redirect_uri', getInstagramRedirectUri())
   authUrl.searchParams.set('response_type', 'code')
   authUrl.searchParams.set('scope', 'instagram_business_basic,instagram_business_manage_messages')
+  authUrl.searchParams.set('force_reauth', 'true')
 
   return new Promise((resolve, reject) => {
     oauthResolve = resolve
