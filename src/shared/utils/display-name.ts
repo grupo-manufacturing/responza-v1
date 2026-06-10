@@ -1,5 +1,6 @@
 export function displayNameInitials(name: string): string {
-  const parts = name.trim().split(/\s+/).filter((part) => part.length > 0)
+  const normalized = name.trim().replace(/^@/, '')
+  const parts = normalized.split(/\s+/).filter((part) => part.length > 0)
 
   if (parts.length === 0) {
     return '?'
