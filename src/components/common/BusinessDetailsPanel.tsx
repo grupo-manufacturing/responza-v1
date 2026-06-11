@@ -10,12 +10,12 @@ import {
   type CommonConversationTypes,
   type CustomerMessageLanguage,
   type CustomerTone,
-} from '@/shared/constants/business-details'
+} from '@/shared/constants/business'
 import { Spinner, SpinnerOverlay } from '@/components/ui/Spinner'
 import AuthService from '@/shared/services/auth.service'
-import BusinessDetailsService, {
-  type CompleteBusinessDetailsPayload,
-} from '@/shared/services/business-details.service'
+import BusinessService, {
+  type CompleteBusinessPayload,
+} from '@/shared/services/business.service'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
 
 type BusinessDetailsFormData = {
@@ -123,7 +123,7 @@ const STEPS: FormStep[] = [
   },
 ]
 
-function buildCompletePayload(formData: BusinessDetailsFormData): CompleteBusinessDetailsPayload {
+function buildCompletePayload(formData: BusinessDetailsFormData): CompleteBusinessPayload {
   return {
     brandAndProducts: formData.brandAndProducts.trim(),
     customerTone: formData.customerTone as CustomerTone,
@@ -161,7 +161,7 @@ export function BusinessDetailsPanel() {
   useEffect(() => {
     let cancelled = false
 
-    void BusinessDetailsService.getBusinessDetails()
+    void BusinessService.getBusiness()
       .then(({ profile }) => {
         if (cancelled) return
 
@@ -195,7 +195,7 @@ export function BusinessDetailsPanel() {
     setError(null)
 
     try {
-      await BusinessDetailsService.completeBusinessDetails(buildCompletePayload(formData))
+      await BusinessService.completeBusiness(buildCompletePayload(formData))
       AuthService.setBusinessDetailsCompleted(true)
       navigate('/dashboard', { replace: true })
     } catch (err: unknown) {

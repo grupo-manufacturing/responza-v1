@@ -6,7 +6,7 @@ import { AppSidebar } from '@/layouts/AppSidebar'
 import { AppTopbar } from '@/layouts/AppTopbar'
 import { SIDEBAR_COLLAPSED_STORAGE_KEY } from '@/shared/constants/sidebar'
 import AuthService from '@/shared/services/auth.service'
-import BusinessDetailsService from '@/shared/services/business-details.service'
+import BusinessService from '@/shared/services/business.service'
 
 function readSidebarCollapsed(): boolean {
   try {
@@ -37,13 +37,13 @@ export function AppLayout() {
   useEffect(() => {
     let cancelled = false
 
-    void BusinessDetailsService.getBusinessDetails()
+    void BusinessService.getBusiness()
       .then(({ profile }) => {
         if (cancelled) return
 
         if (!profile.completed) {
           AuthService.setBusinessDetailsCompleted(false)
-          navigate('/business-details', { replace: true })
+          navigate('/business', { replace: true })
           return
         }
 
@@ -62,7 +62,7 @@ export function AppLayout() {
   }, [navigate])
 
   if (!AuthService.isBusinessDetailsCompleted()) {
-    return <Navigate to="/business-details" replace />
+    return <Navigate to="/business" replace />
   }
 
   if (!isReady) {

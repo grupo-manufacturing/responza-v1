@@ -74,7 +74,7 @@ export class InboxService {
   static async listConversations(
     params: ListConversationsParams = {},
   ): Promise<ListConversationsResponse> {
-    const response = await api.get<ListConversationsResponse>('/inbox', { params })
+    const response = await api.get<ListConversationsResponse>('/conversations', { params })
     return response.data
   }
 

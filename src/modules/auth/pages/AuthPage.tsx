@@ -22,7 +22,7 @@ export function AuthPage() {
   })
 
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/dashboard'
-  const postAuthPath = AuthService.isBusinessDetailsCompleted() ? from : '/business-details'
+  const postAuthPath = AuthService.isBusinessDetailsCompleted() ? from : '/business'
 
   if (AuthService.isAuthenticated()) {
     return <Navigate to={postAuthPath} replace />
@@ -46,7 +46,7 @@ export function AuthPage() {
       AuthService.saveSessionProfile(response)
 
       if (!response.businessDetails.completed) {
-        navigate('/business-details', { replace: true })
+        navigate('/business', { replace: true })
       } else {
         navigate(from, { replace: true })
       }

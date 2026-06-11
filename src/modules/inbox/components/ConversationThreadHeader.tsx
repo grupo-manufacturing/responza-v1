@@ -1,3 +1,4 @@
+import { ContactAvatar } from '@/modules/inbox/components/ContactAvatar'
 import type { Conversation, Participant } from '@/shared/services/inbox.service'
 
 type PendingContact = {
@@ -12,20 +13,29 @@ type ConversationThreadHeaderProps = {
   readonly onBack?: () => void
 }
 
-function contactDisplayName(
+function resolveContactPresentation(
   participants: Participant[],
   conversation: Conversation | null,
   pendingContact: PendingContact | null | undefined,
-): string {
+): { displayName: string; avatarUrl: string | null } {
   if (participants.length > 0) {
-    return participants[0].displayName
+    return {
+      displayName: participants[0].displayName,
+      avatarUrl: participants[0].avatarUrl,
+    }
   }
 
   if (pendingContact !== null && pendingContact !== undefined) {
-    return pendingContact.displayName
+    return {
+      displayName: pendingContact.displayName,
+      avatarUrl: pendingContact.avatarUrl,
+    }
   }
 
-  return conversation?.externalId ?? 'Select a conversation'
+  return {
+    displayName: conversation?.externalId ?? 'Select a conversation',
+    avatarUrl: null,
+  }
 }
 
 export function ConversationThreadHeader({
@@ -34,7 +44,11 @@ export function ConversationThreadHeader({
   pendingContact,
   onBack,
 }: ConversationThreadHeaderProps) {
-  const displayName = contactDisplayName(participants, conversation, pendingContact)
+  const { displayName, avatarUrl } = resolveContactPresentation(
+    participants,
+    conversation,
+    pendingContact,
+  )
 
   return (
     <div className="flex min-w-0 flex-1 items-center gap-3">
@@ -51,6 +65,7 @@ export function ConversationThreadHeader({
         </button>
       )}
 
+      <ContactAvatar displayName={displayName} avatarUrl={avatarUrl} size="md" />
       <p className="min-w-0 truncate text-base font-bold text-neutral-900">{displayName}</p>
     </div>
   )

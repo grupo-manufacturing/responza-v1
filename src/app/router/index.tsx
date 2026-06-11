@@ -47,8 +47,12 @@ export const router = createBrowserRouter([
     element: <ProtectedRoute />,
     children: [
       {
-        path: '/business-details',
+        path: '/business',
         element: suspense(<BusinessDetailsPanel />, 'Preparing your setup...'),
+      },
+      {
+        path: '/business-details',
+        element: <Navigate to="/business" replace />,
       },
       {
         element: <AppLayout />,

@@ -5,9 +5,9 @@ import type {
   CommonConversationTypes,
   CustomerMessageLanguage,
   CustomerTone,
-} from '@/shared/constants/business-details'
+} from '@/shared/constants/business'
 
-export interface BusinessDetailsProfile {
+export interface BusinessProfile {
   organizationId: string
   brandAndProducts: string | null
   customerTone: CustomerTone | null
@@ -22,7 +22,7 @@ export interface BusinessDetailsProfile {
   updatedAt: string
 }
 
-export interface CompleteBusinessDetailsPayload {
+export interface CompleteBusinessPayload {
   brandAndProducts: string
   customerTone: CustomerTone
   sampleCustomerReply: string
@@ -32,22 +32,20 @@ export interface CompleteBusinessDetailsPayload {
   aiRestrictions: AiRestrictions
 }
 
-export interface BusinessDetailsResponse {
-  profile: BusinessDetailsProfile
+export interface BusinessResponse {
+  profile: BusinessProfile
 }
 
-export class BusinessDetailsService {
-  static async getBusinessDetails(): Promise<BusinessDetailsResponse> {
-    const response = await api.get<BusinessDetailsResponse>('/business-details')
+export class BusinessService {
+  static async getBusiness(): Promise<BusinessResponse> {
+    const response = await api.get<BusinessResponse>('/business')
     return response.data
   }
 
-  static async completeBusinessDetails(
-    data: CompleteBusinessDetailsPayload,
-  ): Promise<BusinessDetailsResponse> {
-    const response = await api.post<BusinessDetailsResponse>('/business-details/complete', data)
+  static async completeBusiness(data: CompleteBusinessPayload): Promise<BusinessResponse> {
+    const response = await api.post<BusinessResponse>('/business/complete', data)
     return response.data
   }
 }
 
-export default BusinessDetailsService
+export default BusinessService
