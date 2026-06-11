@@ -1,22 +1,16 @@
 import { useEffect } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 
-import AuthService from '@/shared/services/auth.service'
+import { loadSession } from '@/shared/hooks/useSession'
+import { SessionStorage } from '@/shared/session/storage'
 
 export function ProtectedRoute() {
   const location = useLocation()
-  const isAuthenticated = AuthService.isAuthenticated()
+  const isAuthenticated = SessionStorage.isAuthenticated()
 
   useEffect(() => {
     if (!isAuthenticated) return
-
-    void AuthService.getMe()
-      .then((me) => {
-        AuthService.saveSessionProfile(me)
-      })
-      .catch(() => {
-        /* 401 handled by API interceptor */
-      })
+    void loadSession()
   }, [isAuthenticated])
 
   if (!isAuthenticated) {

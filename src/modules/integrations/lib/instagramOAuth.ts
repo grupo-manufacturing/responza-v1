@@ -3,7 +3,7 @@ import {
   getInstagramOAuthAllowedOrigins,
   getInstagramRedirectUri,
   isInstagramOAuthConfigured,
-} from '@/shared/config/meta'
+} from '@/shared/config/env'
 
 let oauthPopup: Window | null = null
 let oauthResolve: ((result: { code: string }) => void) | null = null
@@ -33,7 +33,7 @@ function bindInstagramOAuthListener(): void {
         }
       }
     } catch {
-      // ignore malformed messages
+      void 0
     }
   })
 }
@@ -67,7 +67,6 @@ export async function startInstagramOAuth(): Promise<{ code: string }> {
       return
     }
 
-    // Check if popup was closed manually
     const checkClosed = setInterval(() => {
       if (oauthPopup?.closed) {
         clearInterval(checkClosed)
@@ -81,7 +80,6 @@ export async function startInstagramOAuth(): Promise<{ code: string }> {
   })
 }
 
-// This function should be called from the OAuth callback page
 export function handleInstagramOAuthCallback(): void {
   const urlParams = new URLSearchParams(window.location.search)
   const code = urlParams.get('code')
@@ -106,7 +104,6 @@ export function handleInstagramOAuthCallback(): void {
     return
   }
 
-  // For Instagram, we just return the code and let the backend handle user info
   window.opener?.postMessage({
     type: 'INSTAGRAM_OAUTH_SUCCESS',
     code

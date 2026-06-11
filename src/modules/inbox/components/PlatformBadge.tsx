@@ -1,9 +1,9 @@
 import {
-  inboxPlatformLogo,
-  inboxPlatformLabel,
-  type InboxPlatformFilter,
-} from '@/shared/constants/inbox'
-import type { IntegrationPlatform } from '@/shared/constants/integrations'
+  INTEGRATION_PLATFORM_LABELS,
+  INTEGRATION_PLATFORM_LOGOS,
+  type IntegrationPlatform,
+} from '@/modules/integrations/integrations.constants'
+import type { InboxPlatformFilter } from '@/modules/inbox/inbox.constants'
 
 type PlatformBadgeProps = {
   readonly platform: IntegrationPlatform
@@ -17,19 +17,19 @@ const sizeClasses = {
 } as const
 
 export function PlatformBadge({ platform, size = 'sm', showLabel = false }: PlatformBadgeProps) {
-  const label = inboxPlatformLabel(platform)
+  const label = INTEGRATION_PLATFORM_LABELS[platform]
 
   return (
     <span
       className={[
         'inline-flex items-center gap-1.5',
-        platform === 'whatsapp' ? 'text-[#128C7E]' : 
+        platform === 'whatsapp' ? 'text-[#128C7E]' :
         platform === 'instagram' ? 'text-[#E1306C]' : 'text-neutral-600',
       ].join(' ')}
       title={label}
     >
       <img
-        src={inboxPlatformLogo(platform)}
+        src={INTEGRATION_PLATFORM_LOGOS[platform]}
         alt=""
         className={[sizeClasses[size], 'shrink-0 object-contain'].join(' ')}
         aria-hidden

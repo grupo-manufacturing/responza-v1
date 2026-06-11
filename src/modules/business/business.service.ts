@@ -5,7 +5,7 @@ import type {
   CommonConversationTypes,
   CustomerMessageLanguage,
   CustomerTone,
-} from '@/shared/constants/business'
+} from './business.constants'
 
 export interface BusinessProfile {
   organizationId: string
@@ -47,5 +47,3 @@ export class BusinessService {
     return response.data
   }
 }
-
-export default BusinessService

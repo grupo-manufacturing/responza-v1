@@ -1,7 +1,7 @@
 import { Spinner } from '@/components/ui/Spinner'
-import { formatInboxTimestamp } from '@/shared/constants/inbox'
-import type { IntegrationPlatform } from '@/shared/constants/integrations'
-import type { Conversation, Message } from '@/shared/services/inbox.service'
+import { formatInboxTimestamp } from '@/modules/inbox/inbox.constants'
+import type { IntegrationPlatform } from '@/modules/integrations/integrations.constants'
+import type { Conversation, Message } from '@/modules/inbox/inbox.service'
 
 const CHAT_BACKGROUND_CLASS = "bg-[url('/chat-bg.jpg')] bg-repeat bg-auto"
 

@@ -1,7 +1,7 @@
 import { ContactAvatar } from '@/modules/inbox/components/ContactAvatar'
 import { InboxEmptyState } from '@/modules/inbox/components/InboxEmptyState'
-import { formatInboxTimestamp } from '@/shared/constants/inbox'
-import type { ConversationListItem } from '@/shared/services/inbox.service'
+import { formatInboxTimestamp } from '@/modules/inbox/inbox.constants'
+import type { ConversationListItem } from '@/modules/inbox/inbox.service'
 
 type ConversationListProps = {
   readonly conversations: ConversationListItem[]

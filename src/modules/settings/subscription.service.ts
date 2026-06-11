@@ -19,5 +19,3 @@ export class SubscriptionService {
     return response.data.subscription
   }
 }
-
-export default SubscriptionService

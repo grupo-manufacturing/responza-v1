@@ -1,6 +1,6 @@
 import api from '@/shared/api/client'
 
-import type { IntegrationPlatform, IntegrationStatus } from '@/shared/constants/integrations'
+import type { IntegrationPlatform, IntegrationStatus } from './integrations.constants'
 
 export interface Integration {
   id?: string
@@ -97,5 +97,3 @@ export class IntegrationsService {
     return response.data
   }
 }
-
-export default IntegrationsService

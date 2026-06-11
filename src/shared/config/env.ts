@@ -1,3 +1,29 @@
+function collapsePathSlashes(url: string): string {
+  const match = url.match(/^(https?:\/\/[^/]+)(.*)$/i)
+  if (match === null) {
+    return url.replace(/\/{2,}/g, '/')
+  }
+
+  const [, origin, path] = match
+  return origin + path.replace(/\/{2,}/g, '/')
+}
+
+export function getApiBaseUrl(): string {
+  const configured = import.meta.env.VITE_API_URL?.trim() ?? ''
+  if (configured.length === 0) {
+    return '/api'
+  }
+
+  let url = configured.replace(/\/+$/, '')
+  url = collapsePathSlashes(url)
+
+  if (import.meta.env.PROD && url.startsWith('http://')) {
+    url = `https://${url.slice('http://'.length)}`
+  }
+
+  return url
+}
+
 export function getMetaAppId(): string {
   return import.meta.env.VITE_META_APP_ID?.trim() ?? ''
 }

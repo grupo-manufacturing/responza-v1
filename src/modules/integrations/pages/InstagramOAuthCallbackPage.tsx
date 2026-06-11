@@ -4,7 +4,6 @@ import { handleInstagramOAuthCallback } from '@/modules/integrations/lib/instagr
 
 export function InstagramOAuthCallbackPage() {
   useEffect(() => {
-    // Handle the OAuth callback when the component mounts
     handleInstagramOAuthCallback()
   }, [])
 

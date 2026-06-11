@@ -6,7 +6,7 @@ import {
   subscriptionBadgeText,
   subscriptionPlanLabel,
 } from '@/shared/utils/subscription-display'
-import SubscriptionService, { type SubscriptionDetails } from '@/shared/services/subscription.service'
+import { SubscriptionService, type SubscriptionDetails } from '@/modules/settings/subscription.service'
 
 export function SubscriptionPanel() {
   const [subscription, setSubscription] = useState<SubscriptionDetails | null>(null)

@@ -3,11 +3,12 @@ import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
 
 import { SubscriptionRequired } from '@/components/common/SubscriptionRequired'
 import { PageSuspense, SpinnerOverlay } from '@/components/ui/Spinner'
+import { BusinessService } from '@/modules/business/business.service'
 import { AppSidebar } from '@/layouts/AppSidebar'
 import { AppTopbar } from '@/layouts/AppTopbar'
-import { SIDEBAR_COLLAPSED_STORAGE_KEY } from '@/shared/constants/sidebar'
-import AuthService from '@/shared/services/auth.service'
-import BusinessService from '@/shared/services/business.service'
+import { SIDEBAR_COLLAPSED_STORAGE_KEY } from '@/layouts/sidebar.config'
+import { useSession } from '@/shared/hooks/useSession'
+import { SessionStorage } from '@/shared/session/storage'
 
 function readSidebarCollapsed(): boolean {
   try {
@@ -24,10 +25,10 @@ function isSubscriptionExemptPath(pathname: string): boolean {
 export function AppLayout() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { hasSubscriptionAccess, loading: sessionLoading } = useSession()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(readSidebarCollapsed)
   const [isReady, setIsReady] = useState(false)
-  const [hasSubscriptionAccess, setHasSubscriptionAccess] = useState(true)
 
   const toggleSidebarCollapsed = () => {
     setSidebarCollapsed((prev) => {
@@ -35,7 +36,7 @@ export function AppLayout() {
       try {
         localStorage.setItem(SIDEBAR_COLLAPSED_STORAGE_KEY, String(next))
       } catch {
-        /* ignore storage errors */
+        return prev
       }
       return next
     })
@@ -50,23 +51,15 @@ export function AppLayout() {
         if (cancelled) return
 
         if (!profile.completed) {
-          AuthService.setBusinessDetailsCompleted(false)
+          SessionStorage.setBusinessDetailsCompleted(false)
           navigate('/business', { replace: true })
           return
         }
 
-        AuthService.setBusinessDetailsCompleted(true)
-
-        const me = await AuthService.getMe()
-        if (cancelled) return
-
-        AuthService.saveSessionProfile(me)
-        setHasSubscriptionAccess(me.subscription.hasAccess)
+        SessionStorage.setBusinessDetailsCompleted(true)
         setIsReady(true)
       } catch {
         if (!cancelled) {
-          const stored = AuthService.getStoredSubscription()
-          setHasSubscriptionAccess(stored?.hasAccess ?? true)
           setIsReady(true)
         }
       }
@@ -77,11 +70,11 @@ export function AppLayout() {
     }
   }, [navigate])
 
-  if (!AuthService.isBusinessDetailsCompleted()) {
+  if (!SessionStorage.isBusinessDetailsCompleted()) {
     return <Navigate to="/business" replace />
   }
 
-  if (!isReady) {
+  if (!isReady || sessionLoading) {
     return <SpinnerOverlay label="Loading your workspace..." className="bg-neutral-50" />
   }
 

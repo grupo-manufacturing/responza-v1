@@ -1,89 +1,10 @@
-import { useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 
-import { Spinner } from '@/components/ui/Spinner'
-import { subscriptionStatusLabel } from '@/shared/utils/subscription-display'
-import AuthService from '@/shared/services/auth.service'
+import { clearSessionCache, useSession } from '@/shared/hooks/useSession'
+import { SessionStorage } from '@/shared/session/storage'
 
-interface NavItem {
-  name: string
-  href: string
-  icon: React.ReactNode
-}
-
-const navigation: NavItem[] = [
-  {
-    name: 'Dashboard',
-    href: '/dashboard',
-    icon: (
-      <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM14 12a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1v-7zM4 14a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1v-5z"
-        />
-      </svg>
-    ),
-  },
-  {
-    name: 'Leads',
-    href: '/leads',
-    icon: (
-      <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-        />
-      </svg>
-    ),
-  },
-  {
-    name: 'Inbox',
-    href: '/inbox',
-    icon: (
-      <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-        />
-      </svg>
-    ),
-  },
-  {
-    name: 'Integrations',
-    href: '/integrations',
-    icon: (
-      <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-        />
-      </svg>
-    ),
-  },
-  {
-    name: 'Settings',
-    href: '/settings',
-    icon: (
-      <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-        />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-      </svg>
-    ),
-  },
-]
+import { SIDEBAR_NAVIGATION } from './sidebar.config'
+import { SidebarAccountFooter } from './SidebarAccountFooter'
 
 type AppSidebarProps = {
   readonly mobileOpen?: boolean
@@ -97,35 +18,6 @@ function SidebarPanelIcon() {
       <rect x="3" y="3" width="18" height="18" rx="2" strokeWidth={1.75} />
       <path strokeLinecap="round" strokeWidth={1.75} d="M9 3v18" />
     </svg>
-  )
-}
-
-function SignOutIconButton({ onClick }: { readonly onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      title="Sign out"
-      aria-label="Sign out"
-      className="inline-flex shrink-0 items-center justify-center rounded-lg p-2 text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
-    >
-      <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-        />
-      </svg>
-    </button>
-  )
-}
-
-function AccountAvatar({ initial }: { readonly initial: string }) {
-  return (
-    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-900">
-      <span className="text-sm font-medium text-white">{initial}</span>
-    </div>
   )
 }
 
@@ -167,41 +59,15 @@ function SidebarCollapseButton({
 
 export function AppSidebar({ mobileOpen = false, collapsed = false, onToggleCollapse }: AppSidebarProps) {
   const navigate = useNavigate()
-  const storedOrg = AuthService.getStoredOrganization()
-  const storedSub = AuthService.getStoredSubscription()
-  const [organizationName, setOrganizationName] = useState(storedOrg?.name ?? '')
-  const [subscriptionStatus, setSubscriptionStatus] = useState(storedSub?.status)
-  const [isProfileLoading, setIsProfileLoading] = useState(!storedOrg?.name)
-
-  useEffect(() => {
-    if (!AuthService.isAuthenticated()) return
-
-    let cancelled = false
-    setIsProfileLoading(!AuthService.getStoredOrganization()?.name)
-
-    void AuthService.getMe()
-      .then((me) => {
-        if (cancelled) return
-        AuthService.saveSessionProfile(me)
-        setOrganizationName(me.organization.name)
-        setSubscriptionStatus(me.subscription.status)
-      })
-      .catch(() => {
-        /* keep cached values from login */
-      })
-      .finally(() => {
-        if (!cancelled) setIsProfileLoading(false)
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  const orgInitial = (organizationName.trim().charAt(0) || 'O').toUpperCase()
+  const { me, loading: sessionLoading } = useSession()
+  const storedOrg = SessionStorage.getStoredOrganization()
+  const organizationName = me?.organization.name ?? storedOrg?.name ?? ''
+  const subscriptionStatus = me?.subscription.status ?? SessionStorage.getStoredSubscription()?.status ?? ''
+  const isProfileLoading = sessionLoading && organizationName.length === 0
 
   const handleLogout = () => {
-    AuthService.clearTokens()
+    SessionStorage.clearTokens()
+    clearSessionCache()
     navigate('/auth?mode=login')
   }
 
@@ -228,31 +94,17 @@ export function AppSidebar({ mobileOpen = false, collapsed = false, onToggleColl
             collapsed ? 'lg:justify-center' : 'justify-between',
           ].join(' ')}
         >
-          <div
-            className={[
-              'flex min-w-0 items-center gap-3',
-              collapsed ? 'lg:justify-center' : '',
-            ].join(' ')}
-          >
+          <div className={['flex min-w-0 items-center gap-3', collapsed ? 'lg:justify-center' : ''].join(' ')}>
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-neutral-900 text-sm font-bold text-white shadow-md">
               R
             </div>
-            <span
-              className={[
-                'truncate text-xl font-semibold text-neutral-900',
-                collapsed ? 'lg:hidden' : '',
-              ].join(' ')}
-            >
+            <span className={['truncate text-xl font-semibold text-neutral-900', collapsed ? 'lg:hidden' : ''].join(' ')}>
               Responza AI
             </span>
           </div>
           {onToggleCollapse !== undefined && (
             <div className={collapsed ? 'shrink-0 lg:hidden' : 'shrink-0'}>
-              <SidebarCollapseButton
-                collapsed={collapsed}
-                onToggle={onToggleCollapse}
-                variant="header"
-              />
+              <SidebarCollapseButton collapsed={collapsed} onToggle={onToggleCollapse} variant="header" />
             </div>
           )}
         </div>
@@ -264,14 +116,10 @@ export function AppSidebar({ mobileOpen = false, collapsed = false, onToggleColl
       >
         {onToggleCollapse !== undefined && collapsed && (
           <div className="mb-1 hidden lg:block">
-            <SidebarCollapseButton
-              collapsed={collapsed}
-              onToggle={onToggleCollapse}
-              variant="nav"
-            />
+            <SidebarCollapseButton collapsed={collapsed} onToggle={onToggleCollapse} variant="nav" />
           </div>
         )}
-        {navigation.map((item) => (
+        {SIDEBAR_NAVIGATION.map((item) => (
           <NavLink
             key={item.name}
             to={item.href}
@@ -304,47 +152,13 @@ export function AppSidebar({ mobileOpen = false, collapsed = false, onToggleColl
         ))}
       </nav>
 
-      <div className={['shrink-0 border-t border-neutral-200 p-4', collapsed ? 'lg:p-2' : ''].join(' ')}>
-        {/* Collapsed rail: sign-out icon only */}
-        <div
-          className={[
-            'hidden items-center justify-center',
-            collapsed ? 'lg:flex' : '',
-          ].join(' ')}
-        >
-          <SignOutIconButton onClick={handleLogout} />
-        </div>
-
-        {/* Expanded: avatar + name/trial on left, sign-out icon on right — one row */}
-        <div
-          className={[
-            'flex items-center gap-2',
-            collapsed ? 'lg:hidden' : '',
-          ].join(' ')}
-        >
-          <div className="flex min-w-0 flex-1 items-center gap-3">
-            <AccountAvatar initial={orgInitial} />
-            <div className="min-w-0 flex-1">
-              {isProfileLoading && !organizationName ? (
-                <div className="flex items-center gap-2 py-1" role="status" aria-label="Loading profile">
-                  <Spinner size="sm" variant="muted" />
-                  <span className="text-sm text-neutral-500">Loading...</span>
-                </div>
-              ) : (
-                <>
-                  <p className="truncate text-base font-medium leading-tight text-neutral-900">
-                    {organizationName || 'Organization'}
-                  </p>
-                  <p className="truncate text-sm leading-tight text-neutral-500">
-                    {subscriptionStatusLabel(subscriptionStatus ?? '')}
-                  </p>
-                </>
-              )}
-            </div>
-          </div>
-          <SignOutIconButton onClick={handleLogout} />
-        </div>
-      </div>
+      <SidebarAccountFooter
+        collapsed={collapsed}
+        organizationName={organizationName}
+        subscriptionStatus={subscriptionStatus}
+        isProfileLoading={isProfileLoading}
+        onLogout={handleLogout}
+      />
     </aside>
   )
 }

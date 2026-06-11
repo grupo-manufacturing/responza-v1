@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import type { IntegrationPlatform } from '@/shared/constants/integrations'
+import type { IntegrationPlatform } from '@/modules/integrations/integrations.constants'
 import { displayNameInitials } from '@/shared/utils/display-name'
 
 type ContactAvatarProps = {

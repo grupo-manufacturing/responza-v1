@@ -3,7 +3,7 @@ import {
   getMetaAppId,
   getWhatsAppEmbeddedConfigId,
   isWhatsAppEmbeddedSignupConfigured,
-} from '@/shared/config/meta'
+} from '@/shared/config/env'
 
 export type WhatsAppSessionInfo = {
   phone_number_id: string
@@ -78,7 +78,7 @@ function bindSessionInfoListener(): void {
         }
       }
     } catch {
-      // ignore malformed postMessage payloads
+      void 0
     }
   })
 }

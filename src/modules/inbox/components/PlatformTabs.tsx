@@ -2,7 +2,7 @@ import {
   INBOX_PLATFORM_FILTERS,
   inboxPlatformFilterLabel,
   type InboxPlatformFilter,
-} from '@/shared/constants/inbox'
+} from '@/modules/inbox/inbox.constants'
 import { platformTabActiveClass } from '@/modules/inbox/components/PlatformBadge'
 
 type PlatformTabsProps = {

@@ -9,8 +9,10 @@ const LandingPage = lazy(() =>
   import('@/modules/landing/pages/LandingPage').then((m) => ({ default: m.LandingPage })),
 )
 const AuthPage = lazy(() => import('@/modules/auth/pages/AuthPage').then((m) => ({ default: m.AuthPage })))
-const BusinessDetailsPanel = lazy(() =>
-  import('@/components/common/BusinessDetailsPanel').then((m) => ({ default: m.BusinessDetailsPanel })),
+const BusinessOnboardingPage = lazy(() =>
+  import('@/modules/business/pages/BusinessOnboardingPage').then((m) => ({
+    default: m.BusinessOnboardingPage,
+  })),
 )
 const DashboardPage = lazy(() =>
   import('@/modules/dashboard/pages/DashboardPage').then((m) => ({ default: m.DashboardPage })),
@@ -48,7 +50,7 @@ export const router = createBrowserRouter([
     children: [
       {
         path: '/business',
-        element: suspense(<BusinessDetailsPanel />, 'Preparing your setup...'),
+        element: suspense(<BusinessOnboardingPage />, 'Preparing your setup...'),
       },
       {
         path: '/business-details',

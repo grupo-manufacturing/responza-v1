@@ -1,7 +1,7 @@
 import api from '@/shared/api/client'
 
-import type { IntegrationPlatform } from '@/shared/constants/integrations'
-import type { MessageDirection } from '@/shared/constants/inbox'
+import type { IntegrationPlatform } from '@/modules/integrations/integrations.constants'
+import type { MessageDirection } from './inbox.constants'
 
 export interface ConversationListItem {
   id: string
@@ -94,5 +94,3 @@ export class InboxService {
     return response.data
   }
 }
-
-export default InboxService

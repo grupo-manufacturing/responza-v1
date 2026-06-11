@@ -1,8 +1,7 @@
 import {
   INTEGRATION_PLATFORM_LABELS,
-  INTEGRATION_PLATFORM_LOGOS,
   type IntegrationPlatform,
-} from '@/shared/constants/integrations'
+} from '@/modules/integrations/integrations.constants'
 
 export type InboxPlatformFilter = IntegrationPlatform | 'all'
 
@@ -21,14 +20,6 @@ export function inboxPlatformFilterLabel(filter: InboxPlatformFilter): string {
   }
 
   return INTEGRATION_PLATFORM_LABELS[filter]
-}
-
-export function inboxPlatformLabel(platform: IntegrationPlatform): string {
-  return INTEGRATION_PLATFORM_LABELS[platform]
-}
-
-export function inboxPlatformLogo(platform: IntegrationPlatform): string {
-  return INTEGRATION_PLATFORM_LOGOS[platform]
 }
 
 export function formatInboxTimestamp(value: string): string {

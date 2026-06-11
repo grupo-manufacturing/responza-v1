@@ -1,6 +1,8 @@
 import axios from 'axios'
 
-import { getApiBaseUrl } from '@/shared/config/api'
+import { getApiBaseUrl } from '@/shared/config/env'
+import { clearSessionCache } from '@/shared/hooks/useSession'
+import { SessionStorage } from '@/shared/session/storage'
 
 const api = axios.create({
   baseURL: getApiBaseUrl(),
@@ -22,11 +24,8 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('accessToken')
-      localStorage.removeItem('refreshToken')
-      localStorage.removeItem('organization')
-      localStorage.removeItem('subscription')
-      localStorage.removeItem('businessDetailsCompleted')
+      clearSessionCache()
+      SessionStorage.clearTokens()
       window.location.href = '/auth?mode=login'
     }
     return Promise.reject(error)

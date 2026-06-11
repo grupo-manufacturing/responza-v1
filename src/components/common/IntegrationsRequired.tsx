@@ -1,14 +1,16 @@
 import { Link } from 'react-router-dom'
 
+import { INTEGRATION_PLATFORM_LOGOS } from '@/modules/integrations/integrations.constants'
+
 export function IntegrationsRequired() {
   return (
     <div className="flex min-h-[420px] flex-col items-center justify-center rounded-2xl border border-neutral-200 bg-white px-6 py-16 text-center shadow-sm">
       <div className="mb-4 flex items-center gap-2">
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#128C7E]/10">
-          <img src="/whatsapp.png" alt="" className="h-6 w-6 object-contain" aria-hidden />
+          <img src={INTEGRATION_PLATFORM_LOGOS.whatsapp} alt="" className="h-6 w-6 object-contain" aria-hidden />
         </div>
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#405DE6]/10 to-[#E1306C]/10">
-          <img src="/instagram.png" alt="" className="h-6 w-6 object-contain" aria-hidden />
+          <img src={INTEGRATION_PLATFORM_LOGOS.instagram} alt="" className="h-6 w-6 object-contain" aria-hidden />
         </div>
       </div>
       <h2 className="text-xl font-semibold text-neutral-900">Connect messaging platforms to use Inbox</h2>

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import { Spinner } from '@/components/ui/Spinner'
-import type { IntegrationPlatform } from '@/shared/constants/integrations'
+import type { IntegrationPlatform } from '@/modules/integrations/integrations.constants'
 
 type MessageComposerProps = {
   readonly disabled: boolean

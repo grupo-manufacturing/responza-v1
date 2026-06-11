@@ -1,5 +1,5 @@
 import { ContactAvatar } from '@/modules/inbox/components/ContactAvatar'
-import type { Conversation, Participant } from '@/shared/services/inbox.service'
+import type { Conversation, Participant } from '@/modules/inbox/inbox.service'
 
 type PendingContact = {
   readonly displayName: string

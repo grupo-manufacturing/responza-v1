@@ -1,5 +1,5 @@
 import { Select } from '@/components/ui/Select'
-import { LEAD_STATUS_OPTIONS } from '@/shared/constants/leads'
+import { LEAD_STATUS_OPTIONS } from '@/modules/leads/leads.constants'
 
 import { leadInputClassName, type LeadFormValues } from './lead-form'
 
