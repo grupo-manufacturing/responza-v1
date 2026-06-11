@@ -9,10 +9,11 @@ import {
   type LeadsLayoutMode,
 } from '@/modules/leads/components/LeadsSearchBar'
 import { ViewLeadModal } from '@/modules/leads/components/ViewLeadModal'
+import { SubscriptionRequired } from '@/components/common/SubscriptionRequired'
 import { Spinner } from '@/components/ui/Spinner'
 import { leadStatusLabel } from '@/shared/constants/leads'
 import LeadsService, { type Lead } from '@/shared/services/leads.service'
-import { getApiErrorMessage } from '@/shared/utils/api-error'
+import { getApiErrorMessage, isSubscriptionRequiredError } from '@/shared/utils/api-error'
 
 function matchesSearchQuery(lead: Lead, query: string): boolean {
   const normalized = query.trim().toLowerCase()
@@ -115,6 +116,7 @@ export function LeadsPage() {
   const [layoutMode, setLayoutMode] = useState<LeadsLayoutMode>('table')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [subscriptionRequired, setSubscriptionRequired] = useState(false)
 
   const [createOpen, setCreateOpen] = useState(false)
   const [viewLead, setViewLead] = useState<Lead | null>(null)
@@ -126,6 +128,7 @@ export function LeadsPage() {
   const loadLeads = useCallback(async () => {
     setLoading(true)
     setError(null)
+    setSubscriptionRequired(false)
 
     try {
       const result = await LeadsService.listLeads({
@@ -134,6 +137,12 @@ export function LeadsPage() {
 
       setLeads(result.leads)
     } catch (err) {
+      if (isSubscriptionRequiredError(err)) {
+        setSubscriptionRequired(true)
+        setLeads([])
+        return
+      }
+
       setError(getApiErrorMessage(err, 'Could not load leads. Please try again.'))
       setLeads([])
     } finally {
@@ -173,6 +182,10 @@ export function LeadsPage() {
     setViewLead((current) => (current?.id === leadId ? null : current))
     setEditLead((current) => (current?.id === leadId ? null : current))
     setDeleteLead(null)
+  }
+
+  if (subscriptionRequired) {
+    return <SubscriptionRequired />
   }
 
   return (

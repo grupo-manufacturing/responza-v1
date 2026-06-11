@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { ConversationList } from '@/modules/inbox/components/ConversationList'
 import { ConversationThread } from '@/modules/inbox/components/ConversationThread'
 import { ConversationThreadHeader } from '@/modules/inbox/components/ConversationThreadHeader'
+import { SubscriptionRequired } from '@/components/common/SubscriptionRequired'
 import { IntegrationsRequired } from '@/modules/inbox/components/IntegrationsRequired'
 import { MessageComposer } from '@/modules/inbox/components/MessageComposer'
 import { PlatformTabs } from '@/modules/inbox/components/PlatformTabs'
@@ -15,7 +16,12 @@ import InboxService, {
   type Message,
   type Participant,
 } from '@/shared/services/inbox.service'
-import { getApiErrorCode, getApiErrorDetails, getApiErrorMessage } from '@/shared/utils/api-error'
+import {
+  getApiErrorCode,
+  getApiErrorDetails,
+  getApiErrorMessage,
+  isSubscriptionRequiredError,
+} from '@/shared/utils/api-error'
 
 const LIST_COLUMN_CLASS = 'w-full lg:w-[280px] lg:shrink-0'
 const LIST_REFRESH_MS = 8000
@@ -36,6 +42,7 @@ export function InboxPage() {
   const [threadLoading, setThreadLoading] = useState(false)
   const [sending, setSending] = useState(false)
   const [integrationsRequired, setIntegrationsRequired] = useState(false)
+  const [subscriptionRequired, setSubscriptionRequired] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [mobileShowThread, setMobileShowThread] = useState(false)
 
@@ -45,6 +52,7 @@ export function InboxPage() {
     }
     setError(null)
     setIntegrationsRequired(false)
+    setSubscriptionRequired(false)
 
     try {
       const result = await InboxService.listConversations({
@@ -52,6 +60,12 @@ export function InboxPage() {
       })
       setConversations(result.conversations)
     } catch (err) {
+      if (isSubscriptionRequiredError(err)) {
+        setSubscriptionRequired(true)
+        setConversations([])
+        return
+      }
+
       if (getApiErrorCode(err) === 'INTEGRATIONS_REQUIRED') {
         setIntegrationsRequired(true)
         setConversations([])
@@ -81,6 +95,11 @@ export function InboxPage() {
       setParticipants(result.participants)
       setMessages(result.messages)
     } catch (err) {
+      if (isSubscriptionRequiredError(err)) {
+        setSubscriptionRequired(true)
+        return
+      }
+
       if (getApiErrorCode(err) === 'INTEGRATIONS_REQUIRED') {
         setIntegrationsRequired(true)
         return
@@ -190,6 +209,10 @@ export function InboxPage() {
       : undefined
 
   const activePlatform: IntegrationPlatform | null = selectedListItem?.platform ?? null
+
+  if (subscriptionRequired) {
+    return <SubscriptionRequired />
+  }
 
   if (integrationsRequired) {
     return <IntegrationsRequired />

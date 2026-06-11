@@ -8,6 +8,10 @@ type ApiErrorBody = {
   }
 }
 
+export function isSubscriptionRequiredError(error: unknown): boolean {
+  return getApiErrorCode(error) === 'SUBSCRIPTION_REQUIRED'
+}
+
 export function getApiErrorCode(error: unknown): string | null {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data as ApiErrorBody | undefined

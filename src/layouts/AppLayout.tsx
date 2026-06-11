@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Navigate, Outlet, useNavigate } from 'react-router-dom'
+import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
 
+import { SubscriptionRequired } from '@/components/common/SubscriptionRequired'
 import { PageSuspense, SpinnerOverlay } from '@/components/ui/Spinner'
 import { AppSidebar } from '@/layouts/AppSidebar'
 import { AppTopbar } from '@/layouts/AppTopbar'
@@ -16,11 +17,17 @@ function readSidebarCollapsed(): boolean {
   }
 }
 
+function isSubscriptionExemptPath(pathname: string): boolean {
+  return pathname.startsWith('/settings')
+}
+
 export function AppLayout() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(readSidebarCollapsed)
   const [isReady, setIsReady] = useState(false)
+  const [hasSubscriptionAccess, setHasSubscriptionAccess] = useState(true)
 
   const toggleSidebarCollapsed = () => {
     setSidebarCollapsed((prev) => {
@@ -37,8 +44,9 @@ export function AppLayout() {
   useEffect(() => {
     let cancelled = false
 
-    void BusinessService.getBusiness()
-      .then(({ profile }) => {
+    void (async () => {
+      try {
+        const { profile } = await BusinessService.getBusiness()
         if (cancelled) return
 
         if (!profile.completed) {
@@ -48,13 +56,21 @@ export function AppLayout() {
         }
 
         AuthService.setBusinessDetailsCompleted(true)
+
+        const me = await AuthService.getMe()
+        if (cancelled) return
+
+        AuthService.saveSessionProfile(me)
+        setHasSubscriptionAccess(me.subscription.hasAccess)
         setIsReady(true)
-      })
-      .catch(() => {
+      } catch {
         if (!cancelled) {
+          const stored = AuthService.getStoredSubscription()
+          setHasSubscriptionAccess(stored?.hasAccess ?? true)
           setIsReady(true)
         }
-      })
+      }
+    })()
 
     return () => {
       cancelled = true
@@ -68,6 +84,9 @@ export function AppLayout() {
   if (!isReady) {
     return <SpinnerOverlay label="Loading your workspace..." className="bg-neutral-50" />
   }
+
+  const showSubscriptionGate =
+    !hasSubscriptionAccess && !isSubscriptionExemptPath(location.pathname)
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -94,9 +113,13 @@ export function AppLayout() {
         ].join(' ')}
       >
         <div className="p-6">
-          <PageSuspense label="Loading page...">
-            <Outlet />
-          </PageSuspense>
+          {showSubscriptionGate ? (
+            <SubscriptionRequired />
+          ) : (
+            <PageSuspense label="Loading page...">
+              <Outlet />
+            </PageSuspense>
+          )}
         </div>
       </main>
     </div>

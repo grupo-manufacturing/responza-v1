@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 
+import { SubscriptionRequired } from '@/components/common/SubscriptionRequired'
 import { Spinner } from '@/components/ui/Spinner'
 import { startWhatsAppEmbeddedSignup } from '@/modules/integrations/lib/whatsappEmbeddedSignup'
 import { startInstagramOAuth } from '@/modules/integrations/lib/instagramOAuth'
@@ -21,7 +22,7 @@ import IntegrationsService, {
   type WhatsAppConnectSummary,
   type InstagramConnectSummary,
 } from '@/shared/services/integrations.service'
-import { getApiErrorCode, getApiErrorMessage } from '@/shared/utils/api-error'
+import { getApiErrorCode, getApiErrorMessage, isSubscriptionRequiredError } from '@/shared/utils/api-error'
 
 function upsertIntegration(integrations: Integration[], updated: Integration): Integration[] {
   return integrations.map((item) => (item.platform === updated.platform ? { ...item, ...updated } : item))
@@ -179,6 +180,7 @@ export function IntegrationsPage() {
   const [busyPlatform, setBusyPlatform] = useState<IntegrationPlatform | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [subscriptionRequired, setSubscriptionRequired] = useState(false)
 
   const loadWhatsAppStatus = useCallback(async () => {
     try {
@@ -201,6 +203,7 @@ export function IntegrationsPage() {
   const loadIntegrations = useCallback(async () => {
     setLoading(true)
     setError(null)
+    setSubscriptionRequired(false)
 
     try {
       const result = await IntegrationsService.listIntegrations()
@@ -208,6 +211,14 @@ export function IntegrationsPage() {
       await loadWhatsAppStatus()
       await loadInstagramStatus()
     } catch (err) {
+      if (isSubscriptionRequiredError(err)) {
+        setSubscriptionRequired(true)
+        setIntegrations([])
+        setWhatsappDetails(null)
+        setInstagramDetails(null)
+        return
+      }
+
       setError(getApiErrorMessage(err, 'Could not load integrations. Please try again.'))
       setIntegrations([])
       setWhatsappDetails(null)
@@ -300,6 +311,10 @@ export function IntegrationsPage() {
 
   const whatsappConfigured = isWhatsAppEmbeddedSignupConfigured()
   const instagramConfigured = isInstagramOAuthConfigured()
+
+  if (subscriptionRequired) {
+    return <SubscriptionRequired />
+  }
 
   return (
     <div className="mx-auto max-w-4xl">
