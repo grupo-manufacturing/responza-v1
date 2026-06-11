@@ -2,6 +2,7 @@ import {
   INTEGRATION_PLATFORM_DESCRIPTIONS,
   INTEGRATION_PLATFORM_LOGOS,
   integrationPlatformLabel,
+  integrationPlatformLogoClass,
   integrationStatusLabel,
   type IntegrationPlatform,
   type IntegrationStatus,
@@ -35,26 +36,26 @@ function WhatsAppDetailsPanel({ details }: { details: WhatsAppConnectSummary }) 
   )
 }
 
-function InstagramDetailsPanel({ details }: { details: InstagramConnectSummary }) {
+function InstagramConnectedProfile({ details }: { details: InstagramConnectSummary }) {
+  const username = details.username
+  const initial = (username?.charAt(0) ?? 'I').toUpperCase()
+
   return (
-    <div className="mt-4 rounded-xl border border-[#E1306C]/20 bg-gradient-to-br from-[#405DE6]/5 to-[#E1306C]/5 px-4 py-3 text-sm text-neutral-700">
-      <p className="font-medium text-[#E1306C]">Connected Instagram Business</p>
-      <dl className="mt-2 space-y-1 text-xs">
-        <div className="flex justify-between gap-3">
-          <dt className="text-neutral-500">Business account ID</dt>
-          <dd className="truncate font-mono text-neutral-800">{details.business_account_id}</dd>
+    <div className="mt-4 flex items-center gap-3 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3">
+      {details.profile_picture_url !== null ? (
+        <img
+          src={details.profile_picture_url}
+          alt=""
+          className="h-11 w-11 shrink-0 rounded-full object-cover ring-2 ring-white"
+        />
+      ) : (
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#405DE6] to-[#E1306C] text-sm font-semibold text-white">
+          {initial}
         </div>
-        <div className="flex justify-between gap-3">
-          <dt className="text-neutral-500">User ID</dt>
-          <dd className="truncate font-mono text-neutral-800">{details.user_id}</dd>
-        </div>
-        {details.username !== null && (
-          <div className="flex justify-between gap-3">
-            <dt className="text-neutral-500">Username</dt>
-            <dd className="truncate font-mono text-neutral-800">@{details.username}</dd>
-          </div>
-        )}
-      </dl>
+      )}
+      <p className="truncate text-sm font-semibold text-neutral-900">
+        {username !== null ? `@${username}` : 'Connected account'}
+      </p>
     </div>
   )
 }
@@ -97,7 +98,7 @@ export function PlatformCard({
           <img
             src={INTEGRATION_PLATFORM_LOGOS[platform]}
             alt={integrationPlatformLabel(platform)}
-            className="h-full w-full object-contain"
+            className={integrationPlatformLogoClass(platform)}
           />
         </div>
 
@@ -124,7 +125,7 @@ export function PlatformCard({
       )}
 
       {platform === 'instagram' && isConnected && instagramDetails !== null && (
-        <InstagramDetailsPanel details={instagramDetails} />
+        <InstagramConnectedProfile details={instagramDetails} />
       )}
 
       <div className="mt-auto flex flex-wrap gap-2 border-t border-neutral-100 pt-4">

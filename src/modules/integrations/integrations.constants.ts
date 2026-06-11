@@ -10,9 +10,17 @@ export const INTEGRATION_PLATFORM_LABELS: Record<IntegrationPlatform, string> = 
 }
 
 export const INTEGRATION_PLATFORM_LOGOS: Record<IntegrationPlatform, string> = {
-  whatsapp: '/whatsapp.svg',
-  instagram: '/instagram.svg',
-  indiamart: '/indiamart.svg',
+  whatsapp: '/whatsapp.png',
+  instagram: '/instagram.png',
+  indiamart: '/indiamart.png',
+}
+
+export function integrationPlatformLogoClass(platform: IntegrationPlatform): string {
+  if (platform === 'indiamart') {
+    return 'h-8 w-auto max-w-full object-contain'
+  }
+
+  return 'h-full w-full object-contain'
 }
 
 export const INTEGRATION_PLATFORM_DESCRIPTIONS: Record<IntegrationPlatform, string> = {

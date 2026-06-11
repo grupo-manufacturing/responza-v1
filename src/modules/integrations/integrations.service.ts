@@ -18,6 +18,7 @@ export interface InstagramConnectSummary {
   business_account_id: string
   user_id: string
   username: string | null
+  profile_picture_url: string | null
 }
 
 export interface ConnectWhatsAppPayload {
