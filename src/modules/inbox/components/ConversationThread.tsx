@@ -38,7 +38,7 @@ function MessageReactions({ message }: { readonly message: Message }) {
   }
 
   return (
-    <div className="mt-0.5 inline-flex items-center gap-0.5 rounded-full border border-neutral-200 bg-white px-1.5 py-0.5 text-sm shadow-sm">
+    <div className="absolute -top-2 right-1 z-10 inline-flex items-center gap-0.5 rounded-full border border-neutral-200 bg-white px-1.5 py-0.5 text-sm shadow-sm">
       {message.customerReaction !== null && <span>{message.customerReaction}</span>}
       {message.agentReaction !== null && <span>{message.agentReaction}</span>}
     </div>
@@ -85,6 +85,8 @@ export function ConversationThread({
                 !isOutbound &&
                 message.platformMessageId !== null &&
                 onReact !== undefined
+              const hasReactions =
+                message.customerReaction !== null || message.agentReaction !== null
 
               return (
                 <div
@@ -97,7 +99,7 @@ export function ConversationThread({
                       isOutbound ? 'flex-row-reverse' : 'flex-row',
                     ].join(' ')}
                   >
-                    <div>
+                    <div className={['relative', hasReactions ? 'mt-2' : ''].join(' ')}>
                       <div
                         className={[
                           'rounded-2xl px-4 py-2.5 text-sm',
@@ -120,9 +122,7 @@ export function ConversationThread({
                           <span>{formatInboxTimestamp(message.createdAt)}</span>
                         </div>
                       </div>
-                      <div className={isOutbound ? 'flex justify-end' : 'flex justify-start'}>
-                        <MessageReactions message={message} />
-                      </div>
+                      <MessageReactions message={message} />
                     </div>
 
                     {canReact && (
