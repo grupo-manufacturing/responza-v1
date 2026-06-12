@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 import { Spinner } from '@/components/ui/Spinner'
+import { EmojiPicker } from '@/modules/inbox/components/EmojiPicker'
 import type { IntegrationPlatform } from '@/modules/integrations/integrations.constants'
 
 type MessageComposerProps = {
@@ -53,8 +54,24 @@ function sendButtonClass(canSend: boolean, platform: IntegrationPlatform | null 
   return 'bg-neutral-900 text-white hover:bg-neutral-800'
 }
 
+function insertAtCursor(textarea: HTMLTextAreaElement, value: string): string {
+  const start = textarea.selectionStart
+  const end = textarea.selectionEnd
+  const next = `${textarea.value.slice(0, start)}${value}${textarea.value.slice(end)}`
+  const cursor = start + value.length
+
+  requestAnimationFrame(() => {
+    textarea.selectionStart = cursor
+    textarea.selectionEnd = cursor
+    textarea.focus()
+  })
+
+  return next
+}
+
 export function MessageComposer({ disabled, sending, platform = null, onSend }: MessageComposerProps) {
   const [content, setContent] = useState('')
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
   const canSend = !disabled && !sending && content.trim().length > 0
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -69,6 +86,16 @@ export function MessageComposer({ disabled, sending, platform = null, onSend }: 
     setContent('')
   }
 
+  const handleEmojiSelect = (emoji: string) => {
+    const textarea = textareaRef.current
+    if (textarea === null || disabled || sending) {
+      setContent((current) => `${current}${emoji}`)
+      return
+    }
+
+    setContent(insertAtCursor(textarea, emoji))
+  }
+
   return (
     <form
       onSubmit={(event) => {
@@ -78,13 +105,15 @@ export function MessageComposer({ disabled, sending, platform = null, onSend }: 
     >
       <div
         className={[
-          'flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-1.5 transition-colors focus-within:border-neutral-900',
+          'flex items-center gap-1 rounded-xl border border-neutral-300 bg-white px-2 py-1.5 transition-colors focus-within:border-neutral-900',
           disabled || sending ? 'bg-neutral-50' : '',
           platform === 'whatsapp' ? 'focus-within:border-[#128C7E]' : '',
           platform === 'instagram' ? 'focus-within:border-[#E1306C]' : '',
         ].join(' ')}
       >
+        <EmojiPicker disabled={disabled || sending} onSelect={handleEmojiSelect} />
         <textarea
+          ref={textareaRef}
           value={content}
           onChange={(event) => setContent(event.target.value)}
           placeholder={composerPlaceholder(disabled)}

@@ -1,4 +1,5 @@
 import { Spinner } from '@/components/ui/Spinner'
+import { MessageStatusIndicator } from '@/modules/inbox/components/MessageStatusIndicator'
 import { formatInboxTimestamp } from '@/modules/inbox/inbox.constants'
 import type { IntegrationPlatform } from '@/modules/integrations/integrations.constants'
 import type { Conversation, Message } from '@/modules/inbox/inbox.service'
@@ -26,18 +27,6 @@ function outboundMetaClass(platform: IntegrationPlatform | null | undefined): st
   }
 
   return 'text-neutral-300'
-}
-
-function messageStatusLabel(status: Message['status']): string | null {
-  if (status === 'pending') {
-    return 'Sending…'
-  }
-
-  if (status === 'failed') {
-    return 'Failed to send'
-  }
-
-  return null
 }
 
 export function ConversationThread({
@@ -73,7 +62,6 @@ export function ConversationThread({
           <div className="space-y-3">
             {messages.map((message) => {
               const isOutbound = message.direction === 'outbound'
-              const statusLabel = isOutbound ? messageStatusLabel(message.status) : null
 
               return (
                 <div
@@ -92,14 +80,12 @@ export function ConversationThread({
                     <p className="whitespace-pre-wrap break-words">{message.content}</p>
                     <div
                       className={[
-                        'mt-1 flex items-center justify-end gap-2 text-xs',
+                        'mt-1 flex items-center justify-end gap-1.5 text-xs',
                         isOutbound ? outboundMetaClass(platform) : 'text-neutral-400',
                       ].join(' ')}
                     >
-                      {statusLabel !== null && (
-                        <span className={message.status === 'failed' ? 'font-medium text-red-600' : ''}>
-                          {statusLabel}
-                        </span>
+                      {isOutbound && (
+                        <MessageStatusIndicator status={message.status} platform={platform} />
                       )}
                       <span>{formatInboxTimestamp(message.createdAt)}</span>
                     </div>

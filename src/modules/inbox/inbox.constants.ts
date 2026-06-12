@@ -7,6 +7,23 @@ export type InboxPlatformFilter = IntegrationPlatform | 'all'
 
 export type MessageDirection = 'inbound' | 'outbound'
 
+export type MessageStatus = 'pending' | 'sent' | 'failed' | 'read'
+
+export const MESSAGE_QUICK_EMOJIS = [
+  '😀',
+  '😂',
+  '❤️',
+  '👍',
+  '🙏',
+  '🎉',
+  '🔥',
+  '✨',
+  '😊',
+  '😍',
+  '🤔',
+  '👋',
+] as const
+
 export const INBOX_PLATFORM_FILTERS: InboxPlatformFilter[] = [
   'all',
   'whatsapp',
