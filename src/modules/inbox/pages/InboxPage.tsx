@@ -93,6 +93,33 @@ export function InboxPage() {
     setMobileShowThread(true)
   }
 
+  const handleReactToMessage = async (messageId: string, emoji: string | null) => {
+    if (selectedConversationId === null) {
+      return
+    }
+
+    setSendError(null)
+
+    try {
+      const result = await InboxService.reactToMessage(selectedConversationId, messageId, { emoji })
+
+      queryClient.setQueryData(
+        inboxKeys.thread(selectedConversationId),
+        (current: Awaited<ReturnType<typeof InboxService.getConversation>> | undefined) => {
+          if (!current) return current
+          return {
+            ...current,
+            messages: current.messages.map((item) =>
+              item.id === messageId ? result.message : item,
+            ),
+          }
+        },
+      )
+    } catch (err) {
+      setSendError(getApiErrorMessage(err, 'Could not react to message. Please try again.'))
+    }
+  }
+
   const handleSendMessage = async (content: string) => {
     if (selectedConversationId === null) {
       return
@@ -236,6 +263,10 @@ export function InboxPage() {
               messages={messages}
               loading={threadLoading}
               platform={activePlatform}
+              reactDisabled={
+                activePlatform === 'indiamart' || activePlatform === null || threadLoading
+              }
+              onReact={handleReactToMessage}
             />
             <MessageComposer
               disabled={selectedConversationId === null || threadLoading}

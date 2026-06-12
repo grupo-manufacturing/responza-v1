@@ -1,5 +1,6 @@
 import { Spinner } from '@/components/ui/Spinner'
 import { MessageStatusIndicator } from '@/modules/inbox/components/MessageStatusIndicator'
+import { ReactionPicker } from '@/modules/inbox/components/ReactionPicker'
 import { formatInboxTimestamp } from '@/modules/inbox/inbox.constants'
 import type { IntegrationPlatform } from '@/modules/integrations/integrations.constants'
 import type { Conversation, Message } from '@/modules/inbox/inbox.service'
@@ -11,6 +12,8 @@ type ConversationThreadProps = {
   readonly messages: Message[]
   readonly loading: boolean
   readonly platform?: IntegrationPlatform | null
+  readonly reactDisabled?: boolean
+  readonly onReact?: (messageId: string, emoji: string | null) => Promise<void>
 }
 
 function outboundBubbleClass(platform: IntegrationPlatform | null | undefined): string {
@@ -29,11 +32,26 @@ function outboundMetaClass(platform: IntegrationPlatform | null | undefined): st
   return 'text-neutral-300'
 }
 
+function MessageReactions({ message }: { readonly message: Message }) {
+  if (message.customerReaction === null && message.agentReaction === null) {
+    return null
+  }
+
+  return (
+    <div className="mt-0.5 inline-flex items-center gap-0.5 rounded-full border border-neutral-200 bg-white px-1.5 py-0.5 text-sm shadow-sm">
+      {message.customerReaction !== null && <span>{message.customerReaction}</span>}
+      {message.agentReaction !== null && <span>{message.agentReaction}</span>}
+    </div>
+  )
+}
+
 export function ConversationThread({
   conversation,
   messages,
   loading,
   platform = null,
+  reactDisabled = false,
+  onReact,
 }: ConversationThreadProps) {
   return (
     <div className={['flex min-h-0 flex-1 flex-col', CHAT_BACKGROUND_CLASS].join(' ')}>
@@ -62,6 +80,11 @@ export function ConversationThread({
           <div className="space-y-3">
             {messages.map((message) => {
               const isOutbound = message.direction === 'outbound'
+              const canReact =
+                !reactDisabled &&
+                !isOutbound &&
+                message.platformMessageId !== null &&
+                onReact !== undefined
 
               return (
                 <div
@@ -70,25 +93,47 @@ export function ConversationThread({
                 >
                   <div
                     className={[
-                      'max-w-[80%] rounded-2xl px-4 py-2.5 text-sm',
-                      isOutbound
-                        ? outboundBubbleClass(platform)
-                        : 'border border-neutral-200 bg-white text-neutral-900',
-                      message.status === 'failed' ? 'ring-2 ring-red-300' : '',
+                      'group flex max-w-[80%] items-end gap-1',
+                      isOutbound ? 'flex-row-reverse' : 'flex-row',
                     ].join(' ')}
                   >
-                    <p className="whitespace-pre-wrap break-words">{message.content}</p>
-                    <div
-                      className={[
-                        'mt-1 flex items-center justify-end gap-1.5 text-xs',
-                        isOutbound ? outboundMetaClass(platform) : 'text-neutral-400',
-                      ].join(' ')}
-                    >
-                      {isOutbound && (
-                        <MessageStatusIndicator status={message.status} platform={platform} />
-                      )}
-                      <span>{formatInboxTimestamp(message.createdAt)}</span>
+                    <div>
+                      <div
+                        className={[
+                          'rounded-2xl px-4 py-2.5 text-sm',
+                          isOutbound
+                            ? outboundBubbleClass(platform)
+                            : 'border border-neutral-200 bg-white text-neutral-900',
+                          message.status === 'failed' ? 'ring-2 ring-red-300' : '',
+                        ].join(' ')}
+                      >
+                        <p className="whitespace-pre-wrap break-words">{message.content}</p>
+                        <div
+                          className={[
+                            'mt-1 flex items-center justify-end gap-1.5 text-xs',
+                            isOutbound ? outboundMetaClass(platform) : 'text-neutral-400',
+                          ].join(' ')}
+                        >
+                          {isOutbound && (
+                            <MessageStatusIndicator status={message.status} platform={platform} />
+                          )}
+                          <span>{formatInboxTimestamp(message.createdAt)}</span>
+                        </div>
+                      </div>
+                      <div className={isOutbound ? 'flex justify-end' : 'flex justify-start'}>
+                        <MessageReactions message={message} />
+                      </div>
                     </div>
+
+                    {canReact && (
+                      <ReactionPicker
+                        disabled={reactDisabled}
+                        onSelect={(emoji) => {
+                          const nextEmoji = emoji === message.agentReaction ? null : emoji
+                          void onReact(message.id, nextEmoji)
+                        }}
+                      />
+                    )}
                   </div>
                 </div>
               )
