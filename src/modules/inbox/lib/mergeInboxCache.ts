@@ -36,12 +36,40 @@ function mapRealtimeMessage(row: Record<string, unknown>): Message | null {
   }
 }
 
-function messageExists(messages: Message[], incoming: Message): boolean {
-  return messages.some(
+function upsertMessageInList(messages: Message[], incoming: Message): Message[] {
+  const index = messages.findIndex(
     (item) =>
       item.id === incoming.id ||
       (incoming.platformMessageId !== null &&
         item.platformMessageId === incoming.platformMessageId),
+  )
+
+  if (index === -1) {
+    return [...messages, incoming]
+  }
+
+  const next = [...messages]
+  next[index] = incoming
+  return next
+}
+
+export function upsertThreadMessage(
+  queryClient: QueryClient,
+  conversationId: string,
+  message: Message,
+): void {
+  queryClient.setQueryData(
+    inboxKeys.thread(conversationId),
+    (current: ConversationDetailResponse | undefined) => {
+      if (current === undefined) {
+        return current
+      }
+
+      return {
+        ...current,
+        messages: upsertMessageInList(current.messages, message),
+      }
+    },
   )
 }
 
@@ -68,13 +96,9 @@ export function applyMessageInsert(
           return current
         }
 
-        if (messageExists(current.messages, message)) {
-          return current
-        }
-
         return {
           ...current,
-          messages: [...current.messages, message],
+          messages: upsertMessageInList(current.messages, message),
         }
       },
     )
@@ -106,9 +130,18 @@ export function applyMessageUpdate(
         return current
       }
 
-      const index = current.messages.findIndex((item) => item.id === message.id)
+      const index = current.messages.findIndex(
+        (item) =>
+          item.id === message.id ||
+          (message.platformMessageId !== null &&
+            item.platformMessageId === message.platformMessageId),
+      )
+
       if (index === -1) {
-        return current
+        return {
+          ...current,
+          messages: upsertMessageInList(current.messages, message),
+        }
       }
 
       const messages = [...current.messages]

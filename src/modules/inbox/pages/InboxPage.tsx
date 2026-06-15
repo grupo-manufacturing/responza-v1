@@ -19,6 +19,7 @@ import {
   useInboxThread,
 } from '@/modules/inbox/hooks/useInboxQueries'
 import { useInboxRealtime } from '@/modules/inbox/hooks/useInboxRealtime'
+import { upsertThreadMessage } from '@/modules/inbox/lib/mergeInboxCache'
 import { InboxService, type Message } from '@/modules/inbox/inbox.service'
 import { useSubscriptionGate } from '@/shared/hooks/useSubscriptionGate'
 import { useSession } from '@/shared/hooks/useSession'
@@ -143,13 +144,7 @@ export function InboxPage() {
     try {
       const result = await InboxService.sendMessage(selectedConversationId, { content })
 
-      queryClient.setQueryData(
-        inboxKeys.thread(selectedConversationId),
-        (current: Awaited<ReturnType<typeof InboxService.getConversation>> | undefined) => {
-          if (!current) return current
-          return { ...current, messages: [...current.messages, result.message] }
-        },
-      )
+      upsertThreadMessage(queryClient, selectedConversationId, result.message)
 
       queryClient.setQueryData(
         inboxKeys.conversations(platformFilter),
@@ -171,13 +166,7 @@ export function InboxPage() {
     } catch (err) {
       const details = getApiErrorDetails<SendMessageErrorDetails>(err)
       if (details?.message) {
-        queryClient.setQueryData(
-          inboxKeys.thread(selectedConversationId),
-          (current: Awaited<ReturnType<typeof InboxService.getConversation>> | undefined) => {
-            if (!current) return current
-            return { ...current, messages: [...current.messages, details.message!] }
-          },
-        )
+        upsertThreadMessage(queryClient, selectedConversationId, details.message)
       }
 
       setSendError(getApiErrorMessage(err, 'Could not send message. Please try again.'))
