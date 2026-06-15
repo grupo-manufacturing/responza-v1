@@ -2,6 +2,7 @@ import axios from 'axios'
 
 import { getApiBaseUrl } from '@/shared/config/env'
 import { clearSessionCache } from '@/shared/hooks/useSession'
+import { resetRealtimeSupabaseClient } from '@/shared/realtime/supabase'
 import { SessionStorage } from '@/shared/session/storage'
 
 const api = axios.create({
@@ -26,6 +27,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       clearSessionCache()
       SessionStorage.clearTokens()
+      resetRealtimeSupabaseClient()
       window.location.href = '/auth?mode=login'
     }
     return Promise.reject(error)

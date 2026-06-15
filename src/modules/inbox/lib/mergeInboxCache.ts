@@ -1,0 +1,130 @@
+import type { QueryClient } from '@tanstack/react-query'
+
+import type { MessageDirection, MessageStatus } from '@/modules/inbox/inbox.constants'
+import type { ConversationDetailResponse, Message } from '@/modules/inbox/inbox.service'
+import { inboxKeys } from '@/modules/inbox/hooks/useInboxQueries'
+
+function mapRealtimeMessage(row: Record<string, unknown>): Message | null {
+  const id = row.id
+  const conversationId = row.conversation_id
+  const content = row.content
+  const createdAt = row.created_at
+
+  if (
+    typeof id !== 'string' ||
+    typeof conversationId !== 'string' ||
+    typeof content !== 'string' ||
+    typeof createdAt !== 'string'
+  ) {
+    return null
+  }
+
+  return {
+    id,
+    organizationId: typeof row.organization_id === 'string' ? row.organization_id : '',
+    conversationId,
+    participantId: typeof row.participant_id === 'string' ? row.participant_id : null,
+    direction: row.direction as MessageDirection,
+    platformMessageId:
+      typeof row.platform_message_id === 'string' ? row.platform_message_id : null,
+    content,
+    status: row.status as MessageStatus,
+    customerReaction:
+      typeof row.customer_reaction === 'string' ? row.customer_reaction : null,
+    agentReaction: typeof row.agent_reaction === 'string' ? row.agent_reaction : null,
+    createdAt,
+  }
+}
+
+function messageExists(messages: Message[], incoming: Message): boolean {
+  return messages.some(
+    (item) =>
+      item.id === incoming.id ||
+      (incoming.platformMessageId !== null &&
+        item.platformMessageId === incoming.platformMessageId),
+  )
+}
+
+export function applyMessageInsert(
+  queryClient: QueryClient,
+  input: {
+    selectedConversationId: string | null
+    row: Record<string, unknown>
+  },
+): void {
+  const message = mapRealtimeMessage(input.row)
+  if (message === null) {
+    return
+  }
+
+  if (
+    input.selectedConversationId !== null &&
+    message.conversationId === input.selectedConversationId
+  ) {
+    queryClient.setQueryData(
+      inboxKeys.thread(input.selectedConversationId),
+      (current: ConversationDetailResponse | undefined) => {
+        if (current === undefined) {
+          return current
+        }
+
+        if (messageExists(current.messages, message)) {
+          return current
+        }
+
+        return {
+          ...current,
+          messages: [...current.messages, message],
+        }
+      },
+    )
+  }
+
+  void queryClient.invalidateQueries({ queryKey: ['inbox', 'conversations'] })
+}
+
+export function applyMessageUpdate(
+  queryClient: QueryClient,
+  input: {
+    selectedConversationId: string | null
+    row: Record<string, unknown>
+  },
+): void {
+  const message = mapRealtimeMessage(input.row)
+  if (message === null || input.selectedConversationId === null) {
+    return
+  }
+
+  if (message.conversationId !== input.selectedConversationId) {
+    return
+  }
+
+  queryClient.setQueryData(
+    inboxKeys.thread(input.selectedConversationId),
+    (current: ConversationDetailResponse | undefined) => {
+      if (current === undefined) {
+        return current
+      }
+
+      const index = current.messages.findIndex((item) => item.id === message.id)
+      if (index === -1) {
+        return current
+      }
+
+      const messages = [...current.messages]
+      messages[index] = message
+      return { ...current, messages }
+    },
+  )
+}
+
+export function invalidateInboxQueries(
+  queryClient: QueryClient,
+  selectedConversationId: string | null,
+): void {
+  void queryClient.invalidateQueries({ queryKey: ['inbox', 'conversations'] })
+
+  if (selectedConversationId !== null) {
+    void queryClient.invalidateQueries({ queryKey: inboxKeys.thread(selectedConversationId) })
+  }
+}

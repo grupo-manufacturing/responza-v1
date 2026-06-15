@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react'
+
 import { Spinner } from '@/components/ui/Spinner'
 import { MessageStatusIndicator } from '@/modules/inbox/components/MessageStatusIndicator'
 import { ReactionPicker } from '@/modules/inbox/components/ReactionPicker'
@@ -53,6 +55,31 @@ export function ConversationThread({
   reactDisabled = false,
   onReact,
 }: ConversationThreadProps) {
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const previousMessageCountRef = useRef(messages.length)
+
+  useEffect(() => {
+    const container = scrollRef.current
+    if (container === null) {
+      previousMessageCountRef.current = messages.length
+      return
+    }
+
+    const grew = messages.length > previousMessageCountRef.current
+    previousMessageCountRef.current = messages.length
+
+    if (!grew) {
+      return
+    }
+
+    const distanceFromBottom =
+      container.scrollHeight - container.scrollTop - container.clientHeight
+
+    if (distanceFromBottom < 120) {
+      container.scrollTop = container.scrollHeight
+    }
+  }, [messages])
+
   return (
     <div className={['flex min-h-0 flex-1 flex-col', CHAT_BACKGROUND_CLASS].join(' ')}>
       {loading && (
@@ -70,7 +97,10 @@ export function ConversationThread({
       )}
 
       {!loading && conversation !== null && (
-        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+        <div
+          ref={scrollRef}
+          className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        >
           {messages.length === 0 && (
             <p className="py-8 text-center text-sm text-neutral-500">
               No messages in this conversation yet.

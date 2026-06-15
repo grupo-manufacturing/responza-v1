@@ -5,6 +5,10 @@ interface ImportMetaEnv {
   readonly VITE_META_APP_ID?: string
   readonly VITE_WHATSAPP_EMBEDDED_CONFIG_ID?: string
   readonly VITE_GRAPH_API_VERSION?: string
+  readonly VITE_INSTAGRAM_APP_ID?: string
+  readonly VITE_INSTAGRAM_REDIRECT_URI?: string
+  readonly VITE_SUPABASE_URL?: string
+  readonly VITE_SUPABASE_ANON_KEY?: string
 }
 
 interface ImportMeta {

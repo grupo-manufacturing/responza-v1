@@ -18,8 +18,11 @@ import {
   useInboxQueryClient,
   useInboxThread,
 } from '@/modules/inbox/hooks/useInboxQueries'
+import { useInboxRealtime } from '@/modules/inbox/hooks/useInboxRealtime'
 import { InboxService, type Message } from '@/modules/inbox/inbox.service'
 import { useSubscriptionGate } from '@/shared/hooks/useSubscriptionGate'
+import { useSession } from '@/shared/hooks/useSession'
+import { SessionStorage } from '@/shared/session/storage'
 import { getApiErrorDetails, getApiErrorMessage } from '@/shared/utils/api-error'
 
 const LIST_COLUMN_CLASS = 'w-full lg:w-[280px] lg:shrink-0'
@@ -33,6 +36,7 @@ export function InboxPage() {
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null)
   const [sending, setSending] = useState(false)
   const { subscriptionRequired, handleError } = useSubscriptionGate()
+  const { me } = useSession()
   const [sendError, setSendError] = useState<string | null>(null)
   const [mobileShowThread, setMobileShowThread] = useState(false)
   const queryClient = useInboxQueryClient()
@@ -41,6 +45,14 @@ export function InboxPage() {
 
   const conversationsQuery = useInboxConversations(platformFilter, queriesEnabled)
   const threadQuery = useInboxThread(selectedConversationId, queriesEnabled)
+
+  const organizationId = me?.organization.id ?? SessionStorage.getStoredOrganization()?.id ?? null
+
+  useInboxRealtime({
+    organizationId,
+    selectedConversationId,
+    enabled: queriesEnabled,
+  })
 
   useEffect(() => {
     if (conversationsQuery.error) {

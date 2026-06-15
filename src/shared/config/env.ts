@@ -90,3 +90,11 @@ export function isWhatsAppEmbeddedSignupConfigured(): boolean {
 export function isInstagramOAuthConfigured(): boolean {
   return getInstagramAppId().length > 0 && getInstagramRedirectUri().length > 0
 }
+
+export function getSupabaseUrl(): string {
+  return import.meta.env.VITE_SUPABASE_URL?.trim() ?? ''
+}
+
+export function getSupabaseAnonKey(): string {
+  return import.meta.env.VITE_SUPABASE_ANON_KEY?.trim() ?? ''
+}
