@@ -9,9 +9,8 @@ export interface Integration {
 }
 
 export interface WhatsAppConnectSummary {
-  phone_number_id: string
-  waba_id: string
-  business_id: string | null
+  display_name: string | null
+  profile_picture_url: string | null
 }
 
 export interface InstagramConnectSummary {

@@ -1,7 +1,7 @@
 import { SubscriptionRequired } from '@/components/common/SubscriptionRequired'
 import { Alert } from '@/components/ui/Alert'
 import { Spinner } from '@/components/ui/Spinner'
-import { PlatformCard } from '@/modules/integrations/components/PlatformCard'
+import { IntegrationRow } from '@/modules/integrations/components/IntegrationRow'
 import { useIntegrations } from '@/modules/integrations/hooks/useIntegrations'
 
 export function IntegrationsPage() {
@@ -66,19 +66,21 @@ export function IntegrationsPage() {
       )}
 
       {!loading && (
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          {integrations.map((integration) => (
-            <PlatformCard
-              key={integration.platform}
-              platform={integration.platform}
-              status={integration.status}
-              busy={busyPlatform === integration.platform}
-              whatsappDetails={integration.platform === 'whatsapp' ? whatsappDetails : null}
-              instagramDetails={integration.platform === 'instagram' ? instagramDetails : null}
-              onConnect={handleConnect}
-              onDisconnect={handleDisconnect}
-            />
-          ))}
+        <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
+          <div className="divide-y divide-neutral-100">
+            {integrations.map((integration) => (
+              <IntegrationRow
+                key={integration.platform}
+                platform={integration.platform}
+                status={integration.status}
+                busy={busyPlatform === integration.platform}
+                whatsappDetails={integration.platform === 'whatsapp' ? whatsappDetails : null}
+                instagramDetails={integration.platform === 'instagram' ? instagramDetails : null}
+                onConnect={handleConnect}
+                onDisconnect={handleDisconnect}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>
