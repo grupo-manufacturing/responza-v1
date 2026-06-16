@@ -41,6 +41,12 @@ export function getCachedSession(): MeResponse | null {
   return cachedMe
 }
 
+export function applySessionProfile(me: MeResponse): void {
+  SessionStorage.saveSessionProfile(me)
+  cachedMe = me
+  notifyListeners()
+}
+
 export function clearSessionCache(): void {
   cachedMe = null
   inflight = null

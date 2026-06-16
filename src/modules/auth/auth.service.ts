@@ -26,4 +26,16 @@ export class AuthService {
     const response = await api.get<MeResponse>('/auth/me')
     return response.data
   }
+
+  static async patchMe(data: { name: string }): Promise<MeResponse> {
+    const response = await api.patch<MeResponse>('/auth/me', data)
+    return response.data
+  }
+
+  static async changePassword(data: {
+    currentPassword: string
+    newPassword: string
+  }): Promise<void> {
+    await api.post('/auth/change-password', data)
+  }
 }

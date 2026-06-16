@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router-dom'
 
-import { ComingSoon } from '@/components/common/ComingSoon'
+import { GeneralSettingsPanel } from '@/modules/settings/components/GeneralSettingsPanel'
 import { SubscriptionPanel } from '@/modules/settings/components/SubscriptionPanel'
 
 const TABS = [
@@ -47,7 +47,7 @@ export function SettingsPage() {
         ))}
       </nav>
 
-      {activeTab === 'general' && <ComingSoon />}
+      {activeTab === 'general' && <GeneralSettingsPanel />}
 
       {activeTab === 'subscription' && <SubscriptionPanel />}
     </div>
