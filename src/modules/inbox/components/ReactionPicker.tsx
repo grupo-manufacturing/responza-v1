@@ -34,13 +34,13 @@ export function ReactionPicker({ disabled, onSelect }: ReactionPickerProps) {
         aria-label="React to message"
         aria-expanded={open}
         onClick={() => setOpen((current) => !current)}
-        className="inline-flex h-7 w-7 items-center justify-center rounded-full text-base text-neutral-400 opacity-0 transition-opacity hover:bg-neutral-100 hover:text-neutral-600 group-hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-0"
+        className="inline-flex h-7 w-7 items-center justify-center rounded-full text-base text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-700 disabled:cursor-not-allowed disabled:opacity-40"
       >
         <span aria-hidden>+</span>
       </button>
 
       {open && (
-        <div className="absolute bottom-full left-0 z-10 mb-1 grid w-[220px] grid-cols-6 gap-1 rounded-xl border border-neutral-200 bg-white p-2 shadow-lg">
+        <div className="absolute top-full right-0 z-30 mt-1 grid w-[220px] grid-cols-6 gap-1 rounded-xl border border-neutral-200 bg-white p-2 shadow-lg">
           {MESSAGE_QUICK_EMOJIS.map((emoji) => (
             <button
               key={emoji}

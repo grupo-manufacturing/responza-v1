@@ -1,11 +1,15 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { Spinner } from '@/components/ui/Spinner'
+import { AiService } from '@/modules/ai/ai.service'
 import { MessageStatusIndicator } from '@/modules/inbox/components/MessageStatusIndicator'
 import { ReactionPicker } from '@/modules/inbox/components/ReactionPicker'
+import { TranslateMessageButton } from '@/modules/inbox/components/TranslateMessageButton'
 import { formatInboxTimestamp } from '@/modules/inbox/inbox.constants'
+import { isTranslatableMessageContent } from '@/modules/inbox/translation.utils'
 import type { IntegrationPlatform } from '@/modules/integrations/integrations.constants'
 import type { Conversation, Message } from '@/modules/inbox/inbox.service'
+import { getApiErrorMessage } from '@/shared/utils/api-error'
 
 const CHAT_BACKGROUND_CLASS = "bg-[url('/chat-bg.jpg')] bg-repeat bg-auto"
 
@@ -17,6 +21,11 @@ type ConversationThreadProps = {
   readonly reactDisabled?: boolean
   readonly onReact?: (messageId: string, emoji: string | null) => Promise<void>
 }
+
+type MessageTranslationState =
+  | { status: 'loading' }
+  | { status: 'success'; translated: string }
+  | { status: 'error'; message: string }
 
 function outboundBubbleClass(platform: IntegrationPlatform | null | undefined): string {
   if (platform === 'whatsapp') {
@@ -32,6 +41,18 @@ function outboundMetaClass(platform: IntegrationPlatform | null | undefined): st
   }
 
   return 'text-neutral-300'
+}
+
+function translationTextClass(isOutbound: boolean, platform: IntegrationPlatform | null | undefined): string {
+  if (!isOutbound) {
+    return 'border-neutral-200 text-neutral-600'
+  }
+
+  if (platform === 'whatsapp') {
+    return 'border-[#128C7E]/20 text-neutral-700'
+  }
+
+  return 'border-white/20 text-neutral-200'
 }
 
 function MessageReactions({ message }: { readonly message: Message }) {
@@ -57,6 +78,11 @@ export function ConversationThread({
 }: ConversationThreadProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const previousMessageCountRef = useRef(messages.length)
+  const [translations, setTranslations] = useState<Record<string, MessageTranslationState>>({})
+
+  useEffect(() => {
+    setTranslations({})
+  }, [conversation?.id])
 
   useEffect(() => {
     const container = scrollRef.current
@@ -79,6 +105,29 @@ export function ConversationThread({
       container.scrollTop = container.scrollHeight
     }
   }, [messages])
+
+  const handleTranslate = async (messageId: string) => {
+    setTranslations((current) => ({
+      ...current,
+      [messageId]: { status: 'loading' },
+    }))
+
+    try {
+      const result = await AiService.translateMessage(messageId)
+      setTranslations((current) => ({
+        ...current,
+        [messageId]: { status: 'success', translated: result.translated },
+      }))
+    } catch (err: unknown) {
+      setTranslations((current) => ({
+        ...current,
+        [messageId]: {
+          status: 'error',
+          message: getApiErrorMessage(err, 'Could not translate this message.'),
+        },
+      }))
+    }
+  }
 
   return (
     <div className={['flex min-h-0 flex-1 flex-col', CHAT_BACKGROUND_CLASS].join(' ')}>
@@ -115,55 +164,82 @@ export function ConversationThread({
                 !isOutbound &&
                 message.platformMessageId !== null &&
                 onReact !== undefined
+              const canTranslate = isTranslatableMessageContent(message.content)
+              const showActions = canReact || canTranslate
               const hasReactions =
                 message.customerReaction !== null || message.agentReaction !== null
+              const translation = translations[message.id]
+              const isTranslating = translation?.status === 'loading'
 
               return (
                 <div
                   key={message.id}
                   className={['flex', isOutbound ? 'justify-end' : 'justify-start'].join(' ')}
                 >
-                  <div
-                    className={[
-                      'group flex max-w-[80%] items-end gap-1',
-                      isOutbound ? 'flex-row-reverse' : 'flex-row',
-                    ].join(' ')}
-                  >
-                    <div className={['relative', hasReactions ? 'mt-2' : ''].join(' ')}>
-                      <div
-                        className={[
-                          'rounded-2xl px-4 py-2.5 text-sm',
-                          isOutbound
-                            ? outboundBubbleClass(platform)
-                            : 'border border-neutral-200 bg-white text-neutral-900',
-                          message.status === 'failed' ? 'ring-2 ring-red-300' : '',
-                        ].join(' ')}
-                      >
-                        <p className="whitespace-pre-wrap break-words">{message.content}</p>
-                        <div
+                  <div className={['group relative max-w-[80%]', hasReactions ? 'mt-2' : ''].join(' ')}>
+                    {showActions && (
+                      <div className="absolute -top-1 right-1 z-20 flex items-center gap-0.5 rounded-full border border-neutral-200 bg-white/95 p-0.5 shadow-sm opacity-0 transition-opacity group-hover:opacity-100">
+                        {canReact && (
+                          <ReactionPicker
+                            disabled={reactDisabled}
+                            onSelect={(emoji) => {
+                              const nextEmoji = emoji === message.agentReaction ? null : emoji
+                              void onReact(message.id, nextEmoji)
+                            }}
+                          />
+                        )}
+                        {canTranslate && (
+                          <TranslateMessageButton
+                            disabled={reactDisabled}
+                            loading={isTranslating}
+                            onTranslate={() => {
+                              void handleTranslate(message.id)
+                            }}
+                          />
+                        )}
+                      </div>
+                    )}
+
+                    <div
+                      className={[
+                        'rounded-2xl px-4 py-2.5 text-sm',
+                        isOutbound
+                          ? outboundBubbleClass(platform)
+                          : 'border border-neutral-200 bg-white text-neutral-900',
+                        message.status === 'failed' ? 'ring-2 ring-red-300' : '',
+                      ].join(' ')}
+                    >
+                      <p className="whitespace-pre-wrap break-words">{message.content}</p>
+
+                      {translation?.status === 'success' && (
+                        <p
                           className={[
-                            'mt-1 flex items-center justify-end gap-1.5 text-xs',
-                            isOutbound ? outboundMetaClass(platform) : 'text-neutral-400',
+                            'mt-2 border-t pt-2 text-sm leading-relaxed',
+                            translationTextClass(isOutbound, platform),
                           ].join(' ')}
                         >
-                          {isOutbound && (
-                            <MessageStatusIndicator status={message.status} platform={platform} />
-                          )}
-                          <span>{formatInboxTimestamp(message.createdAt)}</span>
-                        </div>
+                          {translation.translated}
+                        </p>
+                      )}
+
+                      {translation?.status === 'error' && (
+                        <p className="mt-2 text-xs text-red-600">{translation.message}</p>
+                      )}
+
+                      <div
+                        className={[
+                          'mt-1 flex items-center justify-end gap-1.5 text-xs',
+                          isOutbound ? outboundMetaClass(platform) : 'text-neutral-400',
+                        ].join(' ')}
+                      >
+                        {isOutbound && (
+                          <MessageStatusIndicator status={message.status} platform={platform} />
+                        )}
+                        <span>{formatInboxTimestamp(message.createdAt)}</span>
                       </div>
-                      <MessageReactions message={message} />
                     </div>
 
-                    {canReact && (
-                      <ReactionPicker
-                        disabled={reactDisabled}
-                        onSelect={(emoji) => {
-                          const nextEmoji = emoji === message.agentReaction ? null : emoji
-                          void onReact(message.id, nextEmoji)
-                        }}
-                      />
-                    )}
+                    <MessageReactions message={message} />
                   </div>
                 </div>
               )

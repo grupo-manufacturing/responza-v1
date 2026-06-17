@@ -4,11 +4,24 @@ const ORGANIZATION_STORAGE_KEY = 'organization'
 const SUBSCRIPTION_STORAGE_KEY = 'subscription'
 const BUSINESS_DETAILS_COMPLETED_KEY = 'businessDetailsCompleted'
 
+export type TranslationLanguage =
+  | 'hindi'
+  | 'bengali'
+  | 'telugu'
+  | 'marathi'
+  | 'tamil'
+  | 'gujarati'
+  | 'kannada'
+  | 'malayalam'
+  | 'punjabi'
+  | 'odia'
+
 export type StoredOrganization = {
   id: string
   email: string
   name: string
   plan: string
+  preferredTranslationLanguage: TranslationLanguage | null
 }
 
 export type StoredBusinessDetails = {

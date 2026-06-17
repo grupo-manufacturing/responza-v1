@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 
 import { Alert } from '@/components/ui/Alert'
+import { Select } from '@/components/ui/Select'
 import { SpinnerSection } from '@/components/ui/Spinner'
 import { AuthService } from '@/modules/auth/auth.service'
 import { applySessionProfile } from '@/shared/hooks/useSession'
+import type { TranslationLanguage } from '@/shared/session/storage'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
 
 const inputClassName =
@@ -11,17 +13,25 @@ const inputClassName =
 
 const labelClassName = 'mb-1.5 block text-sm font-medium text-neutral-700'
 
+type LanguageSelectValue = TranslationLanguage | ''
+
 export function GeneralSettingsPanel() {
   const [name, setName] = useState('')
   const [savedName, setSavedName] = useState('')
   const [email, setEmail] = useState('')
+  const [targetLanguage, setTargetLanguage] = useState<LanguageSelectValue>('')
+  const [savedTargetLanguage, setSavedTargetLanguage] = useState<LanguageSelectValue>('')
+  const [languageOptions, setLanguageOptions] = useState<
+    ReadonlyArray<{ value: TranslationLanguage; label: string }>
+  >([])
   const [isLoading, setIsLoading] = useState(true)
-  const [isSavingName, setIsSavingName] = useState(false)
+  const [isSavingAccount, setIsSavingAccount] = useState(false)
   const [isSavingPassword, setIsSavingPassword] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
-  const [nameMessage, setNameMessage] = useState<{ variant: 'success' | 'error'; text: string } | null>(
-    null,
-  )
+  const [accountMessage, setAccountMessage] = useState<{
+    variant: 'success' | 'error'
+    text: string
+  } | null>(null)
   const [passwordMessage, setPasswordMessage] = useState<{
     variant: 'success' | 'error'
     text: string
@@ -33,12 +43,21 @@ export function GeneralSettingsPanel() {
   useEffect(() => {
     let cancelled = false
 
-    void AuthService.getMe()
-      .then((me) => {
+    void Promise.all([AuthService.getMe(), AuthService.getTranslationLanguages()])
+      .then(([me, { languages }]) => {
         if (cancelled) return
         setName(me.organization.name)
         setSavedName(me.organization.name)
         setEmail(me.organization.email)
+        const preferred = me.organization.preferredTranslationLanguage ?? ''
+        setTargetLanguage(preferred)
+        setSavedTargetLanguage(preferred)
+        setLanguageOptions(
+          languages.map((language) => ({
+            value: language.code,
+            label: language.label,
+          })),
+        )
         applySessionProfile(me)
       })
       .catch(() => {
@@ -54,28 +73,46 @@ export function GeneralSettingsPanel() {
   }, [])
 
   const nameDirty = name.trim() !== savedName
-  const canSaveName = nameDirty && name.trim().length > 0 && !isSavingName
+  const languageDirty = targetLanguage !== savedTargetLanguage
+  const canSaveAccount =
+    (nameDirty || languageDirty) && name.trim().length > 0 && !isSavingAccount
 
-  const handleSaveName = async (event: React.FormEvent) => {
+  const handleSaveAccount = async (event: React.FormEvent) => {
     event.preventDefault()
-    if (!canSaveName) return
+    if (!canSaveAccount) return
 
-    setIsSavingName(true)
-    setNameMessage(null)
+    setIsSavingAccount(true)
+    setAccountMessage(null)
 
     try {
-      const me = await AuthService.patchMe({ name: name.trim() })
+      const payload: {
+        name?: string
+        preferredTranslationLanguage?: TranslationLanguage | null
+      } = {}
+
+      if (nameDirty) {
+        payload.name = name.trim()
+      }
+
+      if (languageDirty) {
+        payload.preferredTranslationLanguage = targetLanguage === '' ? null : targetLanguage
+      }
+
+      const me = await AuthService.patchMe(payload)
       setName(me.organization.name)
       setSavedName(me.organization.name)
+      const preferred = me.organization.preferredTranslationLanguage ?? ''
+      setTargetLanguage(preferred)
+      setSavedTargetLanguage(preferred)
       applySessionProfile(me)
-      setNameMessage({ variant: 'success', text: 'Name updated.' })
+      setAccountMessage({ variant: 'success', text: 'Account settings updated.' })
     } catch (err: unknown) {
-      setNameMessage({
+      setAccountMessage({
         variant: 'error',
-        text: getApiErrorMessage(err, 'Could not update name.'),
+        text: getApiErrorMessage(err, 'Could not update account settings.'),
       })
     } finally {
-      setIsSavingName(false)
+      setIsSavingAccount(false)
     }
   }
 
@@ -126,15 +163,22 @@ export function GeneralSettingsPanel() {
     )
   }
 
+  const selectOptions: ReadonlyArray<{ value: LanguageSelectValue; label: string }> = [
+    { value: '', label: 'Select target language…' },
+    ...languageOptions,
+  ]
+
   return (
     <div className="max-w-2xl">
       <div className="mb-6">
         <h2 className="text-lg font-semibold text-neutral-900">General</h2>
-        <p className="mt-1 text-sm text-neutral-500">Your account details and login credentials.</p>
+        <p className="mt-1 text-sm text-neutral-500">
+          Your account details, translation preference, and login credentials.
+        </p>
       </div>
 
       <div className="rounded-2xl border border-neutral-200 bg-white shadow-sm">
-        <form onSubmit={handleSaveName} className="space-y-5 p-6 sm:p-8">
+        <form onSubmit={handleSaveAccount} className="space-y-5 p-6 sm:p-8">
           <div>
             <label htmlFor="account-name" className={labelClassName}>
               Name
@@ -147,7 +191,7 @@ export function GeneralSettingsPanel() {
               value={name}
               onChange={(event) => {
                 setName(event.target.value)
-                setNameMessage(null)
+                setAccountMessage(null)
               }}
               className={inputClassName}
               maxLength={160}
@@ -172,15 +216,34 @@ export function GeneralSettingsPanel() {
             <p className="mt-1.5 text-xs text-neutral-500">Login email cannot be changed here.</p>
           </div>
 
-          {nameMessage !== null && <Alert variant={nameMessage.variant}>{nameMessage.text}</Alert>}
+          <div>
+            <Select<LanguageSelectValue>
+              id="target-translation-language"
+              label="Target translation language"
+              value={targetLanguage}
+              onChange={(value) => {
+                setTargetLanguage(value)
+                setAccountMessage(null)
+              }}
+              options={selectOptions}
+              placeholder="Select target language…"
+            />
+            <p className="mt-1.5 text-xs text-neutral-500">
+              Inbox messages will be translated into this language when you use translate.
+            </p>
+          </div>
+
+          {accountMessage !== null && (
+            <Alert variant={accountMessage.variant}>{accountMessage.text}</Alert>
+          )}
 
           <div className="flex justify-end border-t border-neutral-100 pt-5">
             <button
               type="submit"
-              disabled={!canSaveName}
+              disabled={!canSaveAccount}
               className="inline-flex items-center justify-center rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isSavingName ? 'Saving…' : 'Save name'}
+              {isSavingAccount ? 'Saving…' : 'Save changes'}
             </button>
           </div>
         </form>

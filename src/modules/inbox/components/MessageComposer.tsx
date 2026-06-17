@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react'
 
-import { useConfetti } from '@/components/common/useConfetti'
 import { Spinner } from '@/components/ui/Spinner'
 import { AiService } from '@/modules/ai/ai.service'
 import { EmojiPicker } from '@/modules/inbox/components/EmojiPicker'
@@ -89,7 +88,6 @@ export function MessageComposer({ disabled, sending, platform = null, onSend }: 
   const [content, setContent] = useState('')
   const [rewriting, setRewriting] = useState(false)
   const [rewriteError, setRewriteError] = useState<string | null>(null)
-  const { fire: fireConfetti, confetti } = useConfetti()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const canSend = !disabled && !sending && !rewriting && content.trim().length > 0
   const canRewrite = !disabled && !sending && !rewriting && content.trim().length > 0
@@ -119,7 +117,6 @@ export function MessageComposer({ disabled, sending, platform = null, onSend }: 
     try {
       const { rewritten } = await AiService.rewriteDraft(trimmed)
       setContent(rewritten)
-      fireConfetti()
       requestAnimationFrame(() => {
         textareaRef.current?.focus()
       })
@@ -141,9 +138,7 @@ export function MessageComposer({ disabled, sending, platform = null, onSend }: 
   }
 
   return (
-    <>
-      {confetti}
-      <form
+    <form
         onSubmit={(event) => {
           void handleSubmit(event)
         }}
@@ -206,6 +201,5 @@ export function MessageComposer({ disabled, sending, platform = null, onSend }: 
         </p>
       )}
     </form>
-    </>
   )
 }

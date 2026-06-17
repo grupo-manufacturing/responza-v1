@@ -1,6 +1,7 @@
 import api from '@/shared/api/client'
 
 import type { AuthSession, MeResponse } from './auth.types'
+import type { TranslationLanguage } from '@/shared/session/storage'
 
 interface AuthApiResponse {
   accessToken: string
@@ -9,6 +10,11 @@ interface AuthApiResponse {
   organization: AuthSession['organization']
   subscription: AuthSession['subscription']
   businessDetails: AuthSession['businessDetails']
+}
+
+export interface TranslationLanguageOption {
+  code: TranslationLanguage
+  label: string
 }
 
 export class AuthService {
@@ -27,8 +33,18 @@ export class AuthService {
     return response.data
   }
 
-  static async patchMe(data: { name: string }): Promise<MeResponse> {
+  static async patchMe(data: {
+    name?: string
+    preferredTranslationLanguage?: TranslationLanguage | null
+  }): Promise<MeResponse> {
     const response = await api.patch<MeResponse>('/auth/me', data)
+    return response.data
+  }
+
+  static async getTranslationLanguages(): Promise<{ languages: TranslationLanguageOption[] }> {
+    const response = await api.get<{ languages: TranslationLanguageOption[] }>(
+      '/auth/translation-languages',
+    )
     return response.data
   }
 
