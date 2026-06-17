@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 
+import { useConfetti } from '@/components/common/useConfetti'
 import { Spinner } from '@/components/ui/Spinner'
 import { AiService } from '@/modules/ai/ai.service'
 import { EmojiPicker } from '@/modules/inbox/components/EmojiPicker'
@@ -88,6 +89,7 @@ export function MessageComposer({ disabled, sending, platform = null, onSend }: 
   const [content, setContent] = useState('')
   const [rewriting, setRewriting] = useState(false)
   const [rewriteError, setRewriteError] = useState<string | null>(null)
+  const { fire: fireConfetti, confetti } = useConfetti()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const canSend = !disabled && !sending && !rewriting && content.trim().length > 0
   const canRewrite = !disabled && !sending && !rewriting && content.trim().length > 0
@@ -117,6 +119,7 @@ export function MessageComposer({ disabled, sending, platform = null, onSend }: 
     try {
       const { rewritten } = await AiService.rewriteDraft(trimmed)
       setContent(rewritten)
+      fireConfetti()
       requestAnimationFrame(() => {
         textareaRef.current?.focus()
       })
@@ -138,12 +141,14 @@ export function MessageComposer({ disabled, sending, platform = null, onSend }: 
   }
 
   return (
-    <form
-      onSubmit={(event) => {
-        void handleSubmit(event)
-      }}
-      className="border-t border-neutral-200 bg-white px-4 py-3"
-    >
+    <>
+      {confetti}
+      <form
+        onSubmit={(event) => {
+          void handleSubmit(event)
+        }}
+        className="border-t border-neutral-200 bg-white px-4 py-3"
+      >
       <div
         className={[
           'flex items-center gap-1 rounded-xl border border-neutral-300 bg-white px-2 py-1.5 transition-colors focus-within:border-neutral-900',
@@ -152,6 +157,19 @@ export function MessageComposer({ disabled, sending, platform = null, onSend }: 
           platform === 'instagram' ? 'focus-within:border-[#E1306C]' : '',
         ].join(' ')}
       >
+        <EmojiPicker disabled={disabled || sending || rewriting} onSelect={handleEmojiSelect} />
+        <textarea
+          ref={textareaRef}
+          value={content}
+          onChange={(event) => {
+            setContent(event.target.value)
+            setRewriteError(null)
+          }}
+          placeholder={composerPlaceholder(disabled)}
+          disabled={disabled || sending || rewriting}
+          rows={1}
+          className="min-h-[36px] max-h-28 flex-1 resize-none border-0 bg-transparent py-1.5 text-sm text-neutral-900 outline-none placeholder:text-neutral-400 disabled:cursor-not-allowed"
+        />
         <button
           type="button"
           onClick={() => {
@@ -169,19 +187,6 @@ export function MessageComposer({ disabled, sending, platform = null, onSend }: 
         >
           {rewriting ? <Spinner size="sm" variant="muted" /> : <RewriteIcon />}
         </button>
-        <EmojiPicker disabled={disabled || sending || rewriting} onSelect={handleEmojiSelect} />
-        <textarea
-          ref={textareaRef}
-          value={content}
-          onChange={(event) => {
-            setContent(event.target.value)
-            setRewriteError(null)
-          }}
-          placeholder={composerPlaceholder(disabled)}
-          disabled={disabled || sending || rewriting}
-          rows={1}
-          className="min-h-[36px] max-h-28 flex-1 resize-none border-0 bg-transparent py-1.5 text-sm text-neutral-900 outline-none placeholder:text-neutral-400 disabled:cursor-not-allowed"
-        />
         <button
           type="submit"
           disabled={!canSend}
@@ -201,5 +206,6 @@ export function MessageComposer({ disabled, sending, platform = null, onSend }: 
         </p>
       )}
     </form>
+    </>
   )
 }
