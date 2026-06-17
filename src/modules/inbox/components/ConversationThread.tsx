@@ -24,8 +24,10 @@ type ConversationThreadProps = {
 
 type MessageTranslationState =
   | { status: 'loading' }
-  | { status: 'success'; translated: string }
+  | { status: 'success'; translated: string; showOriginal: boolean }
   | { status: 'error'; message: string }
+
+const MESSAGE_ACTIONS_HEIGHT_CLASS = 'pt-9'
 
 function outboundBubbleClass(platform: IntegrationPlatform | null | undefined): string {
   if (platform === 'whatsapp') {
@@ -41,18 +43,6 @@ function outboundMetaClass(platform: IntegrationPlatform | null | undefined): st
   }
 
   return 'text-neutral-300'
-}
-
-function translationTextClass(isOutbound: boolean, platform: IntegrationPlatform | null | undefined): string {
-  if (!isOutbound) {
-    return 'border-neutral-200 text-neutral-600'
-  }
-
-  if (platform === 'whatsapp') {
-    return 'border-[#128C7E]/20 text-neutral-700'
-  }
-
-  return 'border-white/20 text-neutral-200'
 }
 
 function MessageReactions({ message }: { readonly message: Message }) {
@@ -116,7 +106,7 @@ export function ConversationThread({
       const result = await AiService.translateMessage(messageId)
       setTranslations((current) => ({
         ...current,
-        [messageId]: { status: 'success', translated: result.translated },
+        [messageId]: { status: 'success', translated: result.translated, showOriginal: false },
       }))
     } catch (err: unknown) {
       setTranslations((current) => ({
@@ -127,6 +117,20 @@ export function ConversationThread({
         },
       }))
     }
+  }
+
+  const handleShowOriginal = (messageId: string) => {
+    setTranslations((current) => {
+      const state = current[messageId]
+      if (state?.status !== 'success') {
+        return current
+      }
+
+      return {
+        ...current,
+        [messageId]: { ...state, showOriginal: true },
+      }
+    })
   }
 
   return (
@@ -148,7 +152,7 @@ export function ConversationThread({
       {!loading && conversation !== null && (
         <div
           ref={scrollRef}
-          className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 pb-4 pt-6 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         >
           {messages.length === 0 && (
             <p className="py-8 text-center text-sm text-neutral-500">
@@ -156,7 +160,7 @@ export function ConversationThread({
             </p>
           )}
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             {messages.map((message) => {
               const isOutbound = message.direction === 'outbound'
               const canReact =
@@ -170,76 +174,93 @@ export function ConversationThread({
                 message.customerReaction !== null || message.agentReaction !== null
               const translation = translations[message.id]
               const isTranslating = translation?.status === 'loading'
+              const isShowingTranslation =
+                translation?.status === 'success' && !translation.showOriginal
+              const displayContent = isShowingTranslation
+                ? translation.translated
+                : message.content
 
               return (
                 <div
                   key={message.id}
                   className={['flex', isOutbound ? 'justify-end' : 'justify-start'].join(' ')}
                 >
-                  <div className={['group relative max-w-[80%]', hasReactions ? 'mt-2' : ''].join(' ')}>
-                    {showActions && (
-                      <div className="absolute -top-1 right-1 z-20 flex items-center gap-0.5 rounded-full border border-neutral-200 bg-white/95 p-0.5 shadow-sm opacity-0 transition-opacity group-hover:opacity-100">
-                        {canReact && (
-                          <ReactionPicker
-                            disabled={reactDisabled}
-                            onSelect={(emoji) => {
-                              const nextEmoji = emoji === message.agentReaction ? null : emoji
-                              void onReact(message.id, nextEmoji)
-                            }}
-                          />
-                        )}
-                        {canTranslate && (
-                          <TranslateMessageButton
-                            disabled={reactDisabled}
-                            loading={isTranslating}
-                            onTranslate={() => {
-                              void handleTranslate(message.id)
-                            }}
-                          />
-                        )}
-                      </div>
-                    )}
-
+                  <div
+                    className={[
+                      'flex max-w-[80%] flex-col',
+                      isOutbound ? 'items-end' : 'items-start',
+                    ].join(' ')}
+                  >
                     <div
                       className={[
-                        'rounded-2xl px-4 py-2.5 text-sm',
-                        isOutbound
-                          ? outboundBubbleClass(platform)
-                          : 'border border-neutral-200 bg-white text-neutral-900',
-                        message.status === 'failed' ? 'ring-2 ring-red-300' : '',
+                        'group relative w-full',
+                        showActions ? MESSAGE_ACTIONS_HEIGHT_CLASS : '',
+                        hasReactions ? 'mt-2' : '',
                       ].join(' ')}
                     >
-                      <p className="whitespace-pre-wrap break-words">{message.content}</p>
-
-                      {translation?.status === 'success' && (
-                        <p
-                          className={[
-                            'mt-2 border-t pt-2 text-sm leading-relaxed',
-                            translationTextClass(isOutbound, platform),
-                          ].join(' ')}
-                        >
-                          {translation.translated}
-                        </p>
-                      )}
-
-                      {translation?.status === 'error' && (
-                        <p className="mt-2 text-xs text-red-600">{translation.message}</p>
+                      {showActions && (
+                        <div className="absolute top-0 right-0 z-20 flex items-center gap-0.5 rounded-full border border-neutral-200 bg-white p-0.5 shadow-sm opacity-0 transition-opacity group-hover:opacity-100">
+                          {canReact && (
+                            <ReactionPicker
+                              disabled={reactDisabled}
+                              onSelect={(emoji) => {
+                                const nextEmoji = emoji === message.agentReaction ? null : emoji
+                                void onReact(message.id, nextEmoji)
+                              }}
+                            />
+                          )}
+                          {canTranslate && (
+                            <TranslateMessageButton
+                              disabled={reactDisabled}
+                              loading={isTranslating}
+                              onTranslate={() => {
+                                void handleTranslate(message.id)
+                              }}
+                            />
+                          )}
+                        </div>
                       )}
 
                       <div
                         className={[
-                          'mt-1 flex items-center justify-end gap-1.5 text-xs',
-                          isOutbound ? outboundMetaClass(platform) : 'text-neutral-400',
+                          'rounded-2xl px-4 py-2.5 text-sm',
+                          isOutbound
+                            ? outboundBubbleClass(platform)
+                            : 'border border-neutral-200 bg-white text-neutral-900',
+                          message.status === 'failed' ? 'ring-2 ring-red-300' : '',
                         ].join(' ')}
                       >
-                        {isOutbound && (
-                          <MessageStatusIndicator status={message.status} platform={platform} />
+                        <p className="whitespace-pre-wrap break-words">{displayContent}</p>
+
+                        {translation?.status === 'error' && (
+                          <p className="mt-2 text-xs text-red-600">{translation.message}</p>
                         )}
-                        <span>{formatInboxTimestamp(message.createdAt)}</span>
+
+                        <div
+                          className={[
+                            'mt-1 flex items-center justify-end gap-1.5 text-xs',
+                            isOutbound ? outboundMetaClass(platform) : 'text-neutral-400',
+                          ].join(' ')}
+                        >
+                          {isOutbound && (
+                            <MessageStatusIndicator status={message.status} platform={platform} />
+                          )}
+                          <span>{formatInboxTimestamp(message.createdAt)}</span>
+                        </div>
                       </div>
+
+                      <MessageReactions message={message} />
                     </div>
 
-                    <MessageReactions message={message} />
+                    {isShowingTranslation && (
+                      <button
+                        type="button"
+                        onClick={() => handleShowOriginal(message.id)}
+                        className="mt-1 self-start text-xs font-medium text-neutral-500 transition-colors hover:text-neutral-800"
+                      >
+                        Show original
+                      </button>
+                    )}
                   </div>
                 </div>
               )
