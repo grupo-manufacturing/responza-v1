@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Spinner } from '@/components/ui/Spinner'
 import { AiService } from '@/modules/ai/ai.service'
 import { EmojiPicker } from '@/modules/inbox/components/EmojiPicker'
+import { ReplySuggestionChips } from '@/modules/inbox/components/ReplySuggestionChips'
 import type { IntegrationPlatform } from '@/modules/integrations/integrations.constants'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
 
@@ -195,6 +196,11 @@ export function MessageComposer({
     })
   }
 
+  const handleDismissSuggestions = () => {
+    setSuggestions([])
+    setSuggestError(null)
+  }
+
   const handleEmojiSelect = (emoji: string) => {
     const textarea = textareaRef.current
     if (textarea === null || disabled || sending || aiBusy) {
@@ -208,36 +214,25 @@ export function MessageComposer({
   const composerDisabled = disabled || sending || aiBusy
 
   return (
-    <form
-      onSubmit={(event) => {
-        void handleSubmit(event)
-      }}
-      className="border-t border-neutral-200 bg-white px-4 py-3"
-    >
+    <div className="relative shrink-0">
       {suggestions.length > 0 && (
-        <div className="mb-2 flex flex-wrap gap-2">
-          {suggestions.map((suggestion, index) => (
-            <button
-              key={`${index}-${suggestion.slice(0, 24)}`}
-              type="button"
-              onClick={() => {
-                handleSuggestionSelect(suggestion)
-              }}
-              disabled={composerDisabled}
-              className={[
-                'max-w-full rounded-full border border-violet-200 bg-violet-50 px-3 py-1.5 text-left text-xs text-violet-900 transition-colors',
-                composerDisabled
-                  ? 'cursor-not-allowed opacity-50'
-                  : 'hover:border-violet-300 hover:bg-violet-100',
-              ].join(' ')}
-            >
-              <span className="line-clamp-2">{suggestion}</span>
-            </button>
-          ))}
+        <div className="absolute bottom-full left-0 right-0 z-10 px-4 pb-2">
+          <ReplySuggestionChips
+            suggestions={suggestions}
+            disabled={composerDisabled}
+            onSelect={handleSuggestionSelect}
+            onDismiss={handleDismissSuggestions}
+          />
         </div>
       )}
 
-      <div
+      <form
+        onSubmit={(event) => {
+          void handleSubmit(event)
+        }}
+        className="border-t border-neutral-200 bg-white px-4 py-3"
+      >
+        <div
         className={[
           'flex items-center gap-1 rounded-xl border border-neutral-300 bg-white px-2 py-1.5 transition-colors focus-within:border-neutral-900',
           composerDisabled ? 'bg-neutral-50' : '',
@@ -315,6 +310,7 @@ export function MessageComposer({
           {rewriteError}
         </p>
       )}
-    </form>
+      </form>
+    </div>
   )
 }
