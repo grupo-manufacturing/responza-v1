@@ -270,6 +270,7 @@ export function InboxPage() {
               onReact={handleReactToMessage}
             />
             <MessageComposer
+              conversationId={selectedConversationId}
               disabled={selectedConversationId === null || threadLoading}
               sending={sending}
               platform={activePlatform}

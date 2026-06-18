@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { Spinner } from '@/components/ui/Spinner'
 import { AiService } from '@/modules/ai/ai.service'
@@ -7,6 +7,7 @@ import type { IntegrationPlatform } from '@/modules/integrations/integrations.co
 import { getApiErrorMessage } from '@/shared/utils/api-error'
 
 type MessageComposerProps = {
+  readonly conversationId: string | null
   readonly disabled: boolean
   readonly sending: boolean
   readonly platform?: IntegrationPlatform | null
@@ -27,6 +28,19 @@ function SendIcon() {
         strokeLinejoin="round"
         strokeWidth={2}
         d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+      />
+    </svg>
+  )
+}
+
+function SuggestReplyIcon() {
+  return (
+    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.75}
+        d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
       />
     </svg>
   )
@@ -84,30 +98,52 @@ function insertAtCursor(textarea: HTMLTextAreaElement, value: string): string {
   return next
 }
 
-export function MessageComposer({ disabled, sending, platform = null, onSend }: MessageComposerProps) {
+function isAiBusy(rewriting: boolean, suggesting: boolean): boolean {
+  return rewriting || suggesting
+}
+
+export function MessageComposer({
+  conversationId,
+  disabled,
+  sending,
+  platform = null,
+  onSend,
+}: MessageComposerProps) {
   const [content, setContent] = useState('')
   const [rewriting, setRewriting] = useState(false)
+  const [suggesting, setSuggesting] = useState(false)
   const [rewriteError, setRewriteError] = useState<string | null>(null)
+  const [suggestError, setSuggestError] = useState<string | null>(null)
+  const [suggestions, setSuggestions] = useState<string[]>([])
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const canSend = !disabled && !sending && !rewriting && content.trim().length > 0
-  const canRewrite = !disabled && !sending && !rewriting && content.trim().length > 0
+  const aiBusy = isAiBusy(rewriting, suggesting)
+  const canSend = !disabled && !sending && !aiBusy && content.trim().length > 0
+  const canRewrite = !disabled && !sending && !aiBusy && content.trim().length > 0
+  const canSuggest =
+    !disabled && !sending && !aiBusy && conversationId !== null
+
+  useEffect(() => {
+    setSuggestions([])
+    setSuggestError(null)
+  }, [conversationId])
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
 
     const trimmed = content.trim()
-    if (trimmed.length === 0 || disabled || sending || rewriting) {
+    if (trimmed.length === 0 || disabled || sending || aiBusy) {
       return
     }
 
     await onSend(trimmed)
     setContent('')
     setRewriteError(null)
+    setSuggestions([])
   }
 
   const handleRewrite = async () => {
     const trimmed = content.trim()
-    if (trimmed.length === 0 || disabled || sending || rewriting) {
+    if (trimmed.length === 0 || disabled || sending || aiBusy) {
       return
     }
 
@@ -127,9 +163,41 @@ export function MessageComposer({ disabled, sending, platform = null, onSend }: 
     }
   }
 
+  const handleSuggestReply = async () => {
+    if (conversationId === null || disabled || sending || aiBusy) {
+      return
+    }
+
+    setSuggesting(true)
+    setSuggestError(null)
+
+    try {
+      const { suggestions: nextSuggestions } = await AiService.suggestReply(conversationId)
+      setSuggestions(nextSuggestions)
+    } catch (err: unknown) {
+      setSuggestions([])
+      setSuggestError(getApiErrorMessage(err, 'Could not generate reply suggestions. Please try again.'))
+    } finally {
+      setSuggesting(false)
+    }
+  }
+
+  const handleSuggestionSelect = (suggestion: string) => {
+    if (disabled || sending || aiBusy) {
+      return
+    }
+
+    setContent(suggestion)
+    setRewriteError(null)
+    setSuggestError(null)
+    requestAnimationFrame(() => {
+      textareaRef.current?.focus()
+    })
+  }
+
   const handleEmojiSelect = (emoji: string) => {
     const textarea = textareaRef.current
-    if (textarea === null || disabled || sending || rewriting) {
+    if (textarea === null || disabled || sending || aiBusy) {
       setContent((current) => `${current}${emoji}`)
       return
     }
@@ -137,22 +205,47 @@ export function MessageComposer({ disabled, sending, platform = null, onSend }: 
     setContent(insertAtCursor(textarea, emoji))
   }
 
+  const composerDisabled = disabled || sending || aiBusy
+
   return (
     <form
-        onSubmit={(event) => {
-          void handleSubmit(event)
-        }}
-        className="border-t border-neutral-200 bg-white px-4 py-3"
-      >
+      onSubmit={(event) => {
+        void handleSubmit(event)
+      }}
+      className="border-t border-neutral-200 bg-white px-4 py-3"
+    >
+      {suggestions.length > 0 && (
+        <div className="mb-2 flex flex-wrap gap-2">
+          {suggestions.map((suggestion, index) => (
+            <button
+              key={`${index}-${suggestion.slice(0, 24)}`}
+              type="button"
+              onClick={() => {
+                handleSuggestionSelect(suggestion)
+              }}
+              disabled={composerDisabled}
+              className={[
+                'max-w-full rounded-full border border-violet-200 bg-violet-50 px-3 py-1.5 text-left text-xs text-violet-900 transition-colors',
+                composerDisabled
+                  ? 'cursor-not-allowed opacity-50'
+                  : 'hover:border-violet-300 hover:bg-violet-100',
+              ].join(' ')}
+            >
+              <span className="line-clamp-2">{suggestion}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
       <div
         className={[
           'flex items-center gap-1 rounded-xl border border-neutral-300 bg-white px-2 py-1.5 transition-colors focus-within:border-neutral-900',
-          disabled || sending || rewriting ? 'bg-neutral-50' : '',
+          composerDisabled ? 'bg-neutral-50' : '',
           platform === 'whatsapp' ? 'focus-within:border-[#128C7E]' : '',
           platform === 'instagram' ? 'focus-within:border-[#E1306C]' : '',
         ].join(' ')}
       >
-        <EmojiPicker disabled={disabled || sending || rewriting} onSelect={handleEmojiSelect} />
+        <EmojiPicker disabled={composerDisabled} onSelect={handleEmojiSelect} />
         <textarea
           ref={textareaRef}
           value={content}
@@ -161,10 +254,27 @@ export function MessageComposer({ disabled, sending, platform = null, onSend }: 
             setRewriteError(null)
           }}
           placeholder={composerPlaceholder(disabled)}
-          disabled={disabled || sending || rewriting}
+          disabled={composerDisabled}
           rows={1}
           className="min-h-[36px] max-h-28 flex-1 resize-none border-0 bg-transparent py-1.5 text-sm text-neutral-900 outline-none placeholder:text-neutral-400 disabled:cursor-not-allowed"
         />
+        <button
+          type="button"
+          onClick={() => {
+            void handleSuggestReply()
+          }}
+          disabled={!canSuggest}
+          aria-label={suggesting ? 'Generating reply suggestions' : 'Suggest reply'}
+          title="Suggest reply"
+          className={[
+            'inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-violet-600 transition-colors',
+            canSuggest
+              ? 'hover:bg-violet-50 hover:text-violet-700'
+              : 'cursor-not-allowed opacity-40',
+          ].join(' ')}
+        >
+          {suggesting ? <Spinner size="sm" variant="muted" /> : <SuggestReplyIcon />}
+        </button>
         <button
           type="button"
           onClick={() => {
@@ -195,6 +305,11 @@ export function MessageComposer({ disabled, sending, platform = null, onSend }: 
           {sending ? <Spinner size="sm" variant="muted" /> : <SendIcon />}
         </button>
       </div>
+      {suggestError !== null && (
+        <p className="mt-2 text-xs text-red-600" role="alert">
+          {suggestError}
+        </p>
+      )}
       {rewriteError !== null && (
         <p className="mt-2 text-xs text-red-600" role="alert">
           {rewriteError}
