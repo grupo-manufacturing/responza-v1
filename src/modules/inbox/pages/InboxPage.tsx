@@ -4,6 +4,8 @@ import { IntegrationsRequired } from '@/components/common/IntegrationsRequired'
 import { SubscriptionRequired } from '@/components/common/SubscriptionRequired'
 import { Alert } from '@/components/ui/Alert'
 import { Spinner } from '@/components/ui/Spinner'
+import { AiService, type ConversationAnalyticsResponse } from '@/modules/ai/ai.service'
+import { ConversationAnalyticsPanel } from '@/modules/inbox/components/ConversationAnalyticsPanel'
 import { ConversationList } from '@/modules/inbox/components/ConversationList'
 import { ConversationThread } from '@/modules/inbox/components/ConversationThread'
 import { ConversationThreadHeader } from '@/modules/inbox/components/ConversationThreadHeader'
@@ -40,6 +42,10 @@ export function InboxPage() {
   const { me } = useSession()
   const [sendError, setSendError] = useState<string | null>(null)
   const [mobileShowThread, setMobileShowThread] = useState(false)
+  const [analyticsLoading, setAnalyticsLoading] = useState(false)
+  const [analyticsOpen, setAnalyticsOpen] = useState(false)
+  const [analyticsData, setAnalyticsData] = useState<ConversationAnalyticsResponse | null>(null)
+  const [analyticsError, setAnalyticsError] = useState<string | null>(null)
   const queryClient = useInboxQueryClient()
 
   const queriesEnabled = !subscriptionRequired
@@ -66,6 +72,13 @@ export function InboxPage() {
       handleError(threadQuery.error)
     }
   }, [handleError, threadQuery.error])
+
+  useEffect(() => {
+    setAnalyticsOpen(false)
+    setAnalyticsData(null)
+    setAnalyticsError(null)
+    setAnalyticsLoading(false)
+  }, [selectedConversationId])
 
   const integrationsRequired =
     queriesEnabled &&
@@ -104,6 +117,28 @@ export function InboxPage() {
   const handleSelectConversation = (conversationId: string) => {
     setSelectedConversationId(conversationId)
     setMobileShowThread(true)
+  }
+
+  const handleAnalyzeConversation = async () => {
+    if (selectedConversationId === null || analyticsLoading || threadLoading) {
+      return
+    }
+
+    setAnalyticsLoading(true)
+    setAnalyticsError(null)
+    setAnalyticsOpen(true)
+
+    try {
+      const result = await AiService.analyzeConversation(selectedConversationId)
+      setAnalyticsData(result)
+    } catch (err: unknown) {
+      setAnalyticsData(null)
+      setAnalyticsError(
+        getApiErrorMessage(err, 'Could not generate conversation analytics. Please try again.'),
+      )
+    } finally {
+      setAnalyticsLoading(false)
+    }
   }
 
   const handleReactToMessage = async (messageId: string, emoji: string | null) => {
@@ -228,6 +263,11 @@ export function InboxPage() {
                   : null
               }
               onBack={() => setMobileShowThread(false)}
+              analyticsLoading={analyticsLoading}
+              analyticsDisabled={selectedConversationId === null || threadLoading}
+              onAnalyze={() => {
+                void handleAnalyzeConversation()
+              }}
             />
           </div>
         </div>
@@ -255,7 +295,7 @@ export function InboxPage() {
 
           <section
             className={[
-              'flex min-h-0 min-w-0 flex-1 flex-col',
+              'relative flex min-h-0 min-w-0 flex-1 flex-col',
               mobileShowThread ? 'flex' : 'hidden lg:flex',
             ].join(' ')}
           >
@@ -275,6 +315,13 @@ export function InboxPage() {
               sending={sending}
               platform={activePlatform}
               onSend={handleSendMessage}
+            />
+            <ConversationAnalyticsPanel
+              open={analyticsOpen}
+              loading={analyticsLoading}
+              data={analyticsData}
+              error={analyticsError}
+              onClose={() => setAnalyticsOpen(false)}
             />
           </section>
         </div>

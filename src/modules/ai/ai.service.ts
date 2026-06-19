@@ -14,6 +14,13 @@ export interface SuggestReplyResponse {
   suggestions: string[]
 }
 
+export interface ConversationAnalyticsResponse {
+  leadScore: number
+  suggestedActions: string[]
+  customerHistory: string
+  conversationSummary: string
+}
+
 export class AiService {
   static async rewriteDraft(draft: string): Promise<RewriteDraftResponse> {
     const response = await api.post<RewriteDraftResponse>('/ai/rewrite', { draft })
@@ -27,6 +34,15 @@ export class AiService {
 
   static async suggestReply(conversationId: string): Promise<SuggestReplyResponse> {
     const response = await api.post<SuggestReplyResponse>('/ai/suggest-reply', { conversationId })
+    return response.data
+  }
+
+  static async analyzeConversation(
+    conversationId: string,
+  ): Promise<ConversationAnalyticsResponse> {
+    const response = await api.post<ConversationAnalyticsResponse>('/ai/conversation-analytics', {
+      conversationId,
+    })
     return response.data
   }
 }
