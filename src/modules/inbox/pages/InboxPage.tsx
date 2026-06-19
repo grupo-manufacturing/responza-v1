@@ -233,53 +233,19 @@ export function InboxPage() {
         </Alert>
       )}
 
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
-        <div className="flex shrink-0 border-b border-neutral-200">
-          <div
-            className={[
-              LIST_COLUMN_CLASS,
-              'flex w-full items-center border-neutral-200 px-3 py-2.5 lg:border-r',
-              mobileShowThread ? 'hidden lg:flex' : 'flex',
-            ].join(' ')}
-          >
-            <PlatformTabs value={platformFilter} onChange={handlePlatformFilterChange} />
-          </div>
-
-          <div
-            className={[
-              'flex min-w-0 flex-1 items-center px-4 py-2.5',
-              mobileShowThread ? 'flex' : 'hidden lg:flex',
-            ].join(' ')}
-          >
-            <ConversationThreadHeader
-              conversation={activeConversation}
-              participants={participants}
-              pendingContact={
-                threadLoading && selectedListItem !== undefined
-                  ? {
-                      displayName: selectedListItem.displayName,
-                      avatarUrl: selectedListItem.avatarUrl,
-                    }
-                  : null
-              }
-              onBack={() => setMobileShowThread(false)}
-              analyticsLoading={analyticsLoading}
-              analyticsDisabled={selectedConversationId === null || threadLoading}
-              onAnalyze={() => {
-                void handleAnalyzeConversation()
-              }}
-            />
-          </div>
-        </div>
-
+      <div className="flex min-h-0 flex-1 overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
         <div className="flex min-h-0 flex-1">
-          <section
+          <div
             className={[
               LIST_COLUMN_CLASS,
               'flex min-h-0 flex-col border-neutral-200 lg:border-r',
               mobileShowThread ? 'hidden lg:flex' : 'flex',
             ].join(' ')}
           >
+            <div className="flex shrink-0 border-b border-neutral-200 px-3 py-2.5">
+              <PlatformTabs value={platformFilter} onChange={handlePlatformFilterChange} />
+            </div>
+
             {listLoading ? (
               <div className="flex flex-1 items-center justify-center py-16">
                 <Spinner />
@@ -291,14 +257,35 @@ export function InboxPage() {
                 onSelect={(item) => handleSelectConversation(item.id)}
               />
             )}
-          </section>
+          </div>
 
-          <section
+          <div
             className={[
               'relative flex min-h-0 min-w-0 flex-1 flex-col',
               mobileShowThread ? 'flex' : 'hidden lg:flex',
             ].join(' ')}
           >
+            <div className="flex shrink-0 border-b border-neutral-200 px-4 py-2.5">
+              <ConversationThreadHeader
+                conversation={activeConversation}
+                participants={participants}
+                pendingContact={
+                  threadLoading && selectedListItem !== undefined
+                    ? {
+                        displayName: selectedListItem.displayName,
+                        avatarUrl: selectedListItem.avatarUrl,
+                      }
+                    : null
+                }
+                onBack={() => setMobileShowThread(false)}
+                analyticsLoading={analyticsLoading}
+                analyticsDisabled={selectedConversationId === null || threadLoading}
+                onAnalyze={() => {
+                  void handleAnalyzeConversation()
+                }}
+              />
+            </div>
+
             <ConversationThread
               conversation={activeConversation}
               messages={messages}
@@ -323,7 +310,7 @@ export function InboxPage() {
               error={analyticsError}
               onClose={() => setAnalyticsOpen(false)}
             />
-          </section>
+          </div>
         </div>
       </div>
     </div>

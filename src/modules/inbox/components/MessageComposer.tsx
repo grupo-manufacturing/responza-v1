@@ -18,7 +18,7 @@ type MessageComposerProps = {
 function SendIcon() {
   return (
     <svg
-      className="h-4 w-4 rotate-90"
+      className="h-5 w-5 rotate-90"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
@@ -27,7 +27,7 @@ function SendIcon() {
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth={2}
+        strokeWidth={1.75}
         d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
       />
     </svg>
@@ -68,9 +68,18 @@ function composerPlaceholder(disabled: boolean): string {
   return 'Type a message…'
 }
 
+const composerActionButtonClass =
+  'inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors disabled:cursor-not-allowed'
+
+function composerActionIconClass(enabled: boolean, enabledClassName: string): string {
+  return [
+    composerActionButtonClass,
+    enabled ? enabledClassName : 'cursor-not-allowed opacity-40',
+  ].join(' ')
+}
 function sendButtonClass(canSend: boolean, platform: IntegrationPlatform | null | undefined): string {
   if (!canSend) {
-    return 'bg-neutral-200 text-neutral-400'
+    return 'bg-neutral-100 text-neutral-400'
   }
 
   if (platform === 'whatsapp') {
@@ -261,12 +270,10 @@ export function MessageComposer({
           disabled={!canSuggest}
           aria-label={suggesting ? 'Generating reply suggestions' : 'Suggest reply'}
           title="Suggest reply"
-          className={[
-            'inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-violet-600 transition-colors',
-            canSuggest
-              ? 'hover:bg-violet-50 hover:text-violet-700'
-              : 'cursor-not-allowed opacity-40',
-          ].join(' ')}
+          className={composerActionIconClass(
+            canSuggest,
+            'text-violet-600 hover:bg-violet-50 hover:text-violet-700',
+          )}
         >
           {suggesting ? <Spinner size="sm" variant="muted" /> : <SuggestReplyIcon />}
         </button>
@@ -278,12 +285,10 @@ export function MessageComposer({
           disabled={!canRewrite}
           aria-label={rewriting ? 'Rewriting message' : 'Rewrite message'}
           title="Rewrite message"
-          className={[
-            'inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-neutral-500 transition-colors',
-            canRewrite
-              ? 'hover:bg-neutral-100 hover:text-neutral-900'
-              : 'cursor-not-allowed opacity-40',
-          ].join(' ')}
+          className={composerActionIconClass(
+            canRewrite,
+            'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900',
+          )}
         >
           {rewriting ? <Spinner size="sm" variant="muted" /> : <RewriteIcon />}
         </button>
@@ -291,11 +296,7 @@ export function MessageComposer({
           type="submit"
           disabled={!canSend}
           aria-label={sending ? 'Sending message' : 'Send message'}
-          className={[
-            'inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors',
-            sendButtonClass(canSend, platform),
-            'disabled:cursor-not-allowed',
-          ].join(' ')}
+          className={[composerActionButtonClass, sendButtonClass(canSend, platform)].join(' ')}
         >
           {sending ? <Spinner size="sm" variant="muted" /> : <SendIcon />}
         </button>
