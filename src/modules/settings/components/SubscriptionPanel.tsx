@@ -37,10 +37,17 @@ export function SubscriptionPanel() {
   const [isCancelling, setIsCancelling] = useState(false)
 
   const reload = useCallback(async () => {
-    const [subscriptionData, plansData] = await Promise.all([
-      SubscriptionService.getSubscription(),
-      SubscriptionService.getPlans(),
-    ])
+    let subscriptionData = await SubscriptionService.getSubscription()
+    const plansData = await SubscriptionService.getPlans()
+
+    if (subscriptionData.isTrialing) {
+      try {
+        subscriptionData = await SubscriptionService.syncFromRazorpay()
+      } catch {
+        // No paid Razorpay subscription to sync yet.
+      }
+    }
+
     setSubscription(subscriptionData)
     setPlans(plansData.plans)
     setCheckoutAvailable(plansData.checkoutAvailable)
@@ -78,10 +85,17 @@ export function SubscriptionPanel() {
         customerName: organization?.name,
         customerEmail: organization?.email,
         onSuccess: () => {
-          setSuccessMessage('Payment successful. Your subscription will activate shortly.')
-          clearSessionCache()
-          void loadSession()
-          void reload()
+          void (async () => {
+            setSuccessMessage('Payment successful. Your subscription is now active.')
+            try {
+              await SubscriptionService.syncFromRazorpay()
+            } catch {
+              // Webhook may still apply the update if sync fails.
+            }
+            clearSessionCache()
+            void loadSession()
+            void reload()
+          })()
         },
         onDismiss: () => {
           setBusyPlanKey(null)

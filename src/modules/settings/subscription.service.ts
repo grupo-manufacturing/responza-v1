@@ -72,4 +72,9 @@ export class SubscriptionService {
     )
     return response.data
   }
+
+  static async syncFromRazorpay(): Promise<SubscriptionDetails> {
+    const response = await api.post<{ subscription: SubscriptionDetails }>('/subscription/sync')
+    return response.data.subscription
+  }
 }
