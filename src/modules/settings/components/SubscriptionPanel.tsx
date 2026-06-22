@@ -78,11 +78,7 @@ export function SubscriptionPanel() {
         customerName: organization?.name,
         customerEmail: organization?.email,
         onSuccess: () => {
-          setSuccessMessage(
-            subscription?.isTrialing
-              ? 'Payment method saved. Billing starts when your trial ends.'
-              : 'Payment authorized. Your subscription will activate shortly.',
-          )
+          setSuccessMessage('Payment successful. Your subscription will activate shortly.')
           clearSessionCache()
           void loadSession()
           void reload()
@@ -259,6 +255,7 @@ export function SubscriptionPanel() {
           <h3 className="text-base font-semibold text-neutral-900">Choose a plan</h3>
           <p className="mt-1 text-sm text-neutral-500">
             All plans include the same features. Only conversation volume differs.
+            {subscription.isTrialing && ' Your first payment is charged immediately when you subscribe.'}
           </p>
 
           {!checkoutAvailable && (
