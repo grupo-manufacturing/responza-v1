@@ -216,6 +216,11 @@ export function InboxPage() {
       : undefined
 
   const activePlatform: IntegrationPlatform | null = selectedListItem?.platform ?? null
+  const subscription = me?.subscription ?? SessionStorage.getStoredSubscription()
+  const conversationLimitReached =
+    subscription?.conversationQuotaEnforced === true &&
+    subscription.conversationsRemaining !== null &&
+    subscription.conversationsRemaining <= 0
 
   if (subscriptionRequired) {
     return <SubscriptionRequired />
@@ -227,6 +232,13 @@ export function InboxPage() {
 
   return (
     <div className="flex h-[calc(100vh-7rem)] flex-col">
+      {conversationLimitReached && (
+        <Alert variant="warning" className="mb-3 shrink-0">
+          Monthly conversation limit reached. Upgrade your plan to start new conversations. You can
+          still reply in existing threads.
+        </Alert>
+      )}
+
       {error !== null && (
         <Alert variant="error" className="mb-3 shrink-0">
           {error}
