@@ -29,6 +29,14 @@ export const INTEGRATION_PLATFORM_DESCRIPTIONS: Record<IntegrationPlatform, stri
   indiamart: 'Connect IndiaMART to capture buyer inquiries from your listings.',
 }
 
+export const INTEGRATION_COMING_SOON_PLATFORMS = ['indiamart'] as const satisfies readonly IntegrationPlatform[]
+
+export type ComingSoonIntegrationPlatform = (typeof INTEGRATION_COMING_SOON_PLATFORMS)[number]
+
+export function isIntegrationComingSoon(platform: IntegrationPlatform): boolean {
+  return (INTEGRATION_COMING_SOON_PLATFORMS as readonly IntegrationPlatform[]).includes(platform)
+}
+
 export function integrationPlatformLabel(platform: IntegrationPlatform): string {
   return INTEGRATION_PLATFORM_LABELS[platform]
 }

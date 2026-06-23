@@ -121,7 +121,7 @@ export function useIntegrations() {
         return
       }
 
-      await IntegrationsService.connectIntegration(platform)
+      return
     } catch (err) {
       if (getApiErrorCode(err) === 'NOT_IMPLEMENTED') {
         setError(getApiErrorMessage(err, `${integrationPlatformLabel(platform)} connect is coming soon.`))
