@@ -1,6 +1,9 @@
+import type { MessageContentType } from '@/modules/inbox/inbox.constants'
+import { isMediaPlaceholderContent } from '@/modules/inbox/inbox.preview'
+
 export function isTranslatableMessageContent(
   content: string,
-  contentType: 'text' | 'image' | 'video' | 'audio' | 'document' = 'text',
+  contentType: MessageContentType = 'text',
 ): boolean {
   if (contentType !== 'text') {
     return false
@@ -11,11 +14,7 @@ export function isTranslatableMessageContent(
     return false
   }
 
-  if (trimmed.startsWith('(non-text:')) {
-    return false
-  }
-
-  if (trimmed.startsWith('(attachment:')) {
+  if (isMediaPlaceholderContent(trimmed)) {
     return false
   }
 

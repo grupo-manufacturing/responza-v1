@@ -7,6 +7,12 @@ import { MessageStatusIndicator } from '@/modules/inbox/components/MessageStatus
 import { ReactionPicker } from '@/modules/inbox/components/ReactionPicker'
 import { TranslateMessageButton } from '@/modules/inbox/components/TranslateMessageButton'
 import { formatInboxTimestamp } from '@/modules/inbox/inbox.constants'
+import {
+  formatMessageListPreview,
+  isMediaContentType,
+  isMediaPlaceholderContent,
+  mediaUnavailableLabel,
+} from '@/modules/inbox/inbox.preview'
 import { isTranslatableMessageContent } from '@/modules/inbox/translation.utils'
 import type { IntegrationPlatform } from '@/modules/integrations/integrations.constants'
 import type { Conversation, Message } from '@/modules/inbox/inbox.service'
@@ -181,9 +187,20 @@ export function ConversationThread({
               const displayContent = isShowingTranslation
                 ? translation.translated
                 : message.content
-              const isImageMessage = message.contentType === 'image'
-              const hasImage = isImageMessage && message.mediaUrl !== null
-              const hasCaption = displayContent.trim().length > 0
+              const mediaContentType = isMediaContentType(message.contentType)
+                ? message.contentType
+                : null
+              const isMediaMessage = mediaContentType !== null
+              const hasMedia = isMediaMessage && message.mediaUrl !== null
+              const trimmedContent = displayContent.trim()
+              const hasCaption =
+                trimmedContent.length > 0 &&
+                (!isMediaMessage || !isMediaPlaceholderContent(trimmedContent))
+              const mediaLabel = isMediaMessage
+                ? hasCaption
+                  ? trimmedContent
+                  : formatMessageListPreview('', mediaContentType)
+                : trimmedContent
 
               return (
                 <div
@@ -229,34 +246,42 @@ export function ConversationThread({
                       <div
                         className={[
                           'rounded-2xl text-sm',
-                          hasImage && !hasCaption ? 'p-1.5' : 'px-4 py-2.5',
+                          hasMedia &&
+                            !hasCaption &&
+                            mediaContentType !== null &&
+                            mediaContentType !== 'document'
+                            ? 'p-1.5'
+                            : 'px-4 py-2.5',
                           isOutbound
                             ? outboundBubbleClass(platform)
                             : 'border border-neutral-200 bg-white text-neutral-900',
                           message.status === 'failed' ? 'ring-2 ring-red-300' : '',
                         ].join(' ')}
                       >
-                        {hasImage && (
+                        {hasMedia && mediaContentType !== null && (
                           <MessageMedia
                             mediaUrl={message.mediaUrl!}
-                            alt={hasCaption ? displayContent : 'Image'}
+                            contentType={mediaContentType}
+                            label={mediaLabel}
                             isOutbound={isOutbound}
                             platform={platform}
                           />
                         )}
 
-                        {isImageMessage && !hasImage && (
-                          <p className="text-sm italic opacity-80">Image unavailable</p>
+                        {isMediaMessage && !hasMedia && mediaContentType !== null && (
+                          <p className="text-sm italic opacity-80">
+                            {mediaUnavailableLabel(mediaContentType)}
+                          </p>
                         )}
 
-                        {(!isImageMessage || hasCaption) && (
+                        {hasCaption && mediaContentType !== 'document' && (
                           <p
                             className={[
                               'whitespace-pre-wrap break-words',
-                              hasImage && hasCaption ? 'mt-2' : '',
+                              hasMedia ? 'mt-2' : '',
                             ].join(' ')}
                           >
-                            {isImageMessage && !hasCaption ? null : displayContent}
+                            {displayContent}
                           </p>
                         )}
 

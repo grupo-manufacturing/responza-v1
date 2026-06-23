@@ -1,6 +1,7 @@
 import type { QueryClient } from '@tanstack/react-query'
 
 import type { MessageContentType, MessageDirection, MessageStatus } from '@/modules/inbox/inbox.constants'
+import { isMediaContentType } from '@/modules/inbox/inbox.preview'
 import type { ConversationDetailResponse, Message } from '@/modules/inbox/inbox.service'
 import { inboxKeys } from '@/modules/inbox/hooks/useInboxQueries'
 
@@ -89,7 +90,7 @@ export function applyMessageInsert(
     return
   }
 
-  if (message.contentType === 'image') {
+  if (isMediaContentType(message.contentType)) {
     invalidateInboxQueries(queryClient, input.selectedConversationId)
     return
   }

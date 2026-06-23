@@ -23,6 +23,7 @@ import {
 } from '@/modules/inbox/hooks/useInboxQueries'
 import { useInboxRealtime } from '@/modules/inbox/hooks/useInboxRealtime'
 import { upsertThreadMessage } from '@/modules/inbox/lib/mergeInboxCache'
+import { formatMessageListPreview } from '@/modules/inbox/inbox.preview'
 import { InboxService, type Message } from '@/modules/inbox/inbox.service'
 import { useSubscriptionGate } from '@/shared/hooks/useSubscriptionGate'
 import { useSession } from '@/shared/hooks/useSession'
@@ -194,7 +195,10 @@ export function InboxPage() {
               item.id === selectedConversationId
                 ? {
                     ...item,
-                    lastMessage: result.message.content,
+                    lastMessage: formatMessageListPreview(
+                      result.message.content,
+                      result.message.contentType,
+                    ),
                     lastMessageAt: result.message.createdAt,
                   }
                 : item,
