@@ -9,6 +9,7 @@ import { TranslateMessageButton } from '@/modules/inbox/components/TranslateMess
 import { formatInboxTimestamp } from '@/modules/inbox/inbox.constants'
 import {
   formatMessageListPreview,
+  inferMediaContentTypeFromPlaceholder,
   isMediaContentType,
   isMediaPlaceholderContent,
   mediaUnavailableLabel,
@@ -189,7 +190,7 @@ export function ConversationThread({
                 : message.content
               const mediaContentType = isMediaContentType(message.contentType)
                 ? message.contentType
-                : null
+                : inferMediaContentTypeFromPlaceholder(message.content)
               const isMediaMessage = mediaContentType !== null
               const hasMedia = isMediaMessage && message.mediaUrl !== null
               const trimmedContent = displayContent.trim()

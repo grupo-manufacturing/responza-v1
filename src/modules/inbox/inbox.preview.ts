@@ -29,11 +29,37 @@ export function isMediaPlaceholderContent(content: string): boolean {
   return trimmed.startsWith('(non-text:') || trimmed.startsWith('(attachment:')
 }
 
+export function inferMediaContentTypeFromPlaceholder(content: string): MediaContentType | null {
+  const trimmed = content.trim()
+
+  for (const prefix of ['(attachment:', '(non-text:'] as const) {
+    if (!trimmed.startsWith(prefix) || !trimmed.endsWith(')')) {
+      continue
+    }
+
+    const type = trimmed.slice(prefix.length, -1).trim()
+    if (type === 'file') {
+      return 'document'
+    }
+
+    if (isMediaContentType(type as MessageContentType)) {
+      return type as MediaContentType
+    }
+  }
+
+  return null
+}
+
 export function formatMessageListPreview(
   content: string,
   contentType: MessageContentType,
 ): string {
   if (!isMediaContentType(contentType)) {
+    const inferred = inferMediaContentTypeFromPlaceholder(content)
+    if (inferred !== null) {
+      return MEDIA_PREVIEW_LABELS[inferred]
+    }
+
     return content
   }
 
