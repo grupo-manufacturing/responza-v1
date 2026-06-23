@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 
 import { SubscriptionRequired } from '@/components/common/SubscriptionRequired'
 import { Alert } from '@/components/ui/Alert'
@@ -15,10 +16,12 @@ import { useLeadModal } from '@/modules/leads/hooks/useLeadModal'
 import { useLeads } from '@/modules/leads/hooks/useLeads'
 
 export function LeadsPage() {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [filters, setFilters] = useState<LeadsFilterState>({ status: '' })
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [layoutMode, setLayoutMode] = useState<LeadsLayoutMode>('table')
   const modal = useLeadModal()
+  const openedLeadFromUrl = useRef(false)
 
   const {
     leads,
@@ -32,6 +35,31 @@ export function LeadsPage() {
     handleLeadUpdated,
     handleLeadDeleted,
   } = useLeads(filters.status)
+
+  useEffect(() => {
+    if (loading) {
+      return
+    }
+
+    const leadId = searchParams.get('lead')
+    if (leadId === null) {
+      openedLeadFromUrl.current = false
+      return
+    }
+
+    if (openedLeadFromUrl.current) {
+      return
+    }
+
+    const lead = leads.find((item) => item.id === leadId)
+    if (lead === undefined) {
+      return
+    }
+
+    openedLeadFromUrl.current = true
+    modal.openView(lead)
+    setSearchParams({}, { replace: true })
+  }, [leads, loading, modal.openView, searchParams, setSearchParams])
 
   const hasActiveFilters = filters.status !== ''
   const hasSearch = searchQuery.trim().length > 0

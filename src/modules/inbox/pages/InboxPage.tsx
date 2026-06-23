@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 
 import { IntegrationsRequired } from '@/components/common/IntegrationsRequired'
 import { SubscriptionRequired } from '@/components/common/SubscriptionRequired'
@@ -35,13 +36,16 @@ type SendMessageErrorDetails = {
 }
 
 export function InboxPage() {
+  const [searchParams] = useSearchParams()
+  const initialConversationId = searchParams.get('conversation')
+
   const [platformFilter, setPlatformFilter] = useState<InboxPlatformFilter>('all')
-  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null)
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(initialConversationId)
   const [sending, setSending] = useState(false)
   const { subscriptionRequired, handleError } = useSubscriptionGate()
   const { me } = useSession()
   const [sendError, setSendError] = useState<string | null>(null)
-  const [mobileShowThread, setMobileShowThread] = useState(false)
+  const [mobileShowThread, setMobileShowThread] = useState(initialConversationId !== null)
   const [analyticsLoading, setAnalyticsLoading] = useState(false)
   const [analyticsOpen, setAnalyticsOpen] = useState(false)
   const [analyticsData, setAnalyticsData] = useState<ConversationAnalyticsResponse | null>(null)
