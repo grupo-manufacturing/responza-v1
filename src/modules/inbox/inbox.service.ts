@@ -1,7 +1,7 @@
 import api from '@/shared/api/client'
 
 import type { IntegrationPlatform } from '@/modules/integrations/integrations.constants'
-import type { MessageDirection, MessageStatus } from './inbox.constants'
+import type { MessageContentType, MessageDirection, MessageStatus } from './inbox.constants'
 
 export interface ConversationListItem {
   id: string
@@ -44,6 +44,9 @@ export interface Message {
   direction: MessageDirection
   platformMessageId: string | null
   content: string
+  contentType: MessageContentType
+  mediaUrl: string | null
+  mimeType: string | null
   status: MessageStatus
   customerReaction: string | null
   agentReaction: string | null

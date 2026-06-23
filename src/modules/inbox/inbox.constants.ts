@@ -9,6 +9,8 @@ export type MessageDirection = 'inbound' | 'outbound'
 
 export type MessageStatus = 'pending' | 'sent' | 'failed' | 'read'
 
+export type MessageContentType = 'text' | 'image' | 'video' | 'audio' | 'document'
+
 export const MESSAGE_QUICK_EMOJIS = [
   '😀',
   '😂',

@@ -1,6 +1,6 @@
 import type { QueryClient } from '@tanstack/react-query'
 
-import type { MessageDirection, MessageStatus } from '@/modules/inbox/inbox.constants'
+import type { MessageContentType, MessageDirection, MessageStatus } from '@/modules/inbox/inbox.constants'
 import type { ConversationDetailResponse, Message } from '@/modules/inbox/inbox.service'
 import { inboxKeys } from '@/modules/inbox/hooks/useInboxQueries'
 
@@ -28,6 +28,10 @@ function mapRealtimeMessage(row: Record<string, unknown>): Message | null {
     platformMessageId:
       typeof row.platform_message_id === 'string' ? row.platform_message_id : null,
     content,
+    contentType:
+      typeof row.content_type === 'string' ? (row.content_type as MessageContentType) : 'text',
+    mediaUrl: null,
+    mimeType: typeof row.mime_type === 'string' ? row.mime_type : null,
     status: row.status as MessageStatus,
     customerReaction:
       typeof row.customer_reaction === 'string' ? row.customer_reaction : null,
@@ -82,6 +86,11 @@ export function applyMessageInsert(
 ): void {
   const message = mapRealtimeMessage(input.row)
   if (message === null) {
+    return
+  }
+
+  if (message.contentType === 'image') {
+    invalidateInboxQueries(queryClient, input.selectedConversationId)
     return
   }
 
