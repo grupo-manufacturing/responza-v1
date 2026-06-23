@@ -4,6 +4,8 @@ import { leadStatusLabel } from '@/modules/leads/leads.constants'
 import type { DashboardLead } from '@/modules/dashboard/dashboard.service'
 import { formatInboxTimestamp } from '@/modules/inbox/inbox.constants'
 
+const MAX_VISIBLE_ITEMS = 5
+
 type LeadQueueListProps = {
   readonly leads: DashboardLead[]
   readonly emptyMessage: string
@@ -20,7 +22,7 @@ export function LeadQueueList({ leads, emptyMessage }: LeadQueueListProps) {
 
   return (
     <ul className="divide-y divide-neutral-100">
-      {leads.map((lead) => (
+      {leads.slice(0, MAX_VISIBLE_ITEMS).map((lead) => (
         <li key={lead.id}>
           <div className="flex items-center gap-3 px-5 py-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-900 text-sm font-medium text-white">

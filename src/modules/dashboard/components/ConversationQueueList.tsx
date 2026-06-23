@@ -5,6 +5,8 @@ import { formatInboxTimestamp } from '@/modules/inbox/inbox.constants'
 import type { ConversationListItem } from '@/modules/inbox/inbox.service'
 import type { IntegrationPlatform } from '@/modules/integrations/integrations.constants'
 
+const MAX_VISIBLE_ITEMS = 5
+
 type ConversationQueueListProps = {
   readonly conversations: ConversationListItem[]
   readonly emptyMessage: string
@@ -30,7 +32,7 @@ export function ConversationQueueList({
 
   return (
     <ul className="divide-y divide-neutral-100">
-      {conversations.map((conversation) => {
+      {conversations.slice(0, MAX_VISIBLE_ITEMS).map((conversation) => {
         const platform = isIntegrationPlatform(conversation.platform)
           ? conversation.platform
           : undefined
