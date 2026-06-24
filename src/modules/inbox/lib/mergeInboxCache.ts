@@ -41,6 +41,18 @@ function mapRealtimeMessage(row: Record<string, unknown>): Message | null {
   }
 }
 
+function mergeRealtimeMessage(existing: Message | undefined, incoming: Message): Message {
+  if (existing === undefined) {
+    return incoming
+  }
+
+  return {
+    ...incoming,
+    mediaUrl: incoming.mediaUrl ?? existing.mediaUrl,
+    mimeType: incoming.mimeType ?? existing.mimeType,
+  }
+}
+
 function upsertMessageInList(messages: Message[], incoming: Message): Message[] {
   const index = messages.findIndex(
     (item) =>
@@ -54,7 +66,7 @@ function upsertMessageInList(messages: Message[], incoming: Message): Message[] 
   }
 
   const next = [...messages]
-  next[index] = incoming
+  next[index] = mergeRealtimeMessage(next[index], incoming)
   return next
 }
 
@@ -223,7 +235,7 @@ export function applyMessageUpdate(
       }
 
       const messages = [...current.messages]
-      messages[index] = message
+      messages[index] = mergeRealtimeMessage(messages[index], message)
       return { ...current, messages }
     },
   )
