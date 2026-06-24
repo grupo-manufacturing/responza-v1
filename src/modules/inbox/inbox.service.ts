@@ -67,8 +67,29 @@ export interface ConversationDetailResponse {
   messages: Message[]
 }
 
-export interface SendMessagePayload {
+export interface SendTextMessagePayload {
   content: string
+  contentType?: 'text'
+}
+
+export interface SendMediaMessagePayload {
+  content?: string
+  contentType: Exclude<MessageContentType, 'text'>
+  storagePath: string
+  mimeType: string
+  fileSizeBytes: number
+  filename?: string
+}
+
+export type SendMessagePayload = SendTextMessagePayload | SendMediaMessagePayload
+
+export interface UploadOutboundMediaResponse {
+  media: {
+    storagePath: string
+    mimeType: string
+    fileSizeBytes: number
+    filename: string | null
+  }
 }
 
 export interface SendMessageResponse {
@@ -96,6 +117,35 @@ export class InboxService {
     return response.data
   }
 
+  static async uploadOutboundMedia(
+    conversationId: string,
+    input: {
+      file: File
+      contentType: Exclude<MessageContentType, 'text'>
+      filename?: string
+    },
+  ): Promise<UploadOutboundMediaResponse> {
+    const formData = new FormData()
+    formData.append('file', input.file)
+    formData.append('contentType', input.contentType)
+    if (input.filename !== undefined && input.filename.length > 0) {
+      formData.append('filename', input.filename)
+    }
+
+    const response = await api.post<UploadOutboundMediaResponse>(
+      `/conversations/${conversationId}/messages/media`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        timeout: 60_000,
+      },
+    )
+
+    return response.data
+  }
+
   static async sendMessage(
     conversationId: string,
     payload: SendMessagePayload,
@@ -103,6 +153,9 @@ export class InboxService {
     const response = await api.post<SendMessageResponse>(
       `/conversations/${conversationId}/messages`,
       payload,
+      {
+        timeout: 'storagePath' in payload ? 60_000 : 10_000,
+      },
     )
     return response.data
   }

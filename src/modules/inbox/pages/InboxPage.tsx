@@ -10,7 +10,7 @@ import { ConversationAnalyticsPanel } from '@/modules/inbox/components/Conversat
 import { ConversationList } from '@/modules/inbox/components/ConversationList'
 import { ConversationThread } from '@/modules/inbox/components/ConversationThread'
 import { ConversationThreadHeader } from '@/modules/inbox/components/ConversationThreadHeader'
-import { MessageComposer } from '@/modules/inbox/components/MessageComposer'
+import { MessageComposer, type SendComposerInput } from '@/modules/inbox/components/MessageComposer'
 import { PlatformTabs } from '@/modules/inbox/components/PlatformTabs'
 import type { InboxPlatformFilter } from '@/modules/inbox/inbox.constants'
 import type { IntegrationPlatform } from '@/modules/integrations/integrations.constants'
@@ -22,7 +22,7 @@ import {
   useInboxThread,
 } from '@/modules/inbox/hooks/useInboxQueries'
 import { useInboxRealtime } from '@/modules/inbox/hooks/useInboxRealtime'
-import { upsertThreadMessage } from '@/modules/inbox/lib/mergeInboxCache'
+import { replaceOptimisticThreadMessage, upsertThreadMessage } from '@/modules/inbox/lib/mergeInboxCache'
 import { formatMessageListPreview } from '@/modules/inbox/inbox.preview'
 import { InboxService, type Message } from '@/modules/inbox/inbox.service'
 import { useSubscriptionGate } from '@/shared/hooks/useSubscriptionGate'
@@ -173,18 +173,79 @@ export function InboxPage() {
     }
   }
 
-  const handleSendMessage = async (content: string) => {
-    if (selectedConversationId === null) {
+  const handleSendMessage = async (input: SendComposerInput) => {
+    if (selectedConversationId === null || organizationId === null) {
       return
     }
 
     setSending(true)
     setSendError(null)
 
-    try {
-      const result = await InboxService.sendMessage(selectedConversationId, { content })
+    const optimisticId =
+      input.attachment !== undefined ? `optimistic-${Date.now()}` : null
+    const optimisticPreviewUrl = input.attachment?.previewUrl ?? null
 
-      upsertThreadMessage(queryClient, selectedConversationId, result.message)
+    if (optimisticId !== null && input.attachment !== undefined && threadQuery.data !== undefined) {
+      const optimisticMessage: Message = {
+        id: optimisticId,
+        organizationId,
+        conversationId: selectedConversationId,
+        participantId: null,
+        direction: 'outbound',
+        platformMessageId: null,
+        content: input.content,
+        contentType: input.attachment.contentType,
+        mediaUrl: optimisticPreviewUrl,
+        mimeType: input.attachment.file.type || null,
+        status: 'pending',
+        customerReaction: null,
+        agentReaction: null,
+        createdAt: new Date().toISOString(),
+      }
+
+      queryClient.setQueryData(
+        inboxKeys.thread(selectedConversationId),
+        (current: Awaited<ReturnType<typeof InboxService.getConversation>> | undefined) => {
+          if (!current) return current
+          return {
+            ...current,
+            messages: [...current.messages, optimisticMessage],
+          }
+        },
+      )
+    }
+
+    try {
+      const result =
+        input.attachment !== undefined
+          ? await (async () => {
+              const uploaded = await InboxService.uploadOutboundMedia(selectedConversationId, {
+                file: input.attachment!.file,
+                contentType: input.attachment!.contentType,
+                filename: input.attachment!.file.name,
+              })
+
+              return InboxService.sendMessage(selectedConversationId, {
+                content: input.content,
+                contentType: input.attachment!.contentType,
+                storagePath: uploaded.media.storagePath,
+                mimeType: uploaded.media.mimeType,
+                fileSizeBytes: uploaded.media.fileSizeBytes,
+                filename: uploaded.media.filename ?? input.attachment!.file.name,
+              })
+            })()
+          : await InboxService.sendMessage(selectedConversationId, { content: input.content })
+
+      if (optimisticId !== null) {
+        replaceOptimisticThreadMessage(
+          queryClient,
+          selectedConversationId,
+          optimisticId,
+          result.message,
+        )
+      } else {
+        upsertThreadMessage(queryClient, selectedConversationId, result.message)
+      }
 
       queryClient.setQueryData(
         inboxKeys.conversations(platformFilter),
@@ -208,7 +269,28 @@ export function InboxPage() {
       )
     } catch (err) {
       const details = getApiErrorDetails<SendMessageErrorDetails>(err)
-      if (details?.message) {
+
+      if (optimisticId !== null) {
+        if (details?.message) {
+          replaceOptimisticThreadMessage(
+            queryClient,
+            selectedConversationId,
+            optimisticId,
+            details.message,
+          )
+        } else {
+          queryClient.setQueryData(
+            inboxKeys.thread(selectedConversationId),
+            (current: Awaited<ReturnType<typeof InboxService.getConversation>> | undefined) => {
+              if (!current) return current
+              return {
+                ...current,
+                messages: current.messages.filter((message) => message.id !== optimisticId),
+              }
+            },
+          )
+        }
+      } else if (details?.message) {
         upsertThreadMessage(queryClient, selectedConversationId, details.message)
       }
 

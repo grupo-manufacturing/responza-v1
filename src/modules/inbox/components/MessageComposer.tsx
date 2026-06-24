@@ -4,16 +4,36 @@ import { Spinner } from '@/components/ui/Spinner'
 import { AiService } from '@/modules/ai/ai.service'
 import { EmojiPicker } from '@/modules/inbox/components/EmojiPicker'
 import { ReplySuggestionChips } from '@/modules/inbox/components/ReplySuggestionChips'
+import {
+  attachmentPreviewLabel,
+  canPreviewAttachmentLocally,
+  OUTBOUND_MEDIA_ACCEPT,
+  validateOutboundMediaFile,
+} from '@/modules/inbox/inbox.media'
+import type { MediaContentType } from '@/modules/inbox/inbox.preview'
 import type { IntegrationPlatform } from '@/modules/integrations/integrations.constants'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
+
+export type OutboundComposerAttachment = {
+  file: File
+  contentType: MediaContentType
+  previewUrl: string
+}
+
+export type SendComposerInput = {
+  content: string
+  attachment?: OutboundComposerAttachment
+}
 
 type MessageComposerProps = {
   readonly conversationId: string | null
   readonly disabled: boolean
   readonly sending: boolean
   readonly platform?: IntegrationPlatform | null
-  readonly onSend: (content: string) => Promise<void>
+  readonly onSend: (input: SendComposerInput) => Promise<void>
 }
+
+type SelectedAttachment = OutboundComposerAttachment
 
 function SendIcon() {
   return (
@@ -29,6 +49,19 @@ function SendIcon() {
         strokeLinejoin="round"
         strokeWidth={1.75}
         d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+      />
+    </svg>
+  )
+}
+
+function AttachIcon() {
+  return (
+    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.75}
+        d="m18.375 12.739-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.122 2.122l7.81-7.81"
       />
     </svg>
   )
@@ -60,9 +93,13 @@ function RewriteIcon() {
   )
 }
 
-function composerPlaceholder(disabled: boolean): string {
+function composerPlaceholder(disabled: boolean, hasAttachment: boolean): string {
   if (disabled) {
     return 'Select a conversation to reply'
+  }
+
+  if (hasAttachment) {
+    return 'Add a caption (optional)…'
   }
 
   return 'Type a message…'
@@ -77,6 +114,7 @@ function composerActionIconClass(enabled: boolean, enabledClassName: string): st
     enabled ? enabledClassName : 'cursor-not-allowed opacity-40',
   ].join(' ')
 }
+
 function sendButtonClass(canSend: boolean, platform: IntegrationPlatform | null | undefined): string {
   if (!canSend) {
     return 'bg-neutral-100 text-neutral-400'
@@ -112,6 +150,65 @@ function isAiBusy(rewriting: boolean, suggesting: boolean): boolean {
   return rewriting || suggesting
 }
 
+function AttachmentPreview({
+  attachment,
+  disabled,
+  onRemove,
+}: {
+  readonly attachment: SelectedAttachment
+  readonly disabled: boolean
+  readonly onRemove: () => void
+}) {
+  const label = attachmentPreviewLabel(attachment.contentType, attachment.file.name)
+
+  return (
+    <div className="mb-2 flex items-center gap-3 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2">
+      {attachment.contentType === 'image' && (
+        <img
+          src={attachment.previewUrl}
+          alt={label}
+          className="h-14 w-14 rounded-lg border border-neutral-200 object-cover"
+        />
+      )}
+
+      {attachment.contentType === 'video' && canPreviewAttachmentLocally('video') && (
+        <video
+          src={attachment.previewUrl}
+          className="h-14 w-14 rounded-lg border border-neutral-200 object-cover"
+          muted
+        />
+      )}
+
+      {attachment.contentType === 'audio' && (
+        <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-neutral-200 bg-white text-lg">
+          🎵
+        </div>
+      )}
+
+      {attachment.contentType === 'document' && (
+        <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-neutral-200 bg-white text-lg">
+          📄
+        </div>
+      )}
+
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium text-neutral-900">{label}</p>
+        <p className="text-xs capitalize text-neutral-500">{attachment.contentType}</p>
+      </div>
+
+      <button
+        type="button"
+        onClick={onRemove}
+        disabled={disabled}
+        aria-label="Remove attachment"
+        className="rounded-lg px-2 py-1 text-xs font-medium text-neutral-500 transition-colors hover:bg-neutral-200 hover:text-neutral-900 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        Remove
+      </button>
+    </div>
+  )
+}
+
 export function MessageComposer({
   conversationId,
   disabled,
@@ -120,35 +217,99 @@ export function MessageComposer({
   onSend,
 }: MessageComposerProps) {
   const [content, setContent] = useState('')
+  const [attachment, setAttachment] = useState<SelectedAttachment | null>(null)
+  const [attachmentError, setAttachmentError] = useState<string | null>(null)
   const [rewriting, setRewriting] = useState(false)
   const [suggesting, setSuggesting] = useState(false)
   const [rewriteError, setRewriteError] = useState<string | null>(null)
   const [suggestError, setSuggestError] = useState<string | null>(null)
   const [suggestions, setSuggestions] = useState<string[]>([])
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const aiBusy = isAiBusy(rewriting, suggesting)
-  const canSend = !disabled && !sending && !aiBusy && content.trim().length > 0
+  const attachmentsSupported = platform !== 'indiamart'
+  const canSend =
+    !disabled &&
+    !sending &&
+    !aiBusy &&
+    (attachment !== null || content.trim().length > 0)
   const canRewrite = !disabled && !sending && !aiBusy && content.trim().length > 0
   const canSuggest =
     !disabled && !sending && !aiBusy && conversationId !== null
+  const canAttach = !disabled && !sending && !aiBusy && attachmentsSupported
 
   useEffect(() => {
     setSuggestions([])
     setSuggestError(null)
   }, [conversationId])
 
+  useEffect(() => {
+    return () => {
+      if (attachment !== null) {
+        URL.revokeObjectURL(attachment.previewUrl)
+      }
+    }
+  }, [attachment])
+
+  const clearAttachment = () => {
+    if (attachment !== null) {
+      URL.revokeObjectURL(attachment.previewUrl)
+    }
+    setAttachment(null)
+    setAttachmentError(null)
+    if (fileInputRef.current !== null) {
+      fileInputRef.current.value = ''
+    }
+  }
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
 
-    const trimmed = content.trim()
-    if (trimmed.length === 0 || disabled || sending || aiBusy) {
+    if (disabled || sending || aiBusy) {
       return
     }
 
-    await onSend(trimmed)
+    const trimmed = content.trim()
+    if (attachment === null && trimmed.length === 0) {
+      return
+    }
+
+    await onSend({
+      content: trimmed,
+      attachment: attachment ?? undefined,
+    })
+
     setContent('')
+    clearAttachment()
     setRewriteError(null)
     setSuggestions([])
+  }
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file === undefined) {
+      return
+    }
+
+    const validation = validateOutboundMediaFile(file)
+    if (!validation.valid) {
+      setAttachmentError(validation.message)
+      event.target.value = ''
+      return
+    }
+
+    if (attachment !== null) {
+      URL.revokeObjectURL(attachment.previewUrl)
+    }
+
+    const previewUrl = URL.createObjectURL(file)
+    setAttachment({
+      file,
+      contentType: validation.contentType,
+      previewUrl,
+    })
+    setAttachmentError(null)
+    event.target.value = ''
   }
 
   const handleRewrite = async () => {
@@ -241,76 +402,112 @@ export function MessageComposer({
         }}
         className="border-t border-neutral-200 bg-white px-4 py-3"
       >
-        <div
-        className={[
-          'flex items-center gap-1 rounded-xl border border-neutral-300 bg-white px-2 py-1.5 transition-colors focus-within:border-neutral-900',
-          composerDisabled ? 'bg-neutral-50' : '',
-          platform === 'whatsapp' ? 'focus-within:border-[#128C7E]' : '',
-          platform === 'instagram' ? 'focus-within:border-[#E1306C]' : '',
-        ].join(' ')}
-      >
-        <EmojiPicker disabled={composerDisabled} onSelect={handleEmojiSelect} />
-        <textarea
-          ref={textareaRef}
-          value={content}
-          onChange={(event) => {
-            setContent(event.target.value)
-            setRewriteError(null)
-          }}
-          placeholder={composerPlaceholder(disabled)}
-          disabled={composerDisabled}
-          rows={1}
-          className="min-h-[36px] max-h-28 flex-1 resize-none border-0 bg-transparent py-1.5 text-sm text-neutral-900 outline-none placeholder:text-neutral-400 disabled:cursor-not-allowed"
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept={OUTBOUND_MEDIA_ACCEPT}
+          className="hidden"
+          onChange={handleFileChange}
         />
-        <button
-          type="button"
-          onClick={() => {
-            void handleSuggestReply()
-          }}
-          disabled={!canSuggest}
-          aria-label={suggesting ? 'Generating reply suggestions' : 'Suggest reply'}
-          title="Suggest reply"
-          className={composerActionIconClass(
-            canSuggest,
-            'text-violet-600 hover:bg-violet-50 hover:text-violet-700',
+
+        {attachment !== null && (
+          <AttachmentPreview
+            attachment={attachment}
+            disabled={composerDisabled}
+            onRemove={clearAttachment}
+          />
+        )}
+
+        <div
+          className={[
+            'flex items-center gap-1 rounded-xl border border-neutral-300 bg-white px-2 py-1.5 transition-colors focus-within:border-neutral-900',
+            composerDisabled ? 'bg-neutral-50' : '',
+            platform === 'whatsapp' ? 'focus-within:border-[#128C7E]' : '',
+            platform === 'instagram' ? 'focus-within:border-[#E1306C]' : '',
+          ].join(' ')}
+        >
+          {attachmentsSupported && (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={!canAttach}
+              aria-label="Attach file"
+              title="Attach file"
+              className={composerActionIconClass(
+                canAttach,
+                'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900',
+              )}
+            >
+              <AttachIcon />
+            </button>
           )}
-        >
-          {suggesting ? <Spinner size="sm" variant="muted" /> : <SuggestReplyIcon />}
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            void handleRewrite()
-          }}
-          disabled={!canRewrite}
-          aria-label={rewriting ? 'Rewriting message' : 'Rewrite message'}
-          title="Rewrite message"
-          className={composerActionIconClass(
-            canRewrite,
-            'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900',
-          )}
-        >
-          {rewriting ? <Spinner size="sm" variant="muted" /> : <RewriteIcon />}
-        </button>
-        <button
-          type="submit"
-          disabled={!canSend}
-          aria-label={sending ? 'Sending message' : 'Send message'}
-          className={[composerActionButtonClass, sendButtonClass(canSend, platform)].join(' ')}
-        >
-          {sending ? <Spinner size="sm" variant="muted" /> : <SendIcon />}
-        </button>
-      </div>
-      {suggestError !== null && (
-        <p className="mt-2 text-xs text-red-600" role="alert">
-          {suggestError}
-        </p>
-      )}
-      {rewriteError !== null && (
-        <p className="mt-2 text-xs text-red-600" role="alert">
-          {rewriteError}
-        </p>
-      )}
+          <EmojiPicker disabled={composerDisabled} onSelect={handleEmojiSelect} />
+          <textarea
+            ref={textareaRef}
+            value={content}
+            onChange={(event) => {
+              setContent(event.target.value)
+              setRewriteError(null)
+            }}
+            placeholder={composerPlaceholder(disabled, attachment !== null)}
+            disabled={composerDisabled}
+            rows={1}
+            className="min-h-[36px] max-h-28 flex-1 resize-none border-0 bg-transparent py-1.5 text-sm text-neutral-900 outline-none placeholder:text-neutral-400 disabled:cursor-not-allowed"
+          />
+          <button
+            type="button"
+            onClick={() => {
+              void handleSuggestReply()
+            }}
+            disabled={!canSuggest}
+            aria-label={suggesting ? 'Generating reply suggestions' : 'Suggest reply'}
+            title="Suggest reply"
+            className={composerActionIconClass(
+              canSuggest,
+              'text-violet-600 hover:bg-violet-50 hover:text-violet-700',
+            )}
+          >
+            {suggesting ? <Spinner size="sm" variant="muted" /> : <SuggestReplyIcon />}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              void handleRewrite()
+            }}
+            disabled={!canRewrite}
+            aria-label={rewriting ? 'Rewriting message' : 'Rewrite message'}
+            title="Rewrite message"
+            className={composerActionIconClass(
+              canRewrite,
+              'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900',
+            )}
+          >
+            {rewriting ? <Spinner size="sm" variant="muted" /> : <RewriteIcon />}
+          </button>
+          <button
+            type="submit"
+            disabled={!canSend}
+            aria-label={sending ? 'Sending message' : 'Send message'}
+            className={[composerActionButtonClass, sendButtonClass(canSend, platform)].join(' ')}
+          >
+            {sending ? <Spinner size="sm" variant="muted" /> : <SendIcon />}
+          </button>
+        </div>
+        {attachmentError !== null && (
+          <p className="mt-2 text-xs text-red-600" role="alert">
+            {attachmentError}
+          </p>
+        )}
+        {suggestError !== null && (
+          <p className="mt-2 text-xs text-red-600" role="alert">
+            {suggestError}
+          </p>
+        )}
+        {rewriteError !== null && (
+          <p className="mt-2 text-xs text-red-600" role="alert">
+            {rewriteError}
+          </p>
+        )}
       </form>
     </div>
   )

@@ -78,6 +78,74 @@ export function upsertThreadMessage(
   )
 }
 
+export function appendThreadMessage(
+  queryClient: QueryClient,
+  conversationId: string,
+  message: Message,
+): void {
+  queryClient.setQueryData(
+    inboxKeys.thread(conversationId),
+    (current: ConversationDetailResponse | undefined) => {
+      if (current === undefined) {
+        return current
+      }
+
+      return {
+        ...current,
+        messages: [...current.messages, message],
+      }
+    },
+  )
+}
+
+export function removeThreadMessagesById(
+  queryClient: QueryClient,
+  conversationId: string,
+  messageIds: string[],
+): void {
+  if (messageIds.length === 0) {
+    return
+  }
+
+  const ids = new Set(messageIds)
+
+  queryClient.setQueryData(
+    inboxKeys.thread(conversationId),
+    (current: ConversationDetailResponse | undefined) => {
+      if (current === undefined) {
+        return current
+      }
+
+      return {
+        ...current,
+        messages: current.messages.filter((message) => !ids.has(message.id)),
+      }
+    },
+  )
+}
+
+export function replaceOptimisticThreadMessage(
+  queryClient: QueryClient,
+  conversationId: string,
+  optimisticId: string,
+  message: Message,
+): void {
+  queryClient.setQueryData(
+    inboxKeys.thread(conversationId),
+    (current: ConversationDetailResponse | undefined) => {
+      if (current === undefined) {
+        return current
+      }
+
+      const withoutOptimistic = current.messages.filter((item) => item.id !== optimisticId)
+      return {
+        ...current,
+        messages: upsertMessageInList(withoutOptimistic, message),
+      }
+    },
+  )
+}
+
 export function applyMessageInsert(
   queryClient: QueryClient,
   input: {
