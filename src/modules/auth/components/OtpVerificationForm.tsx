@@ -10,6 +10,8 @@ const inputClassName =
   'w-full rounded-lg border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition-all duration-200 placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-2 focus:ring-neutral-900/10'
 
 const RESEND_COOLDOWN_SECONDS = 60
+const OTP_MIN_LENGTH = 6
+const OTP_MAX_LENGTH = 10
 
 type VerifyLocationState = {
   email?: string
@@ -97,7 +99,7 @@ export function OtpVerificationForm() {
 
         <h1 className="text-2xl font-bold tracking-tight text-neutral-900">Verify your email</h1>
         <p className="mt-1 text-sm text-neutral-500">
-          We sent a 6-digit code to <span className="font-medium text-neutral-700">{email}</span>
+          We sent a verification code to <span className="font-medium text-neutral-700">{email}</span>
         </p>
       </div>
 
@@ -127,16 +129,19 @@ export function OtpVerificationForm() {
               autoComplete="one-time-code"
               required
               value={otp}
-              onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              className={`${inputClassName} text-center text-lg tracking-[0.3em]`}
-              placeholder="000000"
-              maxLength={6}
+              onChange={(e) =>
+                setOtp(e.target.value.replace(/\D/g, '').slice(0, OTP_MAX_LENGTH))
+              }
+              className={`${inputClassName} text-center text-lg tracking-[0.25em]`}
+              placeholder={'0'.repeat(OTP_MIN_LENGTH)}
+              minLength={OTP_MIN_LENGTH}
+              maxLength={OTP_MAX_LENGTH}
             />
           </div>
 
           <button
             type="submit"
-            disabled={isLoading || otp.length !== 6}
+            disabled={isLoading || otp.length < OTP_MIN_LENGTH || otp.length > OTP_MAX_LENGTH}
             className="mt-3 w-full rounded-lg bg-neutral-900 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isLoading ? (
