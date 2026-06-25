@@ -27,6 +27,7 @@ export async function getRealtimeSupabaseClient(): Promise<SupabaseClient | null
       auth: {
         autoRefreshToken: false,
         persistSession: false,
+        storageKey: 'responza-realtime',
       },
     })
   }

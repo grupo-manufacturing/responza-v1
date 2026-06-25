@@ -24,7 +24,11 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const requestUrl = error.config?.url
+    const isOAuthComplete =
+      typeof requestUrl === 'string' && requestUrl.includes('/auth/oauth/complete')
+
+    if (error.response?.status === 401 && !isOAuthComplete) {
       clearSessionCache()
       SessionStorage.clearTokens()
       resetRealtimeSupabaseClient()

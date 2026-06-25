@@ -20,9 +20,11 @@ export function getAuthSupabaseClient(): SupabaseClient {
     authClient = createClient(url, anonKey, {
       auth: {
         flowType: 'pkce',
-        persistSession: false,
+        // PKCE verifier must survive the Google redirect (in-memory storage does not).
+        persistSession: true,
         detectSessionInUrl: false,
         autoRefreshToken: false,
+        storageKey: 'responza-auth-oauth',
       },
     })
   }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { AuthService } from '@/modules/auth/auth.service'
@@ -15,8 +15,14 @@ import { getApiErrorMessage } from '@/shared/utils/api-error'
 export function GoogleOAuthCallbackPage() {
   const navigate = useNavigate()
   const [error, setError] = useState<string | null>(null)
+  const hasHandledCallback = useRef(false)
 
   useEffect(() => {
+    if (hasHandledCallback.current) {
+      return
+    }
+    hasHandledCallback.current = true
+
     const oauthError = readGoogleOAuthCallbackError()
     if (oauthError !== null) {
       setError(oauthError)
@@ -35,6 +41,7 @@ export function GoogleOAuthCallbackPage() {
       try {
         const tokens = await exchangeGoogleOAuthCode(code)
         const session = await AuthService.completeOAuth(tokens)
+        window.history.replaceState({}, document.title, '/auth/google/callback')
         completeAuthSession(session, navigate, nextPath)
       } catch (err: unknown) {
         setError(getApiErrorMessage(err, 'Could not complete Google sign-in. Please try again.'))
