@@ -16,13 +16,6 @@ export type AuthSession = {
   businessDetails: StoredBusinessDetails
 }
 
-export type RegisterResponse =
-  | AuthSession
-  | {
-      requiresEmailVerification: true
-      email: string
-    }
-
 export type MeResponse = {
   organization: StoredOrganization
   subscription: SubscriptionDetails

@@ -1,6 +1,6 @@
 import api from '@/shared/api/client'
 
-import type { AuthSession, MeResponse, RegisterResponse } from './auth.types'
+import type { AuthSession, MeResponse } from './auth.types'
 import type { TranslationLanguage } from '@/shared/session/storage'
 
 interface AuthApiResponse {
@@ -12,20 +12,9 @@ interface AuthApiResponse {
   businessDetails: AuthSession['businessDetails']
 }
 
-interface RegisterVerificationResponse {
-  requiresEmailVerification: true
-  email: string
-}
-
 export interface TranslationLanguageOption {
   code: TranslationLanguage
   label: string
-}
-
-function isRegisterVerificationResponse(
-  data: AuthApiResponse | RegisterVerificationResponse,
-): data is RegisterVerificationResponse {
-  return 'requiresEmailVerification' in data && data.requiresEmailVerification === true
 }
 
 export class AuthService {
@@ -34,25 +23,8 @@ export class AuthService {
     return response.data
   }
 
-  static async register(data: { email: string; password: string; name: string }): Promise<RegisterResponse> {
-    const response = await api.post<AuthApiResponse | RegisterVerificationResponse>('/auth/register', data)
-    if (isRegisterVerificationResponse(response.data)) {
-      return response.data
-    }
-
-    return response.data
-  }
-
-  static async resendVerificationEmail(email: string): Promise<void> {
-    await api.post('/auth/resend-verification', { email })
-  }
-
-  static async completeGoogleSignIn(data: {
-    accessToken: string
-    refreshToken: string
-    expiresIn: number
-  }): Promise<AuthSession> {
-    const response = await api.post<AuthApiResponse>('/auth/google/callback', data)
+  static async register(data: { email: string; password: string; name: string }): Promise<AuthSession> {
+    const response = await api.post<AuthApiResponse>('/auth/register', data)
     return response.data
   }
 

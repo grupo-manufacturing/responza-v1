@@ -29,12 +29,6 @@ const IntegrationsPage = lazy(() =>
 const InstagramOAuthCallbackPage = lazy(() =>
   import('@/modules/integrations/pages/InstagramOAuthCallbackPage').then((m) => ({ default: m.InstagramOAuthCallbackPage })),
 )
-const GoogleOAuthCallbackPage = lazy(() =>
-  import('@/modules/auth/pages/GoogleOAuthCallbackPage').then((m) => ({ default: m.GoogleOAuthCallbackPage })),
-)
-const VerifyEmailPage = lazy(() =>
-  import('@/modules/auth/pages/VerifyEmailPage').then((m) => ({ default: m.VerifyEmailPage })),
-)
 const SettingsPage = lazy(() =>
   import('@/modules/settings/pages/SettingsPage').then((m) => ({ default: m.SettingsPage })),
 )
@@ -46,12 +40,10 @@ function suspense(element: React.ReactNode, label?: string) {
 export const router = createBrowserRouter([
   { path: '/', element: suspense(<LandingPage />, 'Loading...') },
   { path: '/auth', element: suspense(<AuthPage />, 'Loading sign in...') },
-  { path: '/auth/verify-email', element: suspense(<VerifyEmailPage />, 'Verifying email...') },
   { path: '/login', element: <Navigate to="/auth?mode=login" replace /> },
   { path: '/register', element: <Navigate to="/auth?mode=register" replace /> },
   { path: '/subscription', element: <Navigate to="/settings?tab=subscription" replace /> },
   { path: '/oauth/instagram/callback', element: suspense(<InstagramOAuthCallbackPage />, 'Completing Instagram OAuth...') },
-  { path: '/oauth/google/callback', element: suspense(<GoogleOAuthCallbackPage />, 'Completing Google sign-in...') },
 
   {
     element: <ProtectedRoute />,
