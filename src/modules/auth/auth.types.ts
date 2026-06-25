@@ -21,3 +21,14 @@ export type MeResponse = {
   subscription: SubscriptionDetails
   businessDetails: StoredBusinessDetails
 }
+
+export type RegisterPendingResponse = {
+  requiresVerification: true
+  email: string
+}
+
+export function isRegisterPending(
+  response: AuthSession | RegisterPendingResponse,
+): response is RegisterPendingResponse {
+  return 'requiresVerification' in response && response.requiresVerification === true
+}

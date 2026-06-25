@@ -9,6 +9,9 @@ const LandingPage = lazy(() =>
   import('@/modules/landing/pages/LandingPage').then((m) => ({ default: m.LandingPage })),
 )
 const AuthPage = lazy(() => import('@/modules/auth/pages/AuthPage').then((m) => ({ default: m.AuthPage })))
+const OtpVerificationPage = lazy(() =>
+  import('@/modules/auth/pages/OtpVerificationPage').then((m) => ({ default: m.OtpVerificationPage })),
+)
 const BusinessOnboardingPage = lazy(() =>
   import('@/modules/business/pages/BusinessOnboardingPage').then((m) => ({
     default: m.BusinessOnboardingPage,
@@ -40,6 +43,7 @@ function suspense(element: React.ReactNode, label?: string) {
 export const router = createBrowserRouter([
   { path: '/', element: suspense(<LandingPage />, 'Loading...') },
   { path: '/auth', element: suspense(<AuthPage />, 'Loading sign in...') },
+  { path: '/auth/verify', element: suspense(<OtpVerificationPage />, 'Loading verification...') },
   { path: '/login', element: <Navigate to="/auth?mode=login" replace /> },
   { path: '/register', element: <Navigate to="/auth?mode=register" replace /> },
   { path: '/subscription', element: <Navigate to="/settings?tab=subscription" replace /> },

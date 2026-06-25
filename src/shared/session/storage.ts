@@ -22,6 +22,7 @@ export type StoredOrganization = {
   name: string
   plan: string
   preferredTranslationLanguage: TranslationLanguage | null
+  emailVerified: boolean
 }
 
 export type StoredBusinessDetails = {

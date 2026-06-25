@@ -2,10 +2,11 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 import { AuthService } from '@/modules/auth/auth.service'
+import { isRegisterPending } from '@/modules/auth/auth.types'
 import type { AuthFormData } from '@/modules/auth/auth.types'
+import { completeAuthSession } from '@/modules/auth/lib/completeAuthSession'
 import { Spinner } from '@/components/ui/Spinner'
-import { SessionStorage } from '@/shared/session/storage'
-import { getApiErrorMessage } from '@/shared/utils/api-error'
+import { getApiErrorMessage, isEmailNotVerifiedError } from '@/shared/utils/api-error'
 
 const inputClassName =
   'w-full rounded-lg border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition-all duration-200 placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-2 focus:ring-neutral-900/10'
@@ -26,17 +27,6 @@ export function AuthForm() {
 
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/dashboard'
 
-  const completeSignIn = (response: Awaited<ReturnType<typeof AuthService.login>>) => {
-    SessionStorage.saveTokens(response.accessToken, response.refreshToken)
-    SessionStorage.saveSessionProfile(response)
-
-    if (!response.businessDetails.completed) {
-      navigate('/business', { replace: true })
-    } else {
-      navigate(from, { replace: true })
-    }
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
@@ -45,7 +35,7 @@ export function AuthForm() {
     try {
       if (isLogin) {
         const response = await AuthService.login({ email: formData.email, password: formData.password })
-        completeSignIn(response)
+        completeAuthSession(response, navigate, from)
         return
       }
 
@@ -54,8 +44,25 @@ export function AuthForm() {
         password: formData.password,
         name: formData.name,
       })
-      completeSignIn(response)
+
+      if (isRegisterPending(response)) {
+        navigate('/auth/verify', {
+          replace: true,
+          state: { email: response.email, from: { pathname: from } },
+        })
+        return
+      }
+
+      completeAuthSession(response, navigate, from)
     } catch (err: unknown) {
+      if (isLogin && isEmailNotVerifiedError(err)) {
+        navigate('/auth/verify', {
+          replace: true,
+          state: { email: formData.email, from: { pathname: from } },
+        })
+        return
+      }
+
       setError(getApiErrorMessage(err, 'Something went wrong. Please try again.'))
     } finally {
       setIsLoading(false)

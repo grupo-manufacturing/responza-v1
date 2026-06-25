@@ -8,6 +8,10 @@ type ApiErrorBody = {
   }
 }
 
+export function isEmailNotVerifiedError(error: unknown): boolean {
+  return getApiErrorCode(error) === 'EMAIL_NOT_VERIFIED'
+}
+
 export function isSubscriptionRequiredError(error: unknown): boolean {
   return getApiErrorCode(error) === 'SUBSCRIPTION_REQUIRED'
 }

@@ -1,6 +1,6 @@
 import api from '@/shared/api/client'
 
-import type { AuthSession, MeResponse } from './auth.types'
+import type { AuthSession, MeResponse, RegisterPendingResponse } from './auth.types'
 import type { TranslationLanguage } from '@/shared/session/storage'
 
 interface AuthApiResponse {
@@ -23,9 +23,22 @@ export class AuthService {
     return response.data
   }
 
-  static async register(data: { email: string; password: string; name: string }): Promise<AuthSession> {
-    const response = await api.post<AuthApiResponse>('/auth/register', data)
+  static async register(data: {
+    email: string
+    password: string
+    name: string
+  }): Promise<AuthSession | RegisterPendingResponse> {
+    const response = await api.post<AuthApiResponse | RegisterPendingResponse>('/auth/register', data)
     return response.data
+  }
+
+  static async verifyOtp(data: { email: string; token: string }): Promise<AuthSession> {
+    const response = await api.post<AuthApiResponse>('/auth/verify-otp', data)
+    return response.data
+  }
+
+  static async resendOtp(data: { email: string }): Promise<void> {
+    await api.post('/auth/resend-otp', data)
   }
 
   static async getMe(): Promise<MeResponse> {
