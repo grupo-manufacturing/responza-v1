@@ -12,6 +12,9 @@ const AuthPage = lazy(() => import('@/modules/auth/pages/AuthPage').then((m) => 
 const OtpVerificationPage = lazy(() =>
   import('@/modules/auth/pages/OtpVerificationPage').then((m) => ({ default: m.OtpVerificationPage })),
 )
+const GoogleOAuthCallbackPage = lazy(() =>
+  import('@/modules/auth/pages/GoogleOAuthCallbackPage').then((m) => ({ default: m.GoogleOAuthCallbackPage })),
+)
 const BusinessOnboardingPage = lazy(() =>
   import('@/modules/business/pages/BusinessOnboardingPage').then((m) => ({
     default: m.BusinessOnboardingPage,
@@ -44,6 +47,7 @@ export const router = createBrowserRouter([
   { path: '/', element: suspense(<LandingPage />, 'Loading...') },
   { path: '/auth', element: suspense(<AuthPage />, 'Loading sign in...') },
   { path: '/auth/verify', element: suspense(<OtpVerificationPage />, 'Loading verification...') },
+  { path: '/auth/google/callback', element: suspense(<GoogleOAuthCallbackPage />, 'Completing Google sign-in...') },
   { path: '/login', element: <Navigate to="/auth?mode=login" replace /> },
   { path: '/register', element: <Navigate to="/auth?mode=register" replace /> },
   { path: '/subscription', element: <Navigate to="/settings?tab=subscription" replace /> },

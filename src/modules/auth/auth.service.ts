@@ -41,6 +41,26 @@ export class AuthService {
     await api.post('/auth/resend-otp', data)
   }
 
+  static async completeOAuth(tokens: {
+    accessToken: string
+    refreshToken: string
+    expiresIn: number
+  }): Promise<AuthSession> {
+    const response = await api.post<AuthApiResponse>(
+      '/auth/oauth/complete',
+      {
+        refreshToken: tokens.refreshToken,
+        expiresIn: tokens.expiresIn,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${tokens.accessToken}`,
+        },
+      },
+    )
+    return response.data
+  }
+
   static async getMe(): Promise<MeResponse> {
     const response = await api.get<MeResponse>('/auth/me')
     return response.data
