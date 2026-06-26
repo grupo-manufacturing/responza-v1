@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
 import { IntegrationsRequired } from '@/components/common/IntegrationsRequired'
@@ -23,6 +23,14 @@ import {
 } from '@/modules/inbox/hooks/useInboxQueries'
 import { useInboxRealtime } from '@/modules/inbox/hooks/useInboxRealtime'
 import { replaceOptimisticThreadMessage, upsertThreadMessage } from '@/modules/inbox/lib/mergeInboxCache'
+import {
+  bumpConversationInList,
+  flattenConversations,
+  flattenThreadMessages,
+  type ConversationsInfiniteData,
+  type ThreadInfiniteData,
+  updateThreadFirstPage,
+} from '@/modules/inbox/lib/inboxQueryData'
 import { formatMessageListPreview } from '@/modules/inbox/inbox.preview'
 import { InboxService, type Message } from '@/modules/inbox/inbox.service'
 import { useSubscriptionGate } from '@/shared/hooks/useSubscriptionGate'
@@ -112,12 +120,33 @@ export function InboxPage() {
     setMobileShowThread(false)
   }
 
-  const conversations = conversationsQuery.data?.conversations ?? []
+  const conversations = flattenConversations(conversationsQuery.data)
   const listLoading = conversationsQuery.isLoading
+  const listLoadingMore = conversationsQuery.isFetchingNextPage
+
+  const threadFirstPage = threadQuery.data?.pages[0]
   const threadLoading = threadQuery.isLoading && selectedConversationId !== null
-  const activeConversation = threadQuery.data?.conversation ?? null
-  const participants = threadQuery.data?.participants ?? []
-  const messages = threadQuery.data?.messages ?? []
+  const threadLoadingOlder = threadQuery.isFetchingNextPage
+  const activeConversation = threadFirstPage?.conversation ?? null
+  const participants = threadFirstPage?.participants ?? []
+  const messages = flattenThreadMessages(threadQuery.data)
+  const hasMoreOlder = threadQuery.hasNextPage ?? false
+
+  const handleLoadMoreConversations = useCallback(() => {
+    if (!conversationsQuery.hasNextPage || conversationsQuery.isFetchingNextPage) {
+      return
+    }
+
+    void conversationsQuery.fetchNextPage()
+  }, [conversationsQuery])
+
+  const handleLoadOlderMessages = useCallback(() => {
+    if (!threadQuery.hasNextPage || threadQuery.isFetchingNextPage) {
+      return
+    }
+
+    void threadQuery.fetchNextPage()
+  }, [threadQuery])
 
   const handleSelectConversation = (conversationId: string) => {
     setSelectedConversationId(conversationId)
@@ -158,14 +187,17 @@ export function InboxPage() {
 
       queryClient.setQueryData(
         inboxKeys.thread(selectedConversationId),
-        (current: Awaited<ReturnType<typeof InboxService.getConversation>> | undefined) => {
-          if (!current) return current
-          return {
-            ...current,
-            messages: current.messages.map((item) =>
+        (current: ThreadInfiniteData | undefined) => {
+          if (current === undefined || current.pages.length === 0) {
+            return current
+          }
+
+          return updateThreadFirstPage(current, (page) => ({
+            ...page,
+            messages: page.messages.map((item) =>
               item.id === messageId ? result.message : item,
             ),
-          }
+          }))
         },
       )
     } catch (err) {
@@ -185,7 +217,7 @@ export function InboxPage() {
       input.attachment !== undefined ? `optimistic-${Date.now()}` : null
     const optimisticPreviewUrl = input.attachment?.previewUrl ?? null
 
-    if (optimisticId !== null && input.attachment !== undefined && threadQuery.data !== undefined) {
+    if (optimisticId !== null && input.attachment !== undefined && threadFirstPage !== undefined) {
       const optimisticMessage: Message = {
         id: optimisticId,
         organizationId,
@@ -205,12 +237,15 @@ export function InboxPage() {
 
       queryClient.setQueryData(
         inboxKeys.thread(selectedConversationId),
-        (current: Awaited<ReturnType<typeof InboxService.getConversation>> | undefined) => {
-          if (!current) return current
-          return {
-            ...current,
-            messages: [...current.messages, optimisticMessage],
+        (current: ThreadInfiniteData | undefined) => {
+          if (current === undefined || current.pages.length === 0) {
+            return current
           }
+
+          return updateThreadFirstPage(current, (page) => ({
+            ...page,
+            messages: [...page.messages, optimisticMessage],
+          }))
         },
       )
     }
@@ -249,22 +284,18 @@ export function InboxPage() {
 
       queryClient.setQueryData(
         inboxKeys.conversations(platformFilter),
-        (current: Awaited<ReturnType<typeof InboxService.listConversations>> | undefined) => {
-          if (!current) return current
-          return {
-            conversations: current.conversations.map((item) =>
-              item.id === selectedConversationId
-                ? {
-                    ...item,
-                    lastMessage: formatMessageListPreview(
-                      result.message.content,
-                      result.message.contentType,
-                    ),
-                    lastMessageAt: result.message.createdAt,
-                  }
-                : item,
-            ),
+        (current: ConversationsInfiniteData | undefined) => {
+          if (current === undefined) {
+            return current
           }
+
+          return bumpConversationInList(current, selectedConversationId, {
+            lastMessage: formatMessageListPreview(
+              result.message.content,
+              result.message.contentType,
+            ),
+            lastMessageAt: result.message.createdAt,
+          })
         },
       )
     } catch (err) {
@@ -281,12 +312,15 @@ export function InboxPage() {
         } else {
           queryClient.setQueryData(
             inboxKeys.thread(selectedConversationId),
-            (current: Awaited<ReturnType<typeof InboxService.getConversation>> | undefined) => {
-              if (!current) return current
-              return {
-                ...current,
-                messages: current.messages.filter((message) => message.id !== optimisticId),
+            (current: ThreadInfiniteData | undefined) => {
+              if (current === undefined || current.pages.length === 0) {
+                return current
               }
+
+              return updateThreadFirstPage(current, (page) => ({
+                ...page,
+                messages: page.messages.filter((message) => message.id !== optimisticId),
+              }))
             },
           )
         }
@@ -353,11 +387,16 @@ export function InboxPage() {
                 <Spinner />
               </div>
             ) : (
-              <ConversationList
+              <div className="flex min-h-0 flex-1 flex-col">
+                <ConversationList
                 conversations={conversations}
                 selectedId={selectedConversationId}
+                hasMore={conversationsQuery.hasNextPage ?? false}
+                loadingMore={listLoadingMore}
+                onLoadMore={handleLoadMoreConversations}
                 onSelect={(item) => handleSelectConversation(item.id)}
               />
+              </div>
             )}
           </div>
 
@@ -392,6 +431,9 @@ export function InboxPage() {
               conversation={activeConversation}
               messages={messages}
               loading={threadLoading}
+              hasMoreOlder={hasMoreOlder}
+              loadingOlder={threadLoadingOlder}
+              onLoadOlder={handleLoadOlderMessages}
               platform={activePlatform}
               reactDisabled={
                 activePlatform === 'indiamart' || activePlatform === null || threadLoading

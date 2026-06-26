@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 import { Spinner } from '@/components/ui/Spinner'
 import { AiService } from '@/modules/ai/ai.service'
@@ -25,6 +25,9 @@ type ConversationThreadProps = {
   readonly conversation: Conversation | null
   readonly messages: Message[]
   readonly loading: boolean
+  readonly hasMoreOlder: boolean
+  readonly loadingOlder: boolean
+  readonly onLoadOlder: () => void
   readonly platform?: IntegrationPlatform | null
   readonly reactDisabled?: boolean
   readonly onReact?: (messageId: string, emoji: string | null) => Promise<void>
@@ -70,38 +73,101 @@ export function ConversationThread({
   conversation,
   messages,
   loading,
+  hasMoreOlder,
+  loadingOlder,
+  onLoadOlder,
   platform = null,
   reactDisabled = false,
   onReact,
 }: ConversationThreadProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const previousMessageCountRef = useRef(messages.length)
+  const firstMessageIdRef = useRef<string | null>(messages[0]?.id ?? null)
+  const pendingOlderScrollRef = useRef(false)
+  const scrollHeightBeforeOlderLoadRef = useRef(0)
+  const scrollTopBeforeOlderLoadRef = useRef(0)
   const [translations, setTranslations] = useState<Record<string, MessageTranslationState>>({})
 
   useEffect(() => {
     setTranslations({})
+    firstMessageIdRef.current = null
+    previousMessageCountRef.current = 0
   }, [conversation?.id])
 
   useEffect(() => {
     const container = scrollRef.current
+    if (container === null || conversation === null || loading) {
+      return
+    }
+
+    container.scrollTop = container.scrollHeight
+  }, [conversation?.id, loading])
+
+  useEffect(() => {
+    if (loadingOlder) {
+      const container = scrollRef.current
+      if (container !== null) {
+        scrollHeightBeforeOlderLoadRef.current = container.scrollHeight
+        scrollTopBeforeOlderLoadRef.current = container.scrollTop
+        pendingOlderScrollRef.current = true
+      }
+      return
+    }
+
+    if (!hasMoreOlder) {
+      return
+    }
+
+    const container = scrollRef.current
+    if (container === null) {
+      return
+    }
+
+    const handleScroll = () => {
+      if (loadingOlder || container.scrollTop > 80) {
+        return
+      }
+
+      onLoadOlder()
+    }
+
+    container.addEventListener('scroll', handleScroll, { passive: true })
+    return () => container.removeEventListener('scroll', handleScroll)
+  }, [conversation?.id, hasMoreOlder, loadingOlder, onLoadOlder])
+
+  useLayoutEffect(() => {
+    const container = scrollRef.current
     if (container === null) {
       previousMessageCountRef.current = messages.length
+      firstMessageIdRef.current = messages[0]?.id ?? null
       return
     }
 
-    const grew = messages.length > previousMessageCountRef.current
+    const firstMessageId = messages[0]?.id ?? null
+    const prependedOlder =
+      pendingOlderScrollRef.current &&
+      firstMessageIdRef.current !== null &&
+      firstMessageId !== firstMessageIdRef.current
+
+    if (prependedOlder) {
+      const heightDelta =
+        container.scrollHeight - scrollHeightBeforeOlderLoadRef.current
+      container.scrollTop = scrollTopBeforeOlderLoadRef.current + heightDelta
+      pendingOlderScrollRef.current = false
+    } else {
+      const grew = messages.length > previousMessageCountRef.current
+      if (grew) {
+        const distanceFromBottom =
+          container.scrollHeight - container.scrollTop - container.clientHeight
+
+        if (distanceFromBottom < 120) {
+          container.scrollTop = container.scrollHeight
+        }
+      }
+    }
+
     previousMessageCountRef.current = messages.length
-
-    if (!grew) {
-      return
-    }
-
-    const distanceFromBottom =
-      container.scrollHeight - container.scrollTop - container.clientHeight
-
-    if (distanceFromBottom < 120) {
-      container.scrollTop = container.scrollHeight
-    }
+    firstMessageIdRef.current = firstMessageId
   }, [messages])
 
   const handleTranslate = async (messageId: string) => {
@@ -162,6 +228,12 @@ export function ConversationThread({
           ref={scrollRef}
           className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 pb-4 pt-6 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         >
+          {loadingOlder && (
+            <div className="mb-4 flex justify-center">
+              <Spinner size="sm" variant="muted" label="Loading older messages" />
+            </div>
+          )}
+
           {messages.length === 0 && (
             <p className="py-8 text-center text-sm text-neutral-500">
               No messages in this conversation yet.

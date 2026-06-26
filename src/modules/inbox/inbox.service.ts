@@ -55,16 +55,27 @@ export interface Message {
 
 export interface ListConversationsParams {
   platform?: IntegrationPlatform
+  limit?: number
+  cursor?: string
 }
 
 export interface ListConversationsResponse {
   conversations: ConversationListItem[]
+  nextCursor: string | null
+  hasMore: boolean
+}
+
+export interface GetConversationParams {
+  messageLimit?: number
+  before?: string
 }
 
 export interface ConversationDetailResponse {
   conversation: Conversation
   participants: Participant[]
   messages: Message[]
+  messagesNextCursor: string | null
+  hasMoreMessages: boolean
 }
 
 export interface SendTextMessagePayload {
@@ -112,8 +123,11 @@ export class InboxService {
     return response.data
   }
 
-  static async getConversation(id: string): Promise<ConversationDetailResponse> {
-    const response = await api.get<ConversationDetailResponse>(`/conversations/${id}`)
+  static async getConversation(
+    id: string,
+    params: GetConversationParams = {},
+  ): Promise<ConversationDetailResponse> {
+    const response = await api.get<ConversationDetailResponse>(`/conversations/${id}`, { params })
     return response.data
   }
 

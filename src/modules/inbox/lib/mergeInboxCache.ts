@@ -1,9 +1,13 @@
 import type { QueryClient } from '@tanstack/react-query'
 
 import type { MessageContentType, MessageDirection, MessageStatus } from '@/modules/inbox/inbox.constants'
+import { inboxKeys } from '@/modules/inbox/hooks/useInboxQueries'
 import { isMediaContentType } from '@/modules/inbox/inbox.preview'
 import type { ConversationDetailResponse, Message } from '@/modules/inbox/inbox.service'
-import { inboxKeys } from '@/modules/inbox/hooks/useInboxQueries'
+import {
+  type ThreadInfiniteData,
+  updateThreadFirstPage,
+} from '@/modules/inbox/lib/inboxQueryData'
 
 function mapRealtimeMessage(row: Record<string, unknown>): Message | null {
   const id = row.id
@@ -70,24 +74,32 @@ function upsertMessageInList(messages: Message[], incoming: Message): Message[] 
   return next
 }
 
+function updateThreadCache(
+  queryClient: QueryClient,
+  conversationId: string,
+  updater: (page: ConversationDetailResponse) => ConversationDetailResponse,
+): void {
+  queryClient.setQueryData(
+    inboxKeys.thread(conversationId),
+    (current: ThreadInfiniteData | undefined) => {
+      if (current === undefined || current.pages.length === 0) {
+        return current
+      }
+
+      return updateThreadFirstPage(current, updater)
+    },
+  )
+}
+
 export function upsertThreadMessage(
   queryClient: QueryClient,
   conversationId: string,
   message: Message,
 ): void {
-  queryClient.setQueryData(
-    inboxKeys.thread(conversationId),
-    (current: ConversationDetailResponse | undefined) => {
-      if (current === undefined) {
-        return current
-      }
-
-      return {
-        ...current,
-        messages: upsertMessageInList(current.messages, message),
-      }
-    },
-  )
+  updateThreadCache(queryClient, conversationId, (current) => ({
+    ...current,
+    messages: upsertMessageInList(current.messages, message),
+  }))
 }
 
 export function appendThreadMessage(
@@ -95,19 +107,10 @@ export function appendThreadMessage(
   conversationId: string,
   message: Message,
 ): void {
-  queryClient.setQueryData(
-    inboxKeys.thread(conversationId),
-    (current: ConversationDetailResponse | undefined) => {
-      if (current === undefined) {
-        return current
-      }
-
-      return {
-        ...current,
-        messages: [...current.messages, message],
-      }
-    },
-  )
+  updateThreadCache(queryClient, conversationId, (current) => ({
+    ...current,
+    messages: [...current.messages, message],
+  }))
 }
 
 export function removeThreadMessagesById(
@@ -121,19 +124,10 @@ export function removeThreadMessagesById(
 
   const ids = new Set(messageIds)
 
-  queryClient.setQueryData(
-    inboxKeys.thread(conversationId),
-    (current: ConversationDetailResponse | undefined) => {
-      if (current === undefined) {
-        return current
-      }
-
-      return {
-        ...current,
-        messages: current.messages.filter((message) => !ids.has(message.id)),
-      }
-    },
-  )
+  updateThreadCache(queryClient, conversationId, (current) => ({
+    ...current,
+    messages: current.messages.filter((message) => !ids.has(message.id)),
+  }))
 }
 
 export function replaceOptimisticThreadMessage(
@@ -142,20 +136,13 @@ export function replaceOptimisticThreadMessage(
   optimisticId: string,
   message: Message,
 ): void {
-  queryClient.setQueryData(
-    inboxKeys.thread(conversationId),
-    (current: ConversationDetailResponse | undefined) => {
-      if (current === undefined) {
-        return current
-      }
-
-      const withoutOptimistic = current.messages.filter((item) => item.id !== optimisticId)
-      return {
-        ...current,
-        messages: upsertMessageInList(withoutOptimistic, message),
-      }
-    },
-  )
+  updateThreadCache(queryClient, conversationId, (current) => {
+    const withoutOptimistic = current.messages.filter((item) => item.id !== optimisticId)
+    return {
+      ...current,
+      messages: upsertMessageInList(withoutOptimistic, message),
+    }
+  })
 }
 
 export function applyMessageInsert(
@@ -179,19 +166,10 @@ export function applyMessageInsert(
     input.selectedConversationId !== null &&
     message.conversationId === input.selectedConversationId
   ) {
-    queryClient.setQueryData(
-      inboxKeys.thread(input.selectedConversationId),
-      (current: ConversationDetailResponse | undefined) => {
-        if (current === undefined) {
-          return current
-        }
-
-        return {
-          ...current,
-          messages: upsertMessageInList(current.messages, message),
-        }
-      },
-    )
+    updateThreadCache(queryClient, input.selectedConversationId, (current) => ({
+      ...current,
+      messages: upsertMessageInList(current.messages, message),
+    }))
   }
 
   void queryClient.invalidateQueries({ queryKey: ['inbox', 'conversations'] })
@@ -213,32 +191,25 @@ export function applyMessageUpdate(
     return
   }
 
-  queryClient.setQueryData(
-    inboxKeys.thread(input.selectedConversationId),
-    (current: ConversationDetailResponse | undefined) => {
-      if (current === undefined) {
-        return current
+  updateThreadCache(queryClient, input.selectedConversationId, (current) => {
+    const index = current.messages.findIndex(
+      (item) =>
+        item.id === message.id ||
+        (message.platformMessageId !== null &&
+          item.platformMessageId === message.platformMessageId),
+    )
+
+    if (index === -1) {
+      return {
+        ...current,
+        messages: upsertMessageInList(current.messages, message),
       }
+    }
 
-      const index = current.messages.findIndex(
-        (item) =>
-          item.id === message.id ||
-          (message.platformMessageId !== null &&
-            item.platformMessageId === message.platformMessageId),
-      )
-
-      if (index === -1) {
-        return {
-          ...current,
-          messages: upsertMessageInList(current.messages, message),
-        }
-      }
-
-      const messages = [...current.messages]
-      messages[index] = mergeRealtimeMessage(messages[index], message)
-      return { ...current, messages }
-    },
-  )
+    const messages = [...current.messages]
+    messages[index] = mergeRealtimeMessage(messages[index], message)
+    return { ...current, messages }
+  })
 }
 
 export function invalidateInboxQueries(
