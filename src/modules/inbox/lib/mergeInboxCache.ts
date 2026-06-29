@@ -38,9 +38,6 @@ function mapRealtimeMessage(row: Record<string, unknown>): Message | null {
     mediaUrl: null,
     mimeType: typeof row.mime_type === 'string' ? row.mime_type : null,
     status: row.status as MessageStatus,
-    customerReaction:
-      typeof row.customer_reaction === 'string' ? row.customer_reaction : null,
-    agentReaction: typeof row.agent_reaction === 'string' ? row.agent_reaction : null,
     createdAt,
   }
 }

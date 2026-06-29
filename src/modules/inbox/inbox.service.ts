@@ -48,8 +48,6 @@ export interface Message {
   mediaUrl: string | null
   mimeType: string | null
   status: MessageStatus
-  customerReaction: string | null
-  agentReaction: string | null
   createdAt: string
 }
 
@@ -104,14 +102,6 @@ export interface UploadOutboundMediaResponse {
 }
 
 export interface SendMessageResponse {
-  message: Message
-}
-
-export interface ReactToMessagePayload {
-  emoji: string | null
-}
-
-export interface ReactToMessageResponse {
   message: Message
 }
 
@@ -170,18 +160,6 @@ export class InboxService {
       {
         timeout: 'storagePath' in payload ? 60_000 : 10_000,
       },
-    )
-    return response.data
-  }
-
-  static async reactToMessage(
-    conversationId: string,
-    messageId: string,
-    payload: ReactToMessagePayload,
-  ): Promise<ReactToMessageResponse> {
-    const response = await api.post<ReactToMessageResponse>(
-      `/conversations/${conversationId}/messages/${messageId}/reactions`,
-      payload,
     )
     return response.data
   }

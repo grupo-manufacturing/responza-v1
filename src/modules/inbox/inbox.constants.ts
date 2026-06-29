@@ -11,26 +11,13 @@ export type MessageStatus = 'pending' | 'sent' | 'failed' | 'read'
 
 export type MessageContentType = 'text' | 'image' | 'video' | 'audio' | 'document'
 
-export const MESSAGE_QUICK_EMOJIS = [
-  '😀',
-  '😂',
-  '❤️',
-  '👍',
-  '🙏',
-  '🎉',
-  '🔥',
-  '✨',
-  '😊',
-  '😍',
-  '🤔',
-  '👋',
-] as const
-
 export const INBOX_PLATFORM_FILTERS: InboxPlatformFilter[] = [
   'all',
   'whatsapp',
   'instagram',
 ]
+
+export const REPLY_SUGGESTION_CHIP_COUNT = 2
 
 export function inboxPlatformFilterLabel(filter: InboxPlatformFilter): string {
   if (filter === 'all') {

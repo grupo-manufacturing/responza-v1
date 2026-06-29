@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 
 import { Spinner } from '@/components/ui/Spinner'
 import { AiService } from '@/modules/ai/ai.service'
-import { EmojiPicker } from '@/modules/inbox/components/EmojiPicker'
 import { ReplySuggestionChips } from '@/modules/inbox/components/ReplySuggestionChips'
+import { REPLY_SUGGESTION_CHIP_COUNT } from '@/modules/inbox/inbox.constants'
 import {
   attachmentPreviewLabel,
   canPreviewAttachmentLocally,
@@ -117,21 +117,6 @@ function composerActionIconClass(enabled: boolean, enabledClassName: string): st
     composerActionButtonClass,
     enabled ? enabledClassName : 'cursor-not-allowed opacity-40',
   ].join(' ')
-}
-
-function insertAtCursor(textarea: HTMLTextAreaElement, value: string): string {
-  const start = textarea.selectionStart
-  const end = textarea.selectionEnd
-  const next = `${textarea.value.slice(0, start)}${value}${textarea.value.slice(end)}`
-  const cursor = start + value.length
-
-  requestAnimationFrame(() => {
-    textarea.selectionStart = cursor
-    textarea.selectionEnd = cursor
-    textarea.focus()
-  })
-
-  return next
 }
 
 function isAiBusy(rewriting: boolean, suggesting: boolean): boolean {
@@ -332,7 +317,7 @@ export function MessageComposer({
 
     try {
       const { suggestions: nextSuggestions } = await AiService.suggestReply(conversationId)
-      setSuggestions(nextSuggestions)
+      setSuggestions(nextSuggestions.slice(0, REPLY_SUGGESTION_CHIP_COUNT))
     } catch (err: unknown) {
       setSuggestions([])
       setSuggestError(getApiErrorMessage(err, 'Could not generate reply suggestions. Please try again.'))
@@ -357,16 +342,6 @@ export function MessageComposer({
   const handleDismissSuggestions = () => {
     setSuggestions([])
     setSuggestError(null)
-  }
-
-  const handleEmojiSelect = (emoji: string) => {
-    const textarea = textareaRef.current
-    if (textarea === null || disabled || sending || aiBusy) {
-      setContent((current) => `${current}${emoji}`)
-      return
-    }
-
-    setContent(insertAtCursor(textarea, emoji))
   }
 
   const composerDisabled = disabled || sending || aiBusy
@@ -428,7 +403,6 @@ export function MessageComposer({
               <AttachIcon />
             </button>
           )}
-          <EmojiPicker disabled={composerDisabled} onSelect={handleEmojiSelect} />
           <textarea
             ref={textareaRef}
             value={content}

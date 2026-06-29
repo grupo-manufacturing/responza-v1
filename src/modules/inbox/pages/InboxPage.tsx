@@ -176,36 +176,6 @@ export function InboxPage() {
     }
   }
 
-  const handleReactToMessage = async (messageId: string, emoji: string | null) => {
-    if (selectedConversationId === null) {
-      return
-    }
-
-    setSendError(null)
-
-    try {
-      const result = await InboxService.reactToMessage(selectedConversationId, messageId, { emoji })
-
-      queryClient.setQueryData(
-        inboxKeys.thread(selectedConversationId),
-        (current: ThreadInfiniteData | undefined) => {
-          if (current === undefined || current.pages.length === 0) {
-            return current
-          }
-
-          return updateThreadFirstPage(current, (page) => ({
-            ...page,
-            messages: page.messages.map((item) =>
-              item.id === messageId ? result.message : item,
-            ),
-          }))
-        },
-      )
-    } catch (err) {
-      setSendError(getApiErrorMessage(err, 'Could not react to message. Please try again.'))
-    }
-  }
-
   const handleSendMessage = async (input: SendComposerInput) => {
     if (selectedConversationId === null || organizationId === null) {
       return
@@ -231,8 +201,6 @@ export function InboxPage() {
         mediaUrl: optimisticPreviewUrl,
         mimeType: input.attachment.file.type || null,
         status: 'pending',
-        customerReaction: null,
-        agentReaction: null,
         createdAt: new Date().toISOString(),
       }
 
@@ -437,10 +405,7 @@ export function InboxPage() {
               loadingOlder={threadLoadingOlder}
               onLoadOlder={handleLoadOlderMessages}
               platform={activePlatform}
-              reactDisabled={
-                activePlatform === 'indiamart' || activePlatform === null || threadLoading
-              }
-              onReact={handleReactToMessage}
+              actionsDisabled={threadLoading}
             />
             <MessageComposer
               conversationId={selectedConversationId}

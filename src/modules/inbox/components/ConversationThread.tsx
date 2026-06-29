@@ -4,7 +4,6 @@ import { Spinner } from '@/components/ui/Spinner'
 import { AiService } from '@/modules/ai/ai.service'
 import { MessageMedia } from '@/modules/inbox/components/MessageMedia'
 import { MessageStatusIndicator } from '@/modules/inbox/components/MessageStatusIndicator'
-import { ReactionPicker } from '@/modules/inbox/components/ReactionPicker'
 import { TranslateMessageButton } from '@/modules/inbox/components/TranslateMessageButton'
 import { formatInboxTimestamp } from '@/modules/inbox/inbox.constants'
 import {
@@ -33,8 +32,7 @@ type ConversationThreadProps = {
   readonly loadingOlder: boolean
   readonly onLoadOlder: () => void
   readonly platform?: IntegrationPlatform | null
-  readonly reactDisabled?: boolean
-  readonly onReact?: (messageId: string, emoji: string | null) => Promise<void>
+  readonly actionsDisabled?: boolean
 }
 
 type MessageTranslationState =
@@ -44,19 +42,6 @@ type MessageTranslationState =
 
 const MESSAGE_ACTIONS_HEIGHT_CLASS = 'pt-9'
 
-function MessageReactions({ message }: { readonly message: Message }) {
-  if (message.customerReaction === null && message.agentReaction === null) {
-    return null
-  }
-
-  return (
-    <div className="absolute -top-2 right-1 z-10 inline-flex items-center gap-0.5 rounded-full border border-border bg-white px-1.5 py-0.5 text-sm shadow-soft">
-      {message.customerReaction !== null && <span>{message.customerReaction}</span>}
-      {message.agentReaction !== null && <span>{message.agentReaction}</span>}
-    </div>
-  )
-}
-
 export function ConversationThread({
   conversation,
   messages,
@@ -65,8 +50,7 @@ export function ConversationThread({
   loadingOlder,
   onLoadOlder,
   platform = null,
-  reactDisabled = false,
-  onReact,
+  actionsDisabled = false,
 }: ConversationThreadProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const previousMessageCountRef = useRef(messages.length)
@@ -231,16 +215,8 @@ export function ConversationThread({
           <div className="space-y-4">
             {messages.map((message) => {
               const isOutbound = message.direction === 'outbound'
-              const canReact =
-                !reactDisabled &&
-                !isOutbound &&
-                message.platformMessageId !== null &&
-                onReact !== undefined
               const canTranslate =
                 isTranslatableMessageContent(message.content, message.contentType)
-              const showActions = canReact || canTranslate
-              const hasReactions =
-                message.customerReaction !== null || message.agentReaction !== null
               const translation = translations[message.id]
               const isTranslating = translation?.status === 'loading'
               const isShowingTranslation =
@@ -277,30 +253,18 @@ export function ConversationThread({
                     <div
                       className={[
                         'group relative w-full',
-                        showActions ? MESSAGE_ACTIONS_HEIGHT_CLASS : '',
-                        hasReactions ? 'mt-2' : '',
+                        canTranslate ? MESSAGE_ACTIONS_HEIGHT_CLASS : '',
                       ].join(' ')}
                     >
-                      {showActions && (
+                      {canTranslate && (
                         <div className="absolute top-0 right-0 z-20 flex items-center gap-0.5 rounded-full border border-border bg-white/95 p-0.5 shadow-soft opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
-                          {canReact && (
-                            <ReactionPicker
-                              disabled={reactDisabled}
-                              onSelect={(emoji) => {
-                                const nextEmoji = emoji === message.agentReaction ? null : emoji
-                                void onReact(message.id, nextEmoji)
-                              }}
-                            />
-                          )}
-                          {canTranslate && (
-                            <TranslateMessageButton
-                              disabled={reactDisabled}
-                              loading={isTranslating}
-                              onTranslate={() => {
-                                void handleTranslate(message.id)
-                              }}
-                            />
-                          )}
+                          <TranslateMessageButton
+                            disabled={actionsDisabled}
+                            loading={isTranslating}
+                            onTranslate={() => {
+                              void handleTranslate(message.id)
+                            }}
+                          />
                         </div>
                       )}
 
@@ -362,8 +326,6 @@ export function ConversationThread({
                           <span>{formatInboxTimestamp(message.createdAt)}</span>
                         </div>
                       </div>
-
-                      <MessageReactions message={message} />
                     </div>
 
                     {isShowingTranslation && (

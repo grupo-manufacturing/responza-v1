@@ -1,3 +1,5 @@
+import { REPLY_SUGGESTION_CHIP_COUNT } from '@/modules/inbox/inbox.constants'
+
 type ReplySuggestionChipsProps = {
   readonly suggestions: string[]
   readonly disabled?: boolean
@@ -19,14 +21,16 @@ export function ReplySuggestionChips({
   onSelect,
   onDismiss,
 }: ReplySuggestionChipsProps) {
-  if (suggestions.length === 0) {
+  const visibleSuggestions = suggestions.slice(0, REPLY_SUGGESTION_CHIP_COUNT)
+
+  if (visibleSuggestions.length === 0) {
     return null
   }
 
   return (
     <div className="flex items-start gap-2">
       <div className="grid min-w-0 flex-1 grid-cols-2 gap-2">
-        {suggestions.map((suggestion, index) => (
+        {visibleSuggestions.map((suggestion, index) => (
           <button
             key={`${index}-${suggestion.slice(0, 24)}`}
             type="button"
