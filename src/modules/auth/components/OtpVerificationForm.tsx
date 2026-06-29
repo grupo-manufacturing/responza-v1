@@ -1,13 +1,19 @@
 import { useEffect, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
+import { Spinner } from '@/components/ui/Spinner'
 import { AuthService } from '@/modules/auth/auth.service'
 import { completeAuthSession } from '@/modules/auth/lib/completeAuthSession'
-import { Spinner } from '@/components/ui/Spinner'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
 
-const inputClassName =
-  'w-full rounded-lg border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition-all duration-200 placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-2 focus:ring-neutral-900/10'
+import {
+  AUTH_INPUT_CLASS,
+  AuthAlert,
+  AuthBackLink,
+  AuthCard,
+  AuthHeader,
+  AuthPrimaryButton,
+} from '../auth-ui'
 
 const RESEND_COOLDOWN_SECONDS = 60
 const OTP_MIN_LENGTH = 6
@@ -88,37 +94,28 @@ export function OtpVerificationForm() {
   }
 
   return (
-    <div className="relative w-full max-w-sm">
-      <div className="mb-5 text-center">
-        <Link to="/" className="mb-3 inline-flex items-center gap-2 transition-opacity hover:opacity-70">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-900 text-sm font-bold text-white shadow-md">
-            R
-          </div>
-          <span className="text-lg font-semibold text-neutral-900">Responza AI</span>
-        </Link>
+    <>
+      <AuthHeader
+        title={
+          <>
+            Verify your <span className="text-accent-gradient">email</span>
+          </>
+        }
+        description={
+          <>
+            We sent a verification code to{' '}
+            <span className="font-medium text-ink">{email}</span>
+          </>
+        }
+      />
 
-        <h1 className="text-2xl font-bold tracking-tight text-neutral-900">Verify your email</h1>
-        <p className="mt-1 text-sm text-neutral-500">
-          We sent a verification code to <span className="font-medium text-neutral-700">{email}</span>
-        </p>
-      </div>
+      <AuthCard>
+        {error && <AuthAlert variant="error">{error}</AuthAlert>}
+        {resendMessage && <AuthAlert variant="success">{resendMessage}</AuthAlert>}
 
-      <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-lg shadow-neutral-900/5">
-        {error && (
-          <div className="mb-3 rounded-lg border border-red-200 bg-red-50 p-2.5">
-            <p className="text-xs text-red-600">{error}</p>
-          </div>
-        )}
-
-        {resendMessage && (
-          <div className="mb-3 rounded-lg border border-emerald-200 bg-emerald-50 p-2.5">
-            <p className="text-xs text-emerald-700">{resendMessage}</p>
-          </div>
-        )}
-
-        <form onSubmit={(e) => void handleVerify(e)} className="space-y-3">
+        <form onSubmit={(e) => void handleVerify(e)} className="space-y-3.5">
           <div>
-            <label htmlFor="otp" className="mb-1.5 block text-xs font-medium text-neutral-700">
+            <label htmlFor="otp" className="mb-1.5 block text-xs font-medium text-ink-muted">
               Verification code
             </label>
             <input
@@ -129,52 +126,44 @@ export function OtpVerificationForm() {
               autoComplete="one-time-code"
               required
               value={otp}
-              onChange={(e) =>
-                setOtp(e.target.value.replace(/\D/g, '').slice(0, OTP_MAX_LENGTH))
-              }
-              className={`${inputClassName} text-center text-lg tracking-[0.25em]`}
+              onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, OTP_MAX_LENGTH))}
+              className={`${AUTH_INPUT_CLASS} text-center text-lg tracking-[0.25em]`}
               placeholder={'0'.repeat(OTP_MIN_LENGTH)}
               minLength={OTP_MIN_LENGTH}
               maxLength={OTP_MAX_LENGTH}
             />
           </div>
 
-          <button
-            type="submit"
+          <AuthPrimaryButton
             disabled={isLoading || otp.length < OTP_MIN_LENGTH || otp.length > OTP_MAX_LENGTH}
-            className="mt-3 w-full rounded-lg bg-neutral-900 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isLoading ? (
-              <span className="flex items-center justify-center gap-2">
+              <>
                 <Spinner size="sm" variant="white" />
                 Verifying...
-              </span>
+              </>
             ) : (
               'Verify and continue'
             )}
-          </button>
+          </AuthPrimaryButton>
         </form>
 
-        <div className="mt-4 text-center">
-          <p className="text-xs text-neutral-500">
+        <div className="mt-5 text-center">
+          <p className="text-xs text-ink-muted">
             Didn&apos;t receive the code?{' '}
             <button
               type="button"
               onClick={() => void handleResend()}
               disabled={cooldown > 0 || isResending}
-              className="font-semibold text-neutral-900 underline-offset-2 transition-colors hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+              className="font-semibold text-ink underline-offset-2 transition-colors hover:underline disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isResending ? 'Sending...' : cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend code'}
             </button>
           </p>
         </div>
-      </div>
+      </AuthCard>
 
-      <div className="mt-4 text-center">
-        <Link to="/auth?mode=login" className="text-xs text-neutral-500 transition-colors hover:text-neutral-900">
-          ← Back to sign in
-        </Link>
-      </div>
-    </div>
+      <AuthBackLink to="/auth?mode=login">← Back to sign in</AuthBackLink>
+    </>
   )
 }

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import { Spinner } from '@/components/ui/Spinner'
 import { AuthService } from '@/modules/auth/auth.service'
 import { completeAuthSession } from '@/modules/auth/lib/completeAuthSession'
 import {
@@ -9,8 +10,9 @@ import {
   readGoogleOAuthCallbackError,
   readGoogleOAuthNextPath,
 } from '@/modules/auth/lib/googleOAuth'
-import { Spinner } from '@/components/ui/Spinner'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
+
+import { AuthCard, AuthLayout, AuthPrimaryButton } from '../auth-ui'
 
 export function GoogleOAuthCallbackPage() {
   const navigate = useNavigate()
@@ -51,29 +53,27 @@ export function GoogleOAuthCallbackPage() {
 
   if (error !== null) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-neutral-50 p-4">
-        <div className="w-full max-w-sm rounded-2xl border border-red-200 bg-white p-6 text-center shadow-lg">
-          <h1 className="text-lg font-semibold text-neutral-900">Google sign-in failed</h1>
-          <p className="mt-2 text-sm text-red-600">{error}</p>
-          <button
-            type="button"
-            onClick={() => navigate('/auth?mode=login', { replace: true })}
-            className="mt-4 rounded-lg bg-neutral-900 px-4 py-2 text-sm font-semibold text-white hover:bg-neutral-800"
-          >
-            Back to sign in
-          </button>
-        </div>
-      </div>
+      <AuthLayout>
+        <AuthCard>
+          <div className="text-center">
+            <h1 className="text-lg font-semibold text-ink">Google sign-in failed</h1>
+            <p className="mt-2 text-sm text-red-600">{error}</p>
+            <AuthPrimaryButton type="button" onClick={() => navigate('/auth?mode=login', { replace: true })}>
+              Back to sign in
+            </AuthPrimaryButton>
+          </div>
+        </AuthCard>
+      </AuthLayout>
     )
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-50">
+    <AuthLayout>
       <div className="text-center">
         <Spinner size="lg" />
-        <h1 className="mt-4 text-lg font-semibold text-neutral-900">Completing Google sign-in...</h1>
-        <p className="mt-1 text-sm text-neutral-500">Please wait while we set up your workspace.</p>
+        <h1 className="mt-4 text-lg font-semibold text-ink">Completing Google sign-in...</h1>
+        <p className="mt-1 text-sm text-ink-muted">Please wait while we set up your workspace.</p>
       </div>
-    </div>
+    </AuthLayout>
   )
 }
