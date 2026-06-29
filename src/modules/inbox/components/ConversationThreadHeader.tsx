@@ -2,6 +2,10 @@ import { Spinner } from '@/components/ui/Spinner'
 import { ContactAvatar } from '@/modules/inbox/components/ContactAvatar'
 import { INBOX_ICON_BUTTON_CLASS } from '@/modules/inbox/inbox-ui'
 import type { Conversation, Participant } from '@/modules/inbox/inbox.service'
+import {
+  INTEGRATION_PLATFORM_LABELS,
+  type IntegrationPlatform,
+} from '@/modules/integrations/integrations.constants'
 
 type PendingContact = {
   readonly displayName: string
@@ -11,6 +15,7 @@ type PendingContact = {
 type ConversationThreadHeaderProps = {
   readonly conversation: Conversation | null
   readonly participants: Participant[]
+  readonly platform?: IntegrationPlatform | null
   readonly pendingContact?: PendingContact | null
   readonly onBack?: () => void
   readonly analyticsLoading?: boolean
@@ -59,6 +64,7 @@ function resolveContactPresentation(
 export function ConversationThreadHeader({
   conversation,
   participants,
+  platform = null,
   pendingContact,
   onBack,
   analyticsLoading = false,
@@ -91,12 +97,12 @@ export function ConversationThreadHeader({
           displayName={displayName}
           avatarUrl={avatarUrl}
           size="md"
-          platform={conversation?.platform}
+          platform={platform ?? undefined}
         />
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-ink sm:text-base">{displayName}</p>
-          {conversation !== null && (
-            <p className="truncate text-xs text-ink-faint capitalize">{conversation.platform}</p>
+          {platform !== null && (
+            <p className="truncate text-xs text-ink-faint">{INTEGRATION_PLATFORM_LABELS[platform]}</p>
           )}
         </div>
       </div>
