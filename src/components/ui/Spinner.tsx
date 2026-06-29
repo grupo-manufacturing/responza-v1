@@ -6,7 +6,6 @@ type SpinnerVariant = 'brand' | 'white' | 'muted'
 type SpinnerProps = {
   readonly size?: SpinnerSize
   readonly variant?: SpinnerVariant
-  readonly label?: string
   readonly className?: string
 }
 
@@ -25,14 +24,12 @@ const variantClasses: Record<SpinnerVariant, string> = {
 export function Spinner({
   size = 'md',
   variant = 'brand',
-  label,
   className = '',
 }: SpinnerProps) {
-  const ring = (
+  return (
     <span
       role="status"
-      aria-hidden={label === undefined}
-      aria-label={label}
+      aria-label="Loading"
       className={[
         'inline-block shrink-0 animate-spin rounded-full',
         sizeClasses[size],
@@ -41,67 +38,51 @@ export function Spinner({
       ].join(' ')}
     />
   )
-
-  if (label === undefined) {
-    return ring
-  }
-
-  const labelClassName =
-    variant === 'muted' ? 'text-ink-muted' : variant === 'white' ? 'text-white/90' : 'text-ink-muted'
-
-  return (
-    <div className="flex flex-col items-center justify-center gap-3">
-      {ring}
-      <p className={`animate-pulse text-sm font-medium ${labelClassName}`}>{label}</p>
-    </div>
-  )
 }
 
 type SpinnerSectionProps = {
-  readonly label?: string
   readonly className?: string
   readonly minHeightClassName?: string
 }
 
 export function SpinnerSection({
-  label = 'Loading...',
   className = '',
   minHeightClassName = 'min-h-[12rem]',
 }: SpinnerSectionProps) {
   return (
     <div
-      className={['flex flex-col items-center justify-center', minHeightClassName, className].join(' ')}
+      className={['flex items-center justify-center', minHeightClassName, className].join(' ')}
       role="status"
-      aria-live="polite"
+      aria-label="Loading"
     >
-      <Spinner label={label} />
+      <Spinner />
     </div>
   )
 }
 
 type SpinnerOverlayProps = {
-  readonly label?: string
   readonly className?: string
 }
 
-export function SpinnerOverlay({ label = 'Loading...', className = '' }: SpinnerOverlayProps) {
+export function SpinnerOverlay({ className = '' }: SpinnerOverlayProps) {
   return (
     <div
-      className={['bg-surface-muted flex min-h-screen flex-col items-center justify-center', className].join(' ')}
+      className={['bg-surface-muted flex min-h-screen items-center justify-center', className].join(' ')}
+      role="status"
+      aria-label="Loading"
     >
-      <Spinner size="lg" label={label} />
+      <Spinner size="lg" />
     </div>
   )
 }
 
 type PageSuspenseProps = {
   readonly children: ReactNode
-  readonly label?: string
 }
 
-export function PageSuspense({ children, label = 'Loading page...' }: PageSuspenseProps) {
+export function PageSuspense({ children }: PageSuspenseProps) {
   return (
-    <Suspense fallback={<SpinnerSection label={label} minHeightClassName="min-h-[50vh]" />}>
+    <Suspense fallback={<SpinnerSection minHeightClassName="min-h-[50vh]" />}>
       {children}
     </Suspense>
   )

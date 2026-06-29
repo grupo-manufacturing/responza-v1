@@ -150,7 +150,7 @@ export function GeneralSettingsPanel() {
   }
 
   if (isLoading) {
-    return <SpinnerSection label="Loading account..." minHeightClassName="min-h-[20rem]" />
+    return <SpinnerSection minHeightClassName="min-h-[20rem]" />
   }
 
   if (loadError !== null) {

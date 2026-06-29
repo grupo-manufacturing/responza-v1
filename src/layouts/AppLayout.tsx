@@ -75,7 +75,7 @@ export function AppLayout() {
   }
 
   if (!isReady || sessionLoading) {
-    return <SpinnerOverlay label="Loading your workspace..." />
+    return <SpinnerOverlay />
   }
 
   const showSubscriptionGate =
@@ -110,7 +110,7 @@ export function AppLayout() {
           {showSubscriptionGate ? (
             <SubscriptionRequired />
           ) : (
-            <PageSuspense label="Loading page...">
+            <PageSuspense>
               <Outlet />
             </PageSuspense>
           )}

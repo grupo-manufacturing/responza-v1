@@ -129,7 +129,7 @@ export function SubscriptionPanel() {
   }
 
   if (isLoading) {
-    return <SpinnerSection label="Loading subscription..." minHeightClassName="min-h-[20rem]" />
+    return <SpinnerSection minHeightClassName="min-h-[20rem]" />
   }
 
   if (error !== null || subscription === null) {
@@ -199,7 +199,7 @@ export function SubscriptionPanel() {
           )}
           <li className="flex gap-2">
             <span className="font-medium text-ink">Billing</span>
-            <span>Razorpay (GST inclusive)</span>
+            <span>GST inclusive</span>
           </li>
         </ul>
 
@@ -250,7 +250,7 @@ export function SubscriptionPanel() {
 
           {!checkoutAvailable && (
             <Alert variant="warning" className="mt-4">
-              Razorpay checkout is not configured on the server yet.
+              Checkout is not available yet. Please try again later.
             </Alert>
           )}
 

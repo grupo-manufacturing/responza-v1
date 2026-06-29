@@ -121,7 +121,7 @@ export function LeadsPage() {
         }
       />
 
-      {loading && <SpinnerSection label="Loading leads..." minHeightClassName="min-h-[40vh]" />}
+      {loading && <SpinnerSection minHeightClassName="min-h-[40vh]" />}
 
       {!loading && error !== null && <Alert variant="error">{error}</Alert>}
 

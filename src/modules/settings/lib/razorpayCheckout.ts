@@ -48,7 +48,7 @@ export function loadRazorpayCheckoutScript(): Promise<void> {
     script.src = 'https://checkout.razorpay.com/v1/checkout.js'
     script.async = true
     script.onload = () => resolve()
-    script.onerror = () => reject(new Error('Failed to load Razorpay checkout.'))
+    script.onerror = () => reject(new Error('Failed to load checkout.'))
     document.body.appendChild(script)
   })
 
@@ -71,7 +71,7 @@ export async function openRazorpaySubscriptionCheckout(
   await loadRazorpayCheckoutScript()
 
   if (window.Razorpay === undefined) {
-    throw new Error('Razorpay checkout is unavailable.')
+    throw new Error('Checkout is unavailable.')
   }
 
   const checkout = new window.Razorpay({

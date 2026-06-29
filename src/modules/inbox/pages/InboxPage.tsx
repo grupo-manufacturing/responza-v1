@@ -323,7 +323,7 @@ export function InboxPage() {
   }
 
   if (integrationsLoading) {
-    return <SpinnerSection label="Checking integrations..." minHeightClassName="min-h-[50vh]" />
+    return <SpinnerSection minHeightClassName="min-h-[50vh]" />
   }
 
   if (integrationsRequired || integrationsRequiredFromApi) {

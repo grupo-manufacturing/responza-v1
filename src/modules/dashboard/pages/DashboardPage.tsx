@@ -24,7 +24,7 @@ export function DashboardPage() {
   }
 
   if (integrationsLoading) {
-    return <SpinnerSection label="Checking integrations..." minHeightClassName="min-h-[40vh]" />
+    return <SpinnerSection minHeightClassName="min-h-[40vh]" />
   }
 
   if (integrationsRequired) {
@@ -38,7 +38,7 @@ export function DashboardPage() {
         description="See what needs your attention and jump straight into action."
       />
 
-      {loading && <SpinnerSection label="Loading dashboard..." minHeightClassName="min-h-[40vh]" />}
+      {loading && <SpinnerSection minHeightClassName="min-h-[40vh]" />}
 
       {!loading && error !== null && <Alert variant="error">{error}</Alert>}
 

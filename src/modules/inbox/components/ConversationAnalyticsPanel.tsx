@@ -54,7 +54,7 @@ export function ConversationAnalyticsPanel({
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
         {loading && (
           <div className="flex flex-col items-center justify-center gap-3 py-16">
-            <Spinner size="md" variant="muted" label="Analyzing conversation..." />
+            <Spinner size="md" variant="muted" />
           </div>
         )}
 

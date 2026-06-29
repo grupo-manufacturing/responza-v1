@@ -202,7 +202,7 @@ export function ConversationThread({
         >
           {loadingOlder && (
             <div className="mb-4 flex justify-center">
-              <Spinner size="sm" variant="muted" label="Loading older messages" />
+              <Spinner size="sm" variant="muted" />
             </div>
           )}
 

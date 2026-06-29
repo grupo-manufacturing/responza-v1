@@ -78,7 +78,7 @@ export function BusinessOnboardingPage() {
   const canProceed = canProceedStep(currentStepData, formData)
 
   if (isHydrating) {
-    return <SpinnerOverlay label="Preparing your setup..." />
+    return <SpinnerOverlay />
   }
 
   if (alreadyCompleted) {

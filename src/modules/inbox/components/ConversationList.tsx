@@ -91,7 +91,7 @@ export function ConversationList({
 
       {hasMore && (
         <li ref={sentinelRef} className="flex justify-center py-4">
-          {loadingMore && <Spinner size="sm" variant="muted" label="Loading more" />}
+          {loadingMore && <Spinner size="sm" variant="muted" />}
         </li>
       )}
     </ul>

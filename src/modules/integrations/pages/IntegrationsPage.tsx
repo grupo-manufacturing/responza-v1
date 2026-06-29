@@ -46,7 +46,7 @@ export function IntegrationsPage() {
         </Alert>
       )}
 
-      {loading && <SpinnerSection label="Loading integrations..." minHeightClassName="min-h-[40vh]" />}
+      {loading && <SpinnerSection minHeightClassName="min-h-[40vh]" />}
 
       {!loading && success !== null && (
         <Alert variant="success" className="mb-4">

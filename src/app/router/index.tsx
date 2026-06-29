@@ -39,26 +39,26 @@ const SettingsPage = lazy(() =>
   import('@/modules/settings/pages/SettingsPage').then((m) => ({ default: m.SettingsPage })),
 )
 
-function suspense(element: React.ReactNode, label?: string) {
-  return <PageSuspense label={label}>{element}</PageSuspense>
+function suspense(element: React.ReactNode) {
+  return <PageSuspense>{element}</PageSuspense>
 }
 
 export const router = createBrowserRouter([
-  { path: '/', element: suspense(<LandingPage />, 'Loading...') },
-  { path: '/auth', element: suspense(<AuthPage />, 'Loading sign in...') },
-  { path: '/auth/verify', element: suspense(<OtpVerificationPage />, 'Loading verification...') },
-  { path: '/auth/google/callback', element: suspense(<GoogleOAuthCallbackPage />, 'Completing Google sign-in...') },
+  { path: '/', element: suspense(<LandingPage />) },
+  { path: '/auth', element: suspense(<AuthPage />) },
+  { path: '/auth/verify', element: suspense(<OtpVerificationPage />) },
+  { path: '/auth/google/callback', element: suspense(<GoogleOAuthCallbackPage />) },
   { path: '/login', element: <Navigate to="/auth?mode=login" replace /> },
   { path: '/register', element: <Navigate to="/auth?mode=register" replace /> },
   { path: '/subscription', element: <Navigate to="/settings?tab=subscription" replace /> },
-  { path: '/oauth/instagram/callback', element: suspense(<InstagramOAuthCallbackPage />, 'Completing Instagram OAuth...') },
+  { path: '/oauth/instagram/callback', element: suspense(<InstagramOAuthCallbackPage />) },
 
   {
     element: <ProtectedRoute />,
     children: [
       {
         path: '/business',
-        element: suspense(<BusinessOnboardingPage />, 'Preparing your setup...'),
+        element: suspense(<BusinessOnboardingPage />),
       },
       {
         path: '/business-details',
