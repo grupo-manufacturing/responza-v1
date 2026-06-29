@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom'
 import { IntegrationsRequired } from '@/components/common/IntegrationsRequired'
 import { SubscriptionRequired } from '@/components/common/SubscriptionRequired'
 import { Alert } from '@/components/ui/Alert'
-import { Spinner } from '@/components/ui/Spinner'
+import { Spinner, SpinnerSection } from '@/components/ui/Spinner'
 import { AiService, type ConversationAnalyticsResponse } from '@/modules/ai/ai.service'
 import { ConversationAnalyticsPanel } from '@/modules/inbox/components/ConversationAnalyticsPanel'
 import { ConversationList } from '@/modules/inbox/components/ConversationList'
@@ -35,6 +35,7 @@ import { formatMessageListPreview } from '@/modules/inbox/inbox.preview'
 import { INBOX_PANEL_HEADER_CLASS, INBOX_SHELL_CLASS } from '@/modules/inbox/inbox-ui'
 import { InboxService, type Message } from '@/modules/inbox/inbox.service'
 import { useSubscriptionGate } from '@/shared/hooks/useSubscriptionGate'
+import { useIntegrationsGate } from '@/shared/hooks/useIntegrationsGate'
 import { useSession } from '@/shared/hooks/useSession'
 import { SessionStorage } from '@/shared/session/storage'
 import { getApiErrorDetails, getApiErrorMessage } from '@/shared/utils/api-error'
@@ -53,6 +54,7 @@ export function InboxPage() {
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(initialConversationId)
   const [sending, setSending] = useState(false)
   const { subscriptionRequired, handleError } = useSubscriptionGate()
+  const { integrationsLoading, integrationsRequired } = useIntegrationsGate(subscriptionRequired)
   const { me } = useSession()
   const [sendError, setSendError] = useState<string | null>(null)
   const [mobileShowThread, setMobileShowThread] = useState(initialConversationId !== null)
@@ -62,7 +64,8 @@ export function InboxPage() {
   const [analyticsError, setAnalyticsError] = useState<string | null>(null)
   const queryClient = useInboxQueryClient()
 
-  const queriesEnabled = !subscriptionRequired
+  const queriesEnabled =
+    !subscriptionRequired && !integrationsRequired && !integrationsLoading
 
   const conversationsQuery = useInboxConversations(platformFilter, queriesEnabled)
   const threadQuery = useInboxThread(selectedConversationId, queriesEnabled)
@@ -94,7 +97,7 @@ export function InboxPage() {
     setAnalyticsLoading(false)
   }, [selectedConversationId])
 
-  const integrationsRequired =
+  const integrationsRequiredFromApi =
     queriesEnabled &&
     ((conversationsQuery.error !== null && isIntegrationsRequiredError(conversationsQuery.error)) ||
       (threadQuery.error !== null && isIntegrationsRequiredError(threadQuery.error)))
@@ -319,7 +322,11 @@ export function InboxPage() {
     return <SubscriptionRequired />
   }
 
-  if (integrationsRequired) {
+  if (integrationsLoading) {
+    return <SpinnerSection label="Checking integrations..." minHeightClassName="min-h-[50vh]" />
+  }
+
+  if (integrationsRequired || integrationsRequiredFromApi) {
     return <IntegrationsRequired />
   }
 

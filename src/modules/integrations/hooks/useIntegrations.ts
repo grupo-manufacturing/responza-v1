@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 
 import { startInstagramOAuth } from '@/modules/integrations/lib/instagramOAuth'
 import { startWhatsAppEmbeddedSignup } from '@/modules/integrations/lib/whatsappEmbeddedSignup'
@@ -15,11 +16,13 @@ import {
   isWhatsAppEmbeddedSignupConfigured,
 } from '@/shared/config/env'
 import { useSubscriptionGate } from '@/shared/hooks/useSubscriptionGate'
+import { integrationsGateKeys } from '@/shared/hooks/useIntegrationsGate'
 import { mergeByKey } from '@/shared/utils/upsert'
 import { getApiErrorCode, getApiErrorMessage } from '@/shared/utils/api-error'
 import { integrationPlatformLabel } from '@/modules/integrations/integrations.constants'
 
 export function useIntegrations() {
+  const queryClient = useQueryClient()
   const [integrations, setIntegrations] = useState<Integration[]>([])
   const [whatsappDetails, setWhatsappDetails] = useState<WhatsAppConnectSummary | null>(null)
   const [instagramDetails, setInstagramDetails] = useState<InstagramConnectSummary | null>(null)
@@ -47,6 +50,10 @@ export function useIntegrations() {
     }
   }, [])
 
+  const refreshIntegrationsGate = useCallback(() => {
+    void queryClient.invalidateQueries({ queryKey: integrationsGateKeys.all })
+  }, [queryClient])
+
   const loadIntegrations = useCallback(async () => {
     setLoading(true)
     setError(null)
@@ -57,6 +64,7 @@ export function useIntegrations() {
       setIntegrations(result.integrations)
       await loadWhatsAppStatus()
       await loadInstagramStatus()
+      refreshIntegrationsGate()
     } catch (err) {
       if (handleError(err)) {
         setIntegrations([])
@@ -72,7 +80,7 @@ export function useIntegrations() {
     } finally {
       setLoading(false)
     }
-  }, [handleError, loadInstagramStatus, loadWhatsAppStatus, reset])
+  }, [handleError, loadInstagramStatus, loadWhatsAppStatus, refreshIntegrationsGate, reset])
 
   useEffect(() => {
     void loadIntegrations()
@@ -99,6 +107,7 @@ export function useIntegrations() {
         setIntegrations((current) => mergeByKey(current, result.integration, 'platform'))
         setWhatsappDetails(result.whatsapp ?? null)
         setSuccess('WhatsApp connected successfully. Open Inbox to view conversations.')
+        refreshIntegrationsGate()
         return
       }
 
@@ -118,6 +127,7 @@ export function useIntegrations() {
         setIntegrations((current) => mergeByKey(current, result.integration, 'platform'))
         setInstagramDetails(result.instagram ?? null)
         setSuccess('Instagram connected successfully. Open Inbox to view conversations.')
+        refreshIntegrationsGate()
         return
       }
 
@@ -148,6 +158,7 @@ export function useIntegrations() {
         setInstagramDetails(null)
       }
       setSuccess(`${integrationPlatformLabel(platform)} disconnected.`)
+      refreshIntegrationsGate()
     } catch (err) {
       setError(getApiErrorMessage(err, 'Could not disconnect integration. Please try again.'))
     } finally {

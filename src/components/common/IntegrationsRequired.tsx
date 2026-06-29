@@ -14,8 +14,8 @@ export function IntegrationsRequired() {
           </div>
         </div>
       }
-      title="Connect messaging platforms to use Inbox"
-      description="Connect WhatsApp or Instagram (or both) on the Integrations page to receive messages and reply from one unified inbox."
+      title="Connect your messaging platforms"
+      description="Connect WhatsApp or Instagram to receive messages, view your dashboard, and reply from one unified inbox."
       actionLabel="Connect platforms"
       actionTo="/integrations"
     />

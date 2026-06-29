@@ -1,4 +1,5 @@
 import { SubscriptionRequired } from '@/components/common/SubscriptionRequired'
+import { IntegrationsRequired } from '@/components/common/IntegrationsRequired'
 import { Alert } from '@/components/ui/Alert'
 import { SpinnerSection } from '@/components/ui/Spinner'
 import { ConversationQueueList } from '@/modules/dashboard/components/ConversationQueueList'
@@ -9,10 +10,25 @@ import { useDashboard } from '@/modules/dashboard/hooks/useDashboard'
 import { AppButtonLink, AppPage, AppPageHeader } from '@/shared/ui/app-ui'
 
 export function DashboardPage() {
-  const { data, loading, error, subscriptionRequired } = useDashboard()
+  const {
+    data,
+    loading,
+    error,
+    subscriptionRequired,
+    integrationsLoading,
+    integrationsRequired,
+  } = useDashboard()
 
   if (subscriptionRequired) {
     return <SubscriptionRequired />
+  }
+
+  if (integrationsLoading) {
+    return <SpinnerSection label="Checking integrations..." minHeightClassName="min-h-[40vh]" />
+  }
+
+  if (integrationsRequired) {
+    return <IntegrationsRequired />
   }
 
   return (
