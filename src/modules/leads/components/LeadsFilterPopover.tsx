@@ -1,5 +1,6 @@
 import { Select, type SelectOption } from '@/components/ui/Select'
 import { LEAD_STATUS_OPTIONS, type LeadStatus } from '@/modules/leads/leads.constants'
+import { LEADS_POPOVER_PANEL_CLASS, leadsToolbarButtonClass } from '@/modules/leads/leads-ui'
 
 import type { LeadsFilterState } from './LeadsSearchBar'
 
@@ -7,14 +8,6 @@ const STATUS_FILTER_OPTIONS: readonly SelectOption<LeadStatus | ''>[] = [
   { value: '', label: 'All statuses' },
   ...LEAD_STATUS_OPTIONS,
 ]
-
-const toolbarButtonClassName = (active: boolean) =>
-  [
-    'relative inline-flex h-10 w-10 items-center justify-center rounded-lg ring-1 transition-colors',
-    active
-      ? 'bg-neutral-900 text-white ring-neutral-900'
-      : 'bg-neutral-100 text-neutral-500 ring-neutral-200/80 hover:bg-neutral-200/80 hover:text-neutral-900',
-  ].join(' ')
 
 type LeadsFilterPopoverProps = {
   filters: LeadsFilterState
@@ -45,7 +38,7 @@ export function LeadsFilterPopover({
         onClick={onToggle}
         aria-label="Filter leads"
         aria-expanded={open}
-        className={toolbarButtonClassName(open || activeFilterCount > 0)}
+        className={leadsToolbarButtonClass(open || activeFilterCount > 0)}
       >
         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
           <path
@@ -56,7 +49,7 @@ export function LeadsFilterPopover({
           />
         </svg>
         {activeFilterCount > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[10px] font-bold text-neutral-900 ring-1 ring-neutral-200">
+          <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-white">
             {activeFilterCount}
           </span>
         )}
@@ -65,17 +58,17 @@ export function LeadsFilterPopover({
       {open && (
         <div
           ref={panelRef}
-          className="absolute right-0 z-20 mt-2 w-64 rounded-xl border border-neutral-200 bg-white p-4 shadow-lg"
+          className={`${LEADS_POPOVER_PANEL_CLASS} w-64`}
           role="dialog"
           aria-label="Lead filters"
         >
           <div className="mb-3 flex items-center justify-between">
-            <p className="text-sm font-semibold text-neutral-900">Filters</p>
+            <p className="text-sm font-semibold text-ink">Filters</p>
             {activeFilterCount > 0 && (
               <button
                 type="button"
                 onClick={onClear}
-                className="text-xs font-medium text-neutral-600 underline-offset-2 hover:text-neutral-900 hover:underline"
+                className="text-xs font-medium text-accent underline-offset-2 hover:underline"
               >
                 Clear all
               </button>

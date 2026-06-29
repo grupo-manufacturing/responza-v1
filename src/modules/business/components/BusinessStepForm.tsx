@@ -1,3 +1,5 @@
+import { BrandMark } from '@/shared/ui/brand-ui'
+
 import type { BusinessDetailsFormData, FormStep } from '../business-steps'
 import { businessInputClassName } from '../business-steps'
 
@@ -14,12 +16,10 @@ export function BusinessStepForm({ step, stepIndex, formData, onChange }: Busine
   return (
     <div key={stepIndex} className="animate-step-in space-y-4">
       <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-neutral-900 text-sm font-bold text-white shadow-sm">
-          {stepIndex + 1}
-        </span>
+        <BrandMark size="sm" />
         <div className="min-w-0 flex-1 pt-0.5">
-          <h3 className="text-base font-semibold leading-snug text-neutral-900 sm:text-lg">{step.title}</h3>
-          <p className="mt-1 text-sm leading-snug text-neutral-500 sm:text-base">{step.subtitle}</p>
+          <h3 className="text-base font-semibold leading-snug text-ink sm:text-lg">{step.title}</h3>
+          <p className="mt-1 text-sm leading-snug text-ink-muted sm:text-base">{step.subtitle}</p>
         </div>
       </div>
 
@@ -41,8 +41,8 @@ export function BusinessStepForm({ step, stepIndex, formData, onChange }: Busine
                 className={[
                   'flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition-colors duration-150',
                   selected
-                    ? 'border-neutral-900 bg-neutral-50 ring-1 ring-neutral-900/15'
-                    : 'border-neutral-200 bg-white hover:border-neutral-400 hover:bg-neutral-50',
+                    ? 'border-accent bg-accent/8 ring-1 ring-accent/20'
+                    : 'border-border bg-white/80 hover:border-accent/30 hover:bg-surface-muted',
                 ].join(' ')}
               >
                 <input
@@ -56,12 +56,12 @@ export function BusinessStepForm({ step, stepIndex, formData, onChange }: Busine
                       [step.field]: option.value as BusinessDetailsFormData[ChoiceField],
                     })
                   }
-                  className="h-4 w-4 shrink-0 accent-neutral-900"
+                  className="h-4 w-4 shrink-0 accent-accent"
                 />
                 <span
                   className={[
                     'text-sm leading-snug sm:text-base',
-                    selected ? 'font-medium text-neutral-900' : 'text-neutral-700',
+                    selected ? 'font-medium text-ink' : 'text-ink-muted',
                   ].join(' ')}
                 >
                   {option.label}

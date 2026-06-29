@@ -11,7 +11,7 @@ export const SIDEBAR_NAVIGATION: SidebarNavItem[] = [
     name: 'Dashboard',
     href: '/dashboard',
     icon: (
-      <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -25,7 +25,7 @@ export const SIDEBAR_NAVIGATION: SidebarNavItem[] = [
     name: 'Leads',
     href: '/leads',
     icon: (
-      <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -39,7 +39,7 @@ export const SIDEBAR_NAVIGATION: SidebarNavItem[] = [
     name: 'Inbox',
     href: '/inbox',
     icon: (
-      <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -53,7 +53,7 @@ export const SIDEBAR_NAVIGATION: SidebarNavItem[] = [
     name: 'Integrations',
     href: '/integrations',
     icon: (
-      <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -67,7 +67,7 @@ export const SIDEBAR_NAVIGATION: SidebarNavItem[] = [
     name: 'Settings',
     href: '/settings',
     icon: (
-      <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"

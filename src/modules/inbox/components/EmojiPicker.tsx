@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { MESSAGE_QUICK_EMOJIS } from '@/modules/inbox/inbox.constants'
+import { INBOX_COMPOSER_ACTION_CLASS, INBOX_POPOVER_CLASS } from '@/modules/inbox/inbox-ui'
 
 type EmojiPickerProps = {
   readonly disabled: boolean
@@ -47,18 +48,21 @@ export function EmojiPicker({ disabled, onSelect }: EmojiPickerProps) {
         aria-label="Insert emoji"
         aria-expanded={open}
         onClick={() => setOpen((current) => !current)}
-        className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-700 disabled:cursor-not-allowed disabled:opacity-50"
+        className={[
+          INBOX_COMPOSER_ACTION_CLASS,
+          'text-ink-muted hover:bg-surface-muted hover:text-ink disabled:opacity-50',
+        ].join(' ')}
       >
         <EmojiIcon />
       </button>
 
       {open && (
-        <div className="absolute bottom-full left-0 z-10 mb-2 grid w-[220px] grid-cols-6 gap-1 rounded-xl border border-neutral-200 bg-white p-2 shadow-lg">
+        <div className={`${INBOX_POPOVER_CLASS} bottom-full left-0 mb-2 grid w-[220px] grid-cols-6 gap-1`}>
           {MESSAGE_QUICK_EMOJIS.map((emoji) => (
             <button
               key={emoji}
               type="button"
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-lg hover:bg-neutral-100"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-lg hover:bg-surface-muted"
               onClick={() => {
                 onSelect(emoji)
                 setOpen(false)

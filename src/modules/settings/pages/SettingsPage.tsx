@@ -2,6 +2,7 @@ import { useSearchParams } from 'react-router-dom'
 
 import { GeneralSettingsPanel } from '@/modules/settings/components/GeneralSettingsPanel'
 import { SubscriptionPanel } from '@/modules/settings/components/SubscriptionPanel'
+import { AppPage, AppPageHeader } from '@/shared/ui/app-ui'
 
 const TABS = [
   { id: 'general', label: 'General' },
@@ -14,15 +15,6 @@ function isSettingsTab(value: string | null): value is SettingsTab {
   return value === 'general' || value === 'subscription'
 }
 
-function tabClassName(isActive: boolean) {
-  return [
-    'rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200',
-    isActive
-      ? 'bg-neutral-900 text-white shadow-md'
-      : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900',
-  ].join(' ')
-}
-
 export function SettingsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const tabParam = searchParams.get('tab')
@@ -33,14 +25,27 @@ export function SettingsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl">
-      <nav className="mb-6 flex flex-wrap gap-2 border-b border-neutral-200 pb-4">
+    <AppPage className="max-w-4xl">
+      <AppPageHeader
+        title="Settings"
+        description="Manage your account, translation preferences, and subscription."
+      />
+
+      <nav
+        className="mb-6 flex max-w-sm rounded-[var(--radius-pill)] border border-border bg-surface-muted/80 p-1"
+        aria-label="Settings sections"
+      >
         {TABS.map((tab) => (
           <button
             key={tab.id}
             type="button"
             onClick={() => setTab(tab.id)}
-            className={tabClassName(activeTab === tab.id)}
+            className={[
+              'flex-1 rounded-[var(--radius-pill)] px-4 py-2 text-sm font-medium transition-all duration-200',
+              activeTab === tab.id
+                ? 'bg-ink text-on-dark shadow-soft'
+                : 'text-ink-muted hover:text-ink',
+            ].join(' ')}
           >
             {tab.label}
           </button>
@@ -50,6 +55,6 @@ export function SettingsPage() {
       {activeTab === 'general' && <GeneralSettingsPanel />}
 
       {activeTab === 'subscription' && <SubscriptionPanel />}
-    </div>
+    </AppPage>
   )
 }

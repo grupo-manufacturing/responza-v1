@@ -3,7 +3,6 @@ import {
   INTEGRATION_PLATFORM_LOGOS,
   type IntegrationPlatform,
 } from '@/modules/integrations/integrations.constants'
-import type { InboxPlatformFilter } from '@/modules/inbox/inbox.constants'
 
 type PlatformBadgeProps = {
   readonly platform: IntegrationPlatform
@@ -16,18 +15,17 @@ const sizeClasses = {
   md: 'h-5 w-5',
 } as const
 
+const platformTextClass: Record<IntegrationPlatform, string> = {
+  whatsapp: 'text-brand-whatsapp',
+  instagram: 'text-brand-instagram',
+  indiamart: 'text-ink-muted',
+}
+
 export function PlatformBadge({ platform, size = 'sm', showLabel = false }: PlatformBadgeProps) {
   const label = INTEGRATION_PLATFORM_LABELS[platform]
 
   return (
-    <span
-      className={[
-        'inline-flex items-center gap-1.5',
-        platform === 'whatsapp' ? 'text-[#128C7E]' :
-        platform === 'instagram' ? 'text-[#E1306C]' : 'text-neutral-600',
-      ].join(' ')}
-      title={label}
-    >
+    <span className={['inline-flex items-center gap-1.5', platformTextClass[platform]].join(' ')} title={label}>
       <img
         src={INTEGRATION_PLATFORM_LOGOS[platform]}
         alt=""
@@ -39,22 +37,4 @@ export function PlatformBadge({ platform, size = 'sm', showLabel = false }: Plat
   )
 }
 
-export function platformTabActiveClass(filter: InboxPlatformFilter, isActive: boolean): string {
-  if (!isActive) {
-    return 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200 hover:text-neutral-900'
-  }
-
-  if (filter === 'whatsapp') {
-    return 'bg-[#128C7E] text-white'
-  }
-
-  if (filter === 'instagram') {
-    return 'bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#FCAF45] text-white'
-  }
-
-  if (filter === 'indiamart') {
-    return 'bg-[#2E3192] text-white'
-  }
-
-  return 'bg-neutral-900 text-white'
-}
+export { platformTabActiveClass } from '@/modules/inbox/inbox-ui'

@@ -11,6 +11,11 @@ import {
   validateOutboundMediaFile,
 } from '@/modules/inbox/inbox.media'
 import type { MediaContentType } from '@/modules/inbox/inbox.preview'
+import {
+  INBOX_COMPOSER_ACTION_CLASS,
+  composerFocusRingClass,
+  composerSendButtonClass,
+} from '@/modules/inbox/inbox-ui'
 import type { IntegrationPlatform } from '@/modules/integrations/integrations.constants'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
 
@@ -105,30 +110,13 @@ function composerPlaceholder(disabled: boolean, hasAttachment: boolean): string 
   return 'Type a message…'
 }
 
-const composerActionButtonClass =
-  'inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors disabled:cursor-not-allowed'
+const composerActionButtonClass = INBOX_COMPOSER_ACTION_CLASS
 
 function composerActionIconClass(enabled: boolean, enabledClassName: string): string {
   return [
     composerActionButtonClass,
     enabled ? enabledClassName : 'cursor-not-allowed opacity-40',
   ].join(' ')
-}
-
-function sendButtonClass(canSend: boolean, platform: IntegrationPlatform | null | undefined): string {
-  if (!canSend) {
-    return 'bg-neutral-100 text-neutral-400'
-  }
-
-  if (platform === 'whatsapp') {
-    return 'bg-[#128C7E] text-white hover:bg-[#0f7a6d]'
-  }
-
-  if (platform === 'instagram') {
-    return 'bg-gradient-to-r from-[#405DE6] to-[#E1306C] text-white hover:from-[#405DE6]/90 hover:to-[#E1306C]/90'
-  }
-
-  return 'bg-neutral-900 text-white hover:bg-neutral-800'
 }
 
 function insertAtCursor(textarea: HTMLTextAreaElement, value: string): string {
@@ -162,38 +150,38 @@ function AttachmentPreview({
   const label = attachmentPreviewLabel(attachment.contentType, attachment.file.name)
 
   return (
-    <div className="mb-2 flex items-center gap-3 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2">
+    <div className="mb-2 flex items-center gap-3 rounded-xl border border-border bg-surface-muted/80 px-3 py-2">
       {attachment.contentType === 'image' && (
         <img
           src={attachment.previewUrl}
           alt={label}
-          className="h-14 w-14 rounded-lg border border-neutral-200 object-cover"
+          className="h-14 w-14 rounded-lg border border-border object-cover"
         />
       )}
 
       {attachment.contentType === 'video' && canPreviewAttachmentLocally('video') && (
         <video
           src={attachment.previewUrl}
-          className="h-14 w-14 rounded-lg border border-neutral-200 object-cover"
+          className="h-14 w-14 rounded-lg border border-border object-cover"
           muted
         />
       )}
 
       {attachment.contentType === 'audio' && (
-        <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-neutral-200 bg-white text-lg">
+        <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-border bg-white text-lg">
           🎵
         </div>
       )}
 
       {attachment.contentType === 'document' && (
-        <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-neutral-200 bg-white text-lg">
+        <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-border bg-white text-lg">
           📄
         </div>
       )}
 
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-neutral-900">{label}</p>
-        <p className="text-xs capitalize text-neutral-500">{attachment.contentType}</p>
+        <p className="truncate text-sm font-medium text-ink">{label}</p>
+        <p className="text-xs capitalize text-ink-faint">{attachment.contentType}</p>
       </div>
 
       <button
@@ -201,7 +189,7 @@ function AttachmentPreview({
         onClick={onRemove}
         disabled={disabled}
         aria-label="Remove attachment"
-        className="rounded-lg px-2 py-1 text-xs font-medium text-neutral-500 transition-colors hover:bg-neutral-200 hover:text-neutral-900 disabled:cursor-not-allowed disabled:opacity-50"
+        className="rounded-lg px-2 py-1 text-xs font-medium text-ink-muted transition-colors hover:bg-surface-muted hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
       >
         Remove
       </button>
@@ -400,7 +388,7 @@ export function MessageComposer({
         onSubmit={(event) => {
           void handleSubmit(event)
         }}
-        className="border-t border-neutral-200 bg-white px-4 py-3"
+        className="border-t border-border bg-white/95 px-3 py-3 backdrop-blur-sm sm:px-4"
       >
         <input
           ref={fileInputRef}
@@ -420,10 +408,9 @@ export function MessageComposer({
 
         <div
           className={[
-            'flex items-center gap-1 rounded-xl border border-neutral-300 bg-white px-2 py-1.5 transition-colors focus-within:border-neutral-900',
-            composerDisabled ? 'bg-neutral-50' : '',
-            platform === 'whatsapp' ? 'focus-within:border-[#128C7E]' : '',
-            platform === 'instagram' ? 'focus-within:border-[#E1306C]' : '',
+            'flex items-center gap-1 rounded-[var(--radius-pill)] border border-border bg-white px-2 py-1.5 transition-all',
+            composerFocusRingClass(platform),
+            composerDisabled ? 'bg-surface-muted/80' : '',
           ].join(' ')}
         >
           {attachmentsSupported && (
@@ -435,7 +422,7 @@ export function MessageComposer({
               title="Attach file"
               className={composerActionIconClass(
                 canAttach,
-                'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900',
+                'text-ink-muted hover:bg-surface-muted hover:text-ink',
               )}
             >
               <AttachIcon />
@@ -452,7 +439,7 @@ export function MessageComposer({
             placeholder={composerPlaceholder(disabled, attachment !== null)}
             disabled={composerDisabled}
             rows={1}
-            className="min-h-[36px] max-h-28 flex-1 resize-none border-0 bg-transparent py-1.5 text-sm text-neutral-900 outline-none placeholder:text-neutral-400 disabled:cursor-not-allowed"
+            className="min-h-[36px] max-h-28 flex-1 resize-none border-0 bg-transparent py-1.5 text-sm text-ink outline-none placeholder:text-ink-faint disabled:cursor-not-allowed"
           />
           <button
             type="button"
@@ -464,7 +451,7 @@ export function MessageComposer({
             title="Suggest reply"
             className={composerActionIconClass(
               canSuggest,
-              'text-violet-600 hover:bg-violet-50 hover:text-violet-700',
+              'text-accent-violet hover:bg-accent-violet/10 hover:text-accent-violet',
             )}
           >
             {suggesting ? <Spinner size="sm" variant="muted" /> : <SuggestReplyIcon />}
@@ -479,7 +466,7 @@ export function MessageComposer({
             title="Rewrite message"
             className={composerActionIconClass(
               canRewrite,
-              'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900',
+              'text-ink-muted hover:bg-surface-muted hover:text-ink',
             )}
           >
             {rewriting ? <Spinner size="sm" variant="muted" /> : <RewriteIcon />}
@@ -488,7 +475,7 @@ export function MessageComposer({
             type="submit"
             disabled={!canSend}
             aria-label={sending ? 'Sending message' : 'Send message'}
-            className={[composerActionButtonClass, sendButtonClass(canSend, platform)].join(' ')}
+            className={[composerActionButtonClass, 'rounded-[var(--radius-pill)]', composerSendButtonClass(canSend, platform)].join(' ')}
           >
             {sending ? <Spinner size="sm" variant="muted" /> : <SendIcon />}
           </button>

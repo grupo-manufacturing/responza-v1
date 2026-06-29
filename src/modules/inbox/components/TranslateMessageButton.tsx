@@ -1,4 +1,5 @@
 import { Spinner } from '@/components/ui/Spinner'
+import { INBOX_ICON_BUTTON_CLASS } from '@/modules/inbox/inbox-ui'
 
 type TranslateMessageButtonProps = {
   readonly disabled: boolean
@@ -31,7 +32,7 @@ export function TranslateMessageButton({
       aria-label={loading ? 'Translating message' : 'Translate message'}
       title="Translate message"
       onClick={onTranslate}
-      className="inline-flex h-7 w-7 items-center justify-center rounded-full text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-700 disabled:cursor-not-allowed disabled:opacity-40"
+      className={[INBOX_ICON_BUTTON_CLASS, 'h-7 w-7 rounded-full text-accent hover:bg-accent/10 hover:text-accent'].join(' ')}
     >
       {loading ? <Spinner size="sm" variant="muted" /> : <TranslateIcon />}
     </button>

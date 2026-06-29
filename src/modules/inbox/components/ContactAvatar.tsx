@@ -17,14 +17,14 @@ const sizeClasses = {
 
 function avatarBackgroundClass(platform: IntegrationPlatform | undefined): string {
   if (platform === 'whatsapp') {
-    return 'bg-[#128C7E]'
+    return 'bg-brand-whatsapp'
   }
 
   if (platform === 'instagram') {
-    return 'bg-gradient-to-br from-[#833AB4] to-[#FD1D1D]'
+    return 'bg-gradient-to-br from-[#833AB4] to-brand-instagram'
   }
 
-  return 'bg-neutral-900'
+  return 'bg-gradient-to-br from-accent-soft via-accent to-accent-violet'
 }
 
 export function ContactAvatar({

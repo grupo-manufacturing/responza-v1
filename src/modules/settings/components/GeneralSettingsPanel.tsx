@@ -4,14 +4,12 @@ import { Alert } from '@/components/ui/Alert'
 import { Select } from '@/components/ui/Select'
 import { SpinnerSection } from '@/components/ui/Spinner'
 import { AuthService } from '@/modules/auth/auth.service'
+import { AppButton, AppCard, AppLabel, APP_INPUT_CLASS } from '@/shared/ui/app-ui'
 import { applySessionProfile } from '@/shared/hooks/useSession'
 import type { TranslationLanguage } from '@/shared/session/storage'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
 
-const inputClassName =
-  'w-full rounded-lg border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition-all duration-200 placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-2 focus:ring-neutral-900/10'
-
-const labelClassName = 'mb-1.5 block text-sm font-medium text-neutral-700'
+const readOnlyInputClass = `${APP_INPUT_CLASS} cursor-not-allowed bg-surface-muted text-ink-muted`
 
 type LanguageSelectValue = TranslationLanguage | ''
 
@@ -156,11 +154,7 @@ export function GeneralSettingsPanel() {
   }
 
   if (loadError !== null) {
-    return (
-      <div className="max-w-2xl rounded-2xl border border-red-100 bg-red-50/50 p-6 text-sm text-red-600">
-        {loadError}
-      </div>
-    )
+    return <Alert variant="error">{loadError}</Alert>
   }
 
   const selectOptions: ReadonlyArray<{ value: LanguageSelectValue; label: string }> = [
@@ -170,19 +164,10 @@ export function GeneralSettingsPanel() {
 
   return (
     <div className="max-w-2xl">
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold text-neutral-900">General</h2>
-        <p className="mt-1 text-sm text-neutral-500">
-          Your account details, translation preference, and login credentials.
-        </p>
-      </div>
-
-      <div className="rounded-2xl border border-neutral-200 bg-white shadow-sm">
-        <form onSubmit={handleSaveAccount} className="space-y-5 p-6 sm:p-8">
+      <AppCard>
+        <form onSubmit={handleSaveAccount} className="space-y-5">
           <div>
-            <label htmlFor="account-name" className={labelClassName}>
-              Name
-            </label>
+            <AppLabel htmlFor="account-name">Organization name</AppLabel>
             <input
               id="account-name"
               name="name"
@@ -193,27 +178,22 @@ export function GeneralSettingsPanel() {
                 setName(event.target.value)
                 setAccountMessage(null)
               }}
-              className={inputClassName}
+              className={APP_INPUT_CLASS}
               maxLength={160}
             />
           </div>
 
           <div>
-            <label htmlFor="account-email" className={labelClassName}>
-              Email
-            </label>
+            <AppLabel htmlFor="account-email">Email</AppLabel>
             <input
               id="account-email"
               name="email"
               type="email"
               value={email}
               readOnly
-              className={[
-                inputClassName,
-                'cursor-not-allowed bg-neutral-50 text-neutral-500',
-              ].join(' ')}
+              className={readOnlyInputClass}
             />
-            <p className="mt-1.5 text-xs text-neutral-500">Login email cannot be changed here.</p>
+            <p className="mt-1.5 text-xs text-ink-faint">Login email cannot be changed here.</p>
           </div>
 
           <div>
@@ -228,7 +208,7 @@ export function GeneralSettingsPanel() {
               options={selectOptions}
               placeholder="Select target language…"
             />
-            <p className="mt-1.5 text-xs text-neutral-500">
+            <p className="mt-1.5 text-xs text-ink-faint">
               Inbox messages will be translated into this language when you use translate.
             </p>
           </div>
@@ -237,28 +217,20 @@ export function GeneralSettingsPanel() {
             <Alert variant={accountMessage.variant}>{accountMessage.text}</Alert>
           )}
 
-          <div className="flex justify-end border-t border-neutral-100 pt-5">
-            <button
-              type="submit"
-              disabled={!canSaveAccount}
-              className="inline-flex items-center justify-center rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
-            >
+          <div className="flex justify-end border-t border-border pt-5">
+            <AppButton type="submit" disabled={!canSaveAccount}>
               {isSavingAccount ? 'Saving…' : 'Save changes'}
-            </button>
+            </AppButton>
           </div>
         </form>
 
-        <div className="border-t border-neutral-100 px-6 py-6 sm:px-8 sm:py-8">
-          <h3 className="text-sm font-semibold text-neutral-900">Change password</h3>
-          <p className="mt-1 text-sm text-neutral-500">
-            Use a strong password you do not use elsewhere.
-          </p>
+        <div className="mt-8 border-t border-border pt-8">
+          <h3 className="text-sm font-semibold text-ink">Change password</h3>
+          <p className="mt-1 text-sm text-ink-muted">Use a strong password you do not use elsewhere.</p>
 
           <form onSubmit={handleChangePassword} className="mt-5 space-y-4">
             <div>
-              <label htmlFor="current-password" className={labelClassName}>
-                Current password
-              </label>
+              <AppLabel htmlFor="current-password">Current password</AppLabel>
               <input
                 id="current-password"
                 name="currentPassword"
@@ -269,14 +241,12 @@ export function GeneralSettingsPanel() {
                   setCurrentPassword(event.target.value)
                   setPasswordMessage(null)
                 }}
-                className={inputClassName}
+                className={APP_INPUT_CLASS}
               />
             </div>
 
             <div>
-              <label htmlFor="new-password" className={labelClassName}>
-                New password
-              </label>
+              <AppLabel htmlFor="new-password">New password</AppLabel>
               <input
                 id="new-password"
                 name="newPassword"
@@ -287,15 +257,13 @@ export function GeneralSettingsPanel() {
                   setNewPassword(event.target.value)
                   setPasswordMessage(null)
                 }}
-                className={inputClassName}
+                className={APP_INPUT_CLASS}
                 minLength={8}
               />
             </div>
 
             <div>
-              <label htmlFor="confirm-password" className={labelClassName}>
-                Confirm new password
-              </label>
+              <AppLabel htmlFor="confirm-password">Confirm new password</AppLabel>
               <input
                 id="confirm-password"
                 name="confirmPassword"
@@ -306,7 +274,7 @@ export function GeneralSettingsPanel() {
                   setConfirmPassword(event.target.value)
                   setPasswordMessage(null)
                 }}
-                className={inputClassName}
+                className={APP_INPUT_CLASS}
                 minLength={8}
               />
             </div>
@@ -316,22 +284,22 @@ export function GeneralSettingsPanel() {
             )}
 
             <div className="flex justify-end pt-1">
-              <button
+              <AppButton
                 type="submit"
+                variant="secondary"
                 disabled={
                   isSavingPassword ||
                   currentPassword.length === 0 ||
                   newPassword.length === 0 ||
                   confirmPassword.length === 0
                 }
-                className="inline-flex items-center justify-center rounded-lg border border-neutral-200 bg-white px-4 py-2 text-sm font-medium text-neutral-900 transition-colors hover:border-neutral-300 hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isSavingPassword ? 'Updating…' : 'Update password'}
-              </button>
+              </AppButton>
             </div>
           </form>
         </div>
-      </div>
+      </AppCard>
     </div>
   )
 }

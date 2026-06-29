@@ -1,10 +1,10 @@
 import type { Lead } from '@/modules/leads/leads.service'
 
 const iconButtonClassName =
-  'inline-flex h-8 w-8 items-center justify-center rounded-lg text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900'
+  'inline-flex h-8 w-8 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-surface-muted hover:text-ink'
 
 const deleteIconButtonClassName =
-  'inline-flex h-8 w-8 items-center justify-center rounded-lg text-neutral-500 transition-colors hover:bg-red-50 hover:text-red-600'
+  'inline-flex h-8 w-8 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-red-50 hover:text-red-600'
 
 type LeadRowActionsProps = {
   lead: Lead

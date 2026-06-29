@@ -1,5 +1,6 @@
 import { Spinner } from '@/components/ui/Spinner'
 import type { ConversationAnalyticsResponse } from '@/modules/ai/ai.service'
+import { INBOX_ICON_BUTTON_CLASS } from '@/modules/inbox/inbox-ui'
 
 type ConversationAnalyticsPanelProps = {
   readonly open: boolean
@@ -18,27 +19,9 @@ function CloseIcon() {
 }
 
 function leadScoreTone(score: number): string {
-  if (score >= 70) {
-    return 'text-emerald-600'
-  }
-
-  if (score >= 40) {
-    return 'text-amber-600'
-  }
-
-  return 'text-neutral-500'
-}
-
-function leadScoreBarTone(score: number): string {
-  if (score >= 70) {
-    return 'bg-emerald-500'
-  }
-
-  if (score >= 40) {
-    return 'bg-amber-500'
-  }
-
-  return 'bg-neutral-400'
+  if (score >= 70) return 'text-emerald-600'
+  if (score >= 40) return 'text-amber-600'
+  return 'text-ink-muted'
 }
 
 export function ConversationAnalyticsPanel({
@@ -52,17 +35,17 @@ export function ConversationAnalyticsPanel({
     <aside
       aria-hidden={!open}
       className={[
-        'absolute inset-y-0 right-0 z-20 flex w-1/2 flex-col border-l border-neutral-200 bg-white shadow-[-8px_0_24px_rgba(0,0,0,0.06)] transition-transform duration-300 ease-out',
+        'glass-light absolute inset-y-0 right-0 z-20 flex w-full max-w-md flex-col border-l border-border shadow-card transition-transform duration-300 ease-out sm:w-1/2',
         open ? 'translate-x-0' : 'pointer-events-none translate-x-full',
       ].join(' ')}
     >
-      <div className="flex shrink-0 items-center justify-between border-b border-neutral-200 px-4 py-3">
-        <h2 className="text-sm font-semibold text-neutral-900">AI Analytics</h2>
+      <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3">
+        <h2 className="text-sm font-semibold text-ink">AI Analytics</h2>
         <button
           type="button"
           onClick={onClose}
           aria-label="Close analytics panel"
-          className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
+          className={INBOX_ICON_BUTTON_CLASS}
         >
           <CloseIcon />
         </button>
@@ -76,7 +59,7 @@ export function ConversationAnalyticsPanel({
         )}
 
         {!loading && error !== null && (
-          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-700" role="alert">
+          <p className="rounded-xl border border-red-200/80 bg-red-50 px-3 py-2.5 text-sm text-red-700" role="alert">
             {error}
           </p>
         )}
@@ -84,19 +67,17 @@ export function ConversationAnalyticsPanel({
         {!loading && error === null && data !== null && (
           <div className="space-y-5">
             <section>
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
-                Lead Score
-              </h3>
-              <div className="mt-2 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3">
+              <h3 className="text-xs font-medium tracking-wide text-ink-faint uppercase">Lead score</h3>
+              <div className="mt-2 rounded-[var(--radius-card)] border border-border bg-surface-muted/60 px-4 py-3">
                 <div className="flex items-end justify-between gap-3">
                   <p className={['text-3xl font-bold tabular-nums', leadScoreTone(data.leadScore)].join(' ')}>
                     {data.leadScore}
                   </p>
-                  <span className="pb-1 text-xs text-neutral-500">out of 100</span>
+                  <span className="pb-1 text-xs text-ink-faint">out of 100</span>
                 </div>
-                <div className="mt-3 h-2 overflow-hidden rounded-full bg-neutral-200">
+                <div className="mt-3 h-2 overflow-hidden rounded-[var(--radius-pill)] bg-border">
                   <div
-                    className={['h-full rounded-full transition-all', leadScoreBarTone(data.leadScore)].join(' ')}
+                    className="h-full rounded-[var(--radius-pill)] bg-gradient-to-r from-accent-soft via-accent to-accent-violet transition-all"
                     style={{ width: `${data.leadScore}%` }}
                   />
                 </div>
@@ -104,16 +85,14 @@ export function ConversationAnalyticsPanel({
             </section>
 
             <section>
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
-                Suggested Actions
-              </h3>
+              <h3 className="text-xs font-medium tracking-wide text-ink-faint uppercase">Suggested actions</h3>
               <ol className="mt-2 space-y-2">
                 {data.suggestedActions.map((action, index) => (
                   <li
                     key={`${index}-${action.slice(0, 24)}`}
-                    className="flex gap-2.5 rounded-xl border border-violet-200/80 bg-violet-50/60 px-3 py-2.5 text-sm text-violet-950"
+                    className="flex gap-2.5 rounded-xl border border-accent-violet/20 bg-accent-violet/8 px-3 py-2.5 text-sm text-ink"
                   >
-                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-violet-600 text-xs font-semibold text-white">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent-violet text-xs font-semibold text-white">
                       {index + 1}
                     </span>
                     <span className="min-w-0 leading-snug">{action}</span>
@@ -123,19 +102,15 @@ export function ConversationAnalyticsPanel({
             </section>
 
             <section>
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
-                Customer History
-              </h3>
-              <p className="mt-2 rounded-xl border border-neutral-200 bg-white px-3 py-2.5 text-sm leading-relaxed text-neutral-800">
+              <h3 className="text-xs font-medium tracking-wide text-ink-faint uppercase">Customer history</h3>
+              <p className="mt-2 rounded-xl border border-border bg-white/80 px-3 py-2.5 text-sm leading-relaxed text-ink-muted">
                 {data.customerHistory}
               </p>
             </section>
 
             <section>
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
-                Conversation Summary
-              </h3>
-              <p className="mt-2 rounded-xl border border-neutral-200 bg-white px-3 py-2.5 text-sm leading-relaxed text-neutral-800">
+              <h3 className="text-xs font-medium tracking-wide text-ink-faint uppercase">Conversation summary</h3>
+              <p className="mt-2 rounded-xl border border-border bg-white/80 px-3 py-2.5 text-sm leading-relaxed text-ink-muted">
                 {data.conversationSummary}
               </p>
             </section>

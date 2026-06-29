@@ -75,18 +75,18 @@ export function AppLayout() {
   }
 
   if (!isReady || sessionLoading) {
-    return <SpinnerOverlay label="Loading your workspace..." className="bg-neutral-50" />
+    return <SpinnerOverlay label="Loading your workspace..." />
   }
 
   const showSubscriptionGate =
     !hasSubscriptionAccess && !isSubscriptionExemptPath(location.pathname)
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="bg-surface-muted min-h-screen">
       {sidebarOpen && (
         <button
           type="button"
-          className="fixed inset-0 z-40 bg-neutral-900/40 lg:hidden"
+          className="fixed inset-0 z-40 bg-ink/30 backdrop-blur-[2px] lg:hidden"
           aria-label="Close menu"
           onClick={() => setSidebarOpen(false)}
         />
@@ -96,6 +96,7 @@ export function AppLayout() {
         mobileOpen={sidebarOpen}
         collapsed={sidebarCollapsed}
         onToggleCollapse={toggleSidebarCollapsed}
+        onNavigate={() => setSidebarOpen(false)}
       />
       <AppTopbar collapsed={sidebarCollapsed} onMenuClick={() => setSidebarOpen(true)} />
 
@@ -105,7 +106,7 @@ export function AppLayout() {
           sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-72',
         ].join(' ')}
       >
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {showSubscriptionGate ? (
             <SubscriptionRequired />
           ) : (

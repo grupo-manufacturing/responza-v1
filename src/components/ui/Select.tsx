@@ -1,5 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 
+import { APP_INPUT_CLASS } from '@/shared/ui/app-ui'
+
 export type SelectOption<T extends string = string> = {
   readonly value: T
   readonly label: string
@@ -18,13 +20,7 @@ type SelectProps<T extends string> = {
 
 function ChevronDownIcon({ className }: { readonly className?: string }) {
   return (
-    <svg
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-      aria-hidden
-    >
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
     </svg>
   )
@@ -84,7 +80,7 @@ export function Select<T extends string>({
   return (
     <div ref={rootRef} className={['relative', className].filter(Boolean).join(' ')}>
       {label !== undefined && (
-        <label htmlFor={id} className="mb-1.5 block text-xs font-medium text-neutral-600">
+        <label htmlFor={id} className="mb-1.5 block text-xs font-medium text-ink-muted">
           {label}
         </label>
       )}
@@ -97,18 +93,17 @@ export function Select<T extends string>({
         aria-haspopup="listbox"
         aria-expanded={open}
         className={[
-          'flex h-10 w-full items-center justify-between gap-2 rounded-lg border bg-white px-3 text-left text-sm transition-colors',
-          'border-neutral-300 hover:border-neutral-400',
-          'focus:border-neutral-900 focus:outline-none focus:ring-1 focus:ring-neutral-900',
+          APP_INPUT_CLASS,
+          'flex h-10 items-center justify-between gap-2 text-left',
           disabled ? 'cursor-not-allowed opacity-50' : '',
-          open ? 'border-neutral-900 ring-1 ring-neutral-900' : '',
+          open ? 'border-accent ring-2 ring-accent/15' : '',
         ].join(' ')}
       >
-        <span className={['truncate', isPlaceholder ? 'text-neutral-400' : 'text-neutral-900'].join(' ')}>
+        <span className={['truncate', isPlaceholder ? 'text-ink-faint' : 'text-ink'].join(' ')}>
           {displayLabel}
         </span>
         <ChevronDownIcon
-          className={['h-4 w-4 shrink-0 text-neutral-500 transition-transform', open ? 'rotate-180' : ''].join(
+          className={['h-4 w-4 shrink-0 text-ink-muted transition-transform', open ? 'rotate-180' : ''].join(
             ' ',
           )}
         />
@@ -118,7 +113,7 @@ export function Select<T extends string>({
         <ul
           role="listbox"
           aria-labelledby={id}
-          className="absolute z-50 mt-1 max-h-60 w-full overflow-y-auto rounded-lg border border-neutral-200 bg-white py-1 shadow-lg [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          className="absolute z-50 mt-1 max-h-60 w-full overflow-y-auto rounded-xl border border-border bg-white py-1 shadow-card [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         >
           {options.map((option) => {
             const isSelected = option.value === value
@@ -132,8 +127,8 @@ export function Select<T extends string>({
                   className={[
                     'flex w-full items-center px-3 py-2 text-left text-sm transition-colors',
                     isSelected
-                      ? 'bg-neutral-900 font-medium text-white'
-                      : 'text-neutral-900 hover:bg-neutral-100',
+                      ? 'bg-accent/10 font-medium text-accent'
+                      : 'text-ink hover:bg-surface-muted',
                   ].join(' ')}
                 >
                   {option.label}

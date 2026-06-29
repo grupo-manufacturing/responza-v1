@@ -1,8 +1,9 @@
 import { SubscriptionRequired } from '@/components/common/SubscriptionRequired'
 import { Alert } from '@/components/ui/Alert'
-import { Spinner } from '@/components/ui/Spinner'
+import { SpinnerSection } from '@/components/ui/Spinner'
 import { IntegrationRow } from '@/modules/integrations/components/IntegrationRow'
 import { useIntegrations } from '@/modules/integrations/hooks/useIntegrations'
+import { AppCard, AppPage, AppPageHeader } from '@/shared/ui/app-ui'
 
 export function IntegrationsPage() {
   const {
@@ -25,13 +26,11 @@ export function IntegrationsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl">
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-neutral-900">Integrations</h1>
-        <p className="mt-1 text-sm text-neutral-600">
-          Connect messaging platforms to receive and reply to conversations in your inbox.
-        </p>
-      </div>
+    <AppPage className="max-w-4xl">
+      <AppPageHeader
+        title="Integrations"
+        description="Connect messaging platforms to receive and reply to conversations in your inbox."
+      />
 
       {!whatsappConfigured && (
         <Alert variant="warning" className="mb-4">
@@ -47,11 +46,7 @@ export function IntegrationsPage() {
         </Alert>
       )}
 
-      {loading && (
-        <div className="flex justify-center py-16">
-          <Spinner />
-        </div>
-      )}
+      {loading && <SpinnerSection label="Loading integrations..." minHeightClassName="min-h-[40vh]" />}
 
       {!loading && success !== null && (
         <Alert variant="success" className="mb-4">
@@ -66,8 +61,8 @@ export function IntegrationsPage() {
       )}
 
       {!loading && (
-        <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
-          <div className="divide-y divide-neutral-100">
+        <AppCard padding="none" className="overflow-hidden">
+          <div className="divide-y divide-border">
             {integrations.map((integration) => (
               <IntegrationRow
                 key={integration.platform}
@@ -81,8 +76,8 @@ export function IntegrationsPage() {
               />
             ))}
           </div>
-        </div>
+        </AppCard>
       )}
-    </div>
+    </AppPage>
   )
 }

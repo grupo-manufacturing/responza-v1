@@ -9,7 +9,7 @@ export function ConnectedAccountProfile({
   displayName,
   profilePictureUrl,
   fallbackInitial,
-  avatarClassName = 'bg-neutral-200 text-neutral-600',
+  avatarClassName = 'bg-surface-muted text-ink-muted',
 }: ConnectedAccountProfileProps) {
   const initial = fallbackInitial.charAt(0).toUpperCase()
 
@@ -19,7 +19,7 @@ export function ConnectedAccountProfile({
         <img
           src={profilePictureUrl}
           alt=""
-          className="h-9 w-9 shrink-0 rounded-full object-cover ring-1 ring-neutral-200"
+          className="h-9 w-9 shrink-0 rounded-full object-cover ring-2 ring-white"
         />
       ) : (
         <div
@@ -31,9 +31,7 @@ export function ConnectedAccountProfile({
           {initial}
         </div>
       )}
-      <p className="truncate text-sm font-medium text-neutral-900">
-        {displayName ?? 'Connected account'}
-      </p>
+      <p className="truncate text-sm font-medium text-ink">{displayName ?? 'Connected account'}</p>
     </div>
   )
 }

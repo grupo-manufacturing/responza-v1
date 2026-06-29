@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 
 import { handleInstagramOAuthCallback } from '@/modules/integrations/lib/instagramOAuth'
+import { Spinner } from '@/components/ui/Spinner'
 
 export function InstagramOAuthCallbackPage() {
   useEffect(() => {
@@ -8,11 +9,11 @@ export function InstagramOAuthCallbackPage() {
   }, [])
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#405DE6] to-[#E1306C]">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#405DE6] to-brand-instagram px-4">
       <div className="text-center text-white">
-        <div className="mx-auto mb-6 h-8 w-8 animate-spin rounded-full border-2 border-white/30 border-t-white"></div>
-        <h1 className="mb-2 text-2xl font-semibold">Completing Instagram OAuth...</h1>
-        <p className="text-white/90">Please wait while we finalize your Instagram connection.</p>
+        <Spinner size="lg" variant="white" />
+        <h1 className="mt-4 text-xl font-semibold sm:text-2xl">Completing Instagram connection...</h1>
+        <p className="mt-1 text-sm text-white/90">Please wait while we finalize your Instagram connection.</p>
       </div>
     </div>
   )

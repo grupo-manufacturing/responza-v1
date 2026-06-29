@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { AppButtonLink, AppCard } from '@/shared/ui/app-ui'
 
 type DashboardActionPanelProps = {
   readonly title: string
@@ -16,24 +16,25 @@ export function DashboardActionPanel({
   children,
 }: DashboardActionPanelProps) {
   return (
-    <section className="flex min-h-[280px] flex-col rounded-xl border border-neutral-200 bg-white shadow-sm">
-      <div className="border-b border-neutral-100 px-5 py-4">
+    <AppCard padding="none" className="flex min-h-[280px] flex-col overflow-hidden">
+      <div className="border-b border-border px-5 py-4">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-base font-semibold text-neutral-900">{title}</h2>
-            <p className="mt-1 text-sm text-neutral-600">{description}</p>
+            <h2 className="text-base font-semibold text-ink">{title}</h2>
+            <p className="mt-1 text-sm text-ink-muted">{description}</p>
           </div>
           {viewAllHref !== undefined && (
-            <Link
+            <AppButtonLink
               to={viewAllHref}
-              className="shrink-0 text-sm font-medium text-neutral-900 underline underline-offset-2 hover:text-neutral-700"
+              variant="ghost"
+              className="!px-2 !py-1 text-xs font-medium text-accent hover:text-accent"
             >
               {viewAllLabel}
-            </Link>
+            </AppButtonLink>
           )}
         </div>
       </div>
       <div className="flex-1">{children}</div>
-    </section>
+    </AppCard>
   )
 }

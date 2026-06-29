@@ -8,7 +8,7 @@ function SignOutIconButton({ onClick }: { readonly onClick: () => void }) {
       onClick={onClick}
       title="Sign out"
       aria-label="Sign out"
-      className="inline-flex shrink-0 items-center justify-center rounded-lg p-2 text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
+      className="inline-flex shrink-0 items-center justify-center rounded-xl p-2 text-ink-muted transition-colors hover:bg-surface-muted hover:text-ink"
     >
       <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
         <path
@@ -24,7 +24,7 @@ function SignOutIconButton({ onClick }: { readonly onClick: () => void }) {
 
 function AccountAvatar({ initial }: { readonly initial: string }) {
   return (
-    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-900">
+    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent-soft via-accent to-accent-violet">
       <span className="text-sm font-medium text-white">{initial}</span>
     </div>
   )
@@ -46,7 +46,7 @@ export function SidebarAccountFooter({
   onLogout,
 }: SidebarAccountFooterProps) {
   return (
-    <div className={['shrink-0 border-t border-neutral-200 p-4', collapsed ? 'lg:p-2' : ''].join(' ')}>
+    <div className={['shrink-0 border-t border-border p-3', collapsed ? 'lg:p-2' : ''].join(' ')}>
       <div className={['hidden items-center justify-center', collapsed ? 'lg:flex' : ''].join(' ')}>
         <SignOutIconButton onClick={onLogout} />
       </div>
@@ -58,14 +58,14 @@ export function SidebarAccountFooter({
             {isProfileLoading && !organizationName ? (
               <div className="flex items-center gap-2 py-1" role="status" aria-label="Loading profile">
                 <Spinner size="sm" variant="muted" />
-                <span className="text-sm text-neutral-500">Loading...</span>
+                <span className="text-sm text-ink-muted">Loading...</span>
               </div>
             ) : (
               <>
-                <p className="truncate text-base font-medium leading-tight text-neutral-900">
+                <p className="truncate text-sm font-medium leading-tight text-ink">
                   {organizationName || 'Organization'}
                 </p>
-                <p className="truncate text-sm leading-tight text-neutral-500">
+                <p className="truncate text-xs leading-tight text-ink-muted">
                   {subscriptionStatusLabel(subscriptionStatus)}
                 </p>
               </>

@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
+import { APP_INPUT_CLASS } from '@/shared/ui/app-ui'
+
 import { LeadsFilterPopover } from './LeadsFilterPopover'
 import { LeadsLayoutToggle } from './LeadsLayoutToggle'
 import type { LeadStatus } from '@/modules/leads/leads.constants'
@@ -71,9 +73,9 @@ export function LeadsSearchBar({
 
   return (
     <div className="flex w-full min-w-0 items-center gap-2 sm:w-auto">
-      <div className="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-lg bg-neutral-100 px-3 ring-1 ring-neutral-200/80 sm:w-72 sm:flex-none lg:w-80">
+      <div className="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-xl border border-border bg-white/80 px-3 sm:w-72 sm:flex-none lg:w-80">
         <svg
-          className="h-4 w-4 shrink-0 text-neutral-400"
+          className="h-4 w-4 shrink-0 text-ink-faint"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -90,8 +92,8 @@ export function LeadsSearchBar({
           type="search"
           value={searchQuery}
           onChange={(event) => onSearchQueryChange(event.target.value)}
-          placeholder="Search..."
-          className="min-w-0 flex-1 bg-transparent text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none"
+          placeholder="Search leads..."
+          className={`${APP_INPUT_CLASS} !border-0 !bg-transparent !p-0 !shadow-none !ring-0 focus:!ring-0`}
         />
       </div>
 

@@ -1,7 +1,8 @@
 import { Select } from '@/components/ui/Select'
 import { LEAD_STATUS_OPTIONS } from '@/modules/leads/leads.constants'
+import { AppLabel } from '@/shared/ui/app-ui'
 
-import { leadInputClassName, type LeadFormValues } from './lead-form'
+import { leadInputClassName, leadTextareaClassName, type LeadFormValues } from './lead-form'
 
 type LeadFormFieldsProps = {
   idPrefix: string
@@ -15,9 +16,9 @@ export function LeadFormFields({ idPrefix, values, onChange }: LeadFormFieldsPro
   return (
     <div className="space-y-4">
       <div>
-        <label htmlFor={`${idPrefix}-name`} className="text-sm font-medium text-neutral-700">
+        <AppLabel htmlFor={`${idPrefix}-name`}>
           Name <span className="text-red-600">*</span>
-        </label>
+        </AppLabel>
         <input
           id={`${idPrefix}-name`}
           required
@@ -29,9 +30,7 @@ export function LeadFormFields({ idPrefix, values, onChange }: LeadFormFieldsPro
       </div>
 
       <div>
-        <label htmlFor={`${idPrefix}-email`} className="text-sm font-medium text-neutral-700">
-          Email
-        </label>
+        <AppLabel htmlFor={`${idPrefix}-email`}>Email</AppLabel>
         <input
           id={`${idPrefix}-email`}
           type="email"
@@ -43,9 +42,7 @@ export function LeadFormFields({ idPrefix, values, onChange }: LeadFormFieldsPro
       </div>
 
       <div>
-        <label htmlFor={`${idPrefix}-phone`} className="text-sm font-medium text-neutral-700">
-          Phone
-        </label>
+        <AppLabel htmlFor={`${idPrefix}-phone`}>Phone</AppLabel>
         <input
           id={`${idPrefix}-phone`}
           type="tel"
@@ -55,13 +52,11 @@ export function LeadFormFields({ idPrefix, values, onChange }: LeadFormFieldsPro
           onChange={(event) => patch({ phone: event.target.value })}
           className={leadInputClassName}
         />
-        <p className="mt-1 text-xs text-neutral-500">If provided, at least 3 characters.</p>
+        <p className="mt-1 text-xs text-ink-faint">If provided, at least 3 characters.</p>
       </div>
 
       <div>
-        <label htmlFor={`${idPrefix}-status`} className="text-sm font-medium text-neutral-700">
-          Status
-        </label>
+        <AppLabel htmlFor={`${idPrefix}-status`}>Status</AppLabel>
         <Select
           id={`${idPrefix}-status`}
           value={values.status}
@@ -72,16 +67,14 @@ export function LeadFormFields({ idPrefix, values, onChange }: LeadFormFieldsPro
       </div>
 
       <div>
-        <label htmlFor={`${idPrefix}-notes`} className="text-sm font-medium text-neutral-700">
-          Notes
-        </label>
+        <AppLabel htmlFor={`${idPrefix}-notes`}>Notes</AppLabel>
         <textarea
           id={`${idPrefix}-notes`}
           rows={4}
           maxLength={5000}
           value={values.notes}
           onChange={(event) => patch({ notes: event.target.value })}
-          className={leadInputClassName}
+          className={leadTextareaClassName}
         />
       </div>
     </div>

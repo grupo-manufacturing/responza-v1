@@ -1,13 +1,12 @@
-import { Link } from 'react-router-dom'
-
 import { SubscriptionRequired } from '@/components/common/SubscriptionRequired'
 import { Alert } from '@/components/ui/Alert'
-import { Spinner } from '@/components/ui/Spinner'
+import { SpinnerSection } from '@/components/ui/Spinner'
 import { ConversationQueueList } from '@/modules/dashboard/components/ConversationQueueList'
 import { DashboardActionPanel } from '@/modules/dashboard/components/DashboardActionPanel'
 import { DashboardStatsRow } from '@/modules/dashboard/components/DashboardStatsRow'
 import { LeadQueueList } from '@/modules/dashboard/components/LeadQueueList'
 import { useDashboard } from '@/modules/dashboard/hooks/useDashboard'
+import { AppButtonLink, AppPage, AppPageHeader } from '@/shared/ui/app-ui'
 
 export function DashboardPage() {
   const { data, loading, error, subscriptionRequired } = useDashboard()
@@ -17,32 +16,31 @@ export function DashboardPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl">
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-neutral-900">Dashboard</h1>
-        <p className="mt-1 text-sm text-neutral-600">
-          See what needs your attention and jump straight into action.
-        </p>
-      </div>
+    <AppPage>
+      <AppPageHeader
+        title="Dashboard"
+        description="See what needs your attention and jump straight into action."
+      />
 
-      {loading && (
-        <div className="flex justify-center py-16">
-          <Spinner />
-        </div>
-      )}
+      {loading && <SpinnerSection label="Loading dashboard..." minHeightClassName="min-h-[40vh]" />}
 
       {!loading && error !== null && <Alert variant="error">{error}</Alert>}
 
       {!loading && error === null && data !== undefined && (
         <div className="space-y-6">
-          <DashboardStatsRow stats={data.stats} />
+          <DashboardStatsRow
+            stats={data.stats}
+            needsReplyCount={data.needsReply.length}
+            toNudgeCount={data.toNudge.length}
+            leadsCount={data.leadsToFollowUp.length}
+          />
 
           {data.stats.totalConversations === 0 && (
-            <div className="rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-700">
-              Connect WhatsApp or Instagram to start receiving conversations.{' '}
-              <Link to="/integrations" className="font-medium text-neutral-900 underline underline-offset-2">
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-card)] border border-accent/20 bg-accent/5 px-4 py-3 text-sm text-ink-muted">
+              <span>Connect WhatsApp or Instagram to start receiving conversations.</span>
+              <AppButtonLink to="/integrations" variant="secondary" className="!px-4 !py-2 text-xs">
                 Go to Integrations
-              </Link>
+              </AppButtonLink>
             </div>
           )}
 
@@ -89,6 +87,6 @@ export function DashboardPage() {
           </div>
         </div>
       )}
-    </div>
+    </AppPage>
   )
 }

@@ -1,5 +1,6 @@
 import { Spinner } from '@/components/ui/Spinner'
 import { ContactAvatar } from '@/modules/inbox/components/ContactAvatar'
+import { INBOX_ICON_BUTTON_CLASS } from '@/modules/inbox/inbox-ui'
 import type { Conversation, Participant } from '@/modules/inbox/inbox.service'
 
 type PendingContact = {
@@ -78,7 +79,7 @@ export function ConversationThreadHeader({
             type="button"
             onClick={onBack}
             aria-label="Back to conversations"
-            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 lg:hidden"
+            className={[INBOX_ICON_BUTTON_CLASS, 'lg:hidden'].join(' ')}
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -86,8 +87,18 @@ export function ConversationThreadHeader({
           </button>
         )}
 
-        <ContactAvatar displayName={displayName} avatarUrl={avatarUrl} size="md" />
-        <p className="min-w-0 truncate text-base font-bold text-neutral-900">{displayName}</p>
+        <ContactAvatar
+          displayName={displayName}
+          avatarUrl={avatarUrl}
+          size="md"
+          platform={conversation?.platform}
+        />
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold text-ink sm:text-base">{displayName}</p>
+          {conversation !== null && (
+            <p className="truncate text-xs text-ink-faint capitalize">{conversation.platform}</p>
+          )}
+        </div>
       </div>
 
       {onAnalyze !== undefined && (
@@ -98,10 +109,10 @@ export function ConversationThreadHeader({
           aria-label={analyticsLoading ? 'Analyzing conversation' : 'Open conversation analytics'}
           title="AI Analytics"
           className={[
-            'inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-violet-600 transition-colors',
+            INBOX_ICON_BUTTON_CLASS,
             !analyticsDisabled && !analyticsLoading
-              ? 'hover:bg-violet-50 hover:text-violet-700'
-              : 'cursor-not-allowed opacity-40',
+              ? 'text-accent-violet hover:bg-accent-violet/10 hover:text-accent-violet'
+              : '',
           ].join(' ')}
         >
           {analyticsLoading ? <Spinner size="sm" variant="muted" /> : <AnalyticsIcon />}

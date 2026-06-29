@@ -17,9 +17,9 @@ const sizeClasses: Record<SpinnerSize, string> = {
 }
 
 const variantClasses: Record<SpinnerVariant, string> = {
-  brand: 'border-neutral-200 border-t-neutral-900',
+  brand: 'border-border border-t-accent',
   white: 'border-white/30 border-t-white',
-  muted: 'border-neutral-200 border-t-neutral-500',
+  muted: 'border-border border-t-ink-muted',
 }
 
 export function Spinner({
@@ -47,7 +47,7 @@ export function Spinner({
   }
 
   const labelClassName =
-    variant === 'muted' ? 'text-neutral-500' : variant === 'white' ? 'text-white/90' : 'text-neutral-600'
+    variant === 'muted' ? 'text-ink-muted' : variant === 'white' ? 'text-white/90' : 'text-ink-muted'
 
   return (
     <div className="flex flex-col items-center justify-center gap-3">
@@ -87,7 +87,7 @@ type SpinnerOverlayProps = {
 export function SpinnerOverlay({ label = 'Loading...', className = '' }: SpinnerOverlayProps) {
   return (
     <div
-      className={['flex min-h-screen flex-col items-center justify-center bg-neutral-50', className].join(' ')}
+      className={['bg-surface-muted flex min-h-screen flex-col items-center justify-center', className].join(' ')}
     >
       <Spinner size="lg" label={label} />
     </div>

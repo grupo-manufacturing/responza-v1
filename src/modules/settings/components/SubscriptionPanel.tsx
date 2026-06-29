@@ -8,6 +8,8 @@ import {
   type SubscriptionDetails,
 } from '@/modules/settings/subscription.service'
 import { openRazorpaySubscriptionCheckout } from '@/modules/settings/lib/razorpayCheckout'
+import { AppButton, AppCard, AppProgressBar } from '@/shared/ui/app-ui'
+import { SectionBadge } from '@/shared/ui/brand-ui'
 import { clearSessionCache, loadSession } from '@/shared/hooks/useSession'
 import { SessionStorage } from '@/shared/session/storage'
 import {
@@ -131,11 +133,7 @@ export function SubscriptionPanel() {
   }
 
   if (error !== null || subscription === null) {
-    return (
-      <div className="max-w-2xl rounded-2xl border border-red-100 bg-red-50/50 p-6 text-sm text-red-600">
-        {error ?? 'Subscription unavailable.'}
-      </div>
-    )
+    return <Alert variant="error">{error ?? 'Subscription unavailable.'}</Alert>
   }
 
   const planTitle = subscriptionPlanLabel(subscription.status, subscription.plan)
@@ -146,33 +144,24 @@ export function SubscriptionPanel() {
   const showPlanPicker = !subscription.isPaid
   const canCancel = subscription.isPaid && subscription.status === 'active'
 
+  const quotaPercent =
+    subscription.conversationLimit !== null &&
+    subscription.conversationsUsed !== null &&
+    subscription.conversationLimit > 0
+      ? Math.min(100, (subscription.conversationsUsed / subscription.conversationLimit) * 100)
+      : 0
+
   return (
-    <div className="max-w-3xl">
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold text-neutral-900">Subscription & billing</h2>
-        <p className="mt-1 text-sm text-neutral-500">
-          Manage your plan, trial status, and billing details.
-        </p>
-      </div>
+    <div className="max-w-3xl space-y-8">
+      {actionError !== null && <Alert variant="error">{actionError}</Alert>}
+      {successMessage !== null && <Alert variant="success">{successMessage}</Alert>}
 
-      {actionError !== null && (
-        <Alert variant="error" className="mb-4">
-          {actionError}
-        </Alert>
-      )}
-
-      {successMessage !== null && (
-        <Alert variant="success" className="mb-4">
-          {successMessage}
-        </Alert>
-      )}
-
-      <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm sm:p-8">
-        <div className="flex items-start justify-between gap-4 border-b border-neutral-100 pb-6">
+      <AppCard>
+        <div className="flex items-start justify-between gap-4 border-b border-border pb-6">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Current plan</p>
-            <p className="mt-1 text-xl font-semibold text-neutral-900">{planTitle}</p>
-            <p className="mt-1 text-sm text-neutral-600">
+            <p className="text-xs font-medium tracking-wide text-ink-faint uppercase">Current plan</p>
+            <p className="mt-1 text-xl font-semibold text-ink">{planTitle}</p>
+            <p className="mt-1 text-sm text-ink-muted">
               {subscription.isTrialing && trialDays !== null
                 ? `Full access during your trial — ${trialDays}.`
                 : subscription.hasAccess
@@ -181,41 +170,41 @@ export function SubscriptionPanel() {
             </p>
           </div>
           <span
-            className={`rounded-full px-3 py-1 text-xs font-medium ring-1 ${subscriptionBadgeClass(subscription.status)}`}
+            className={`rounded-[var(--radius-pill)] px-3 py-1 text-xs font-medium ring-1 ${subscriptionBadgeClass(subscription.status)}`}
           >
             {subscriptionBadgeText(subscription.status, subscription.hasAccess)}
           </span>
         </div>
 
-        <ul className="mt-6 space-y-3 text-sm text-neutral-600">
+        <ul className="mt-6 space-y-3 text-sm text-ink-muted">
           <li className="flex gap-2">
-            <span className="font-medium text-neutral-900">Plan</span>
-            <span>— {subscription.plan}</span>
+            <span className="font-medium text-ink">Plan</span>
+            <span>{subscription.plan}</span>
           </li>
           <li className="flex gap-2">
-            <span className="font-medium text-neutral-900">Status</span>
-            <span>— {subscription.status}</span>
+            <span className="font-medium text-ink">Status</span>
+            <span>{subscription.status}</span>
           </li>
           {subscription.isTrialing && (
             <li className="flex gap-2">
-              <span className="font-medium text-neutral-900">Trial ends</span>
-              <span>— {new Date(subscription.trialEndsAt).toLocaleDateString()}</span>
+              <span className="font-medium text-ink">Trial ends</span>
+              <span>{new Date(subscription.trialEndsAt).toLocaleDateString()}</span>
             </li>
           )}
           {subscription.subscriptionPeriodEndsAt !== null && (
             <li className="flex gap-2">
-              <span className="font-medium text-neutral-900">Current period ends</span>
-              <span>— {new Date(subscription.subscriptionPeriodEndsAt).toLocaleDateString()}</span>
+              <span className="font-medium text-ink">Current period ends</span>
+              <span>{new Date(subscription.subscriptionPeriodEndsAt).toLocaleDateString()}</span>
             </li>
           )}
           <li className="flex gap-2">
-            <span className="font-medium text-neutral-900">Billing</span>
-            <span>— Razorpay (GST inclusive)</span>
+            <span className="font-medium text-ink">Billing</span>
+            <span>Razorpay (GST inclusive)</span>
           </li>
         </ul>
 
         {subscription.isTrialing && (
-          <p className="mt-6 text-sm text-neutral-600">
+          <p className="mt-6 text-sm text-ink-muted">
             Conversations are unlimited during your free trial.
           </p>
         )}
@@ -224,24 +213,10 @@ export function SubscriptionPanel() {
           subscription.conversationLimit !== null &&
           subscription.conversationsUsed !== null && (
             <div className="mt-6">
-              <div className="mb-2 flex items-center justify-between text-sm">
-                <span className="font-medium text-neutral-900">Conversations this period</span>
-                <span className="text-neutral-600">
-                  {subscription.conversationsUsed.toLocaleString('en-IN')} /{' '}
-                  {subscription.conversationLimit.toLocaleString('en-IN')}
-                </span>
-              </div>
-              <div className="h-2 overflow-hidden rounded-full bg-neutral-100">
-                <div
-                  className="h-full rounded-full bg-neutral-900 transition-all"
-                  style={{
-                    width: `${Math.min(
-                      100,
-                      (subscription.conversationsUsed / subscription.conversationLimit) * 100,
-                    )}%`,
-                  }}
-                />
-              </div>
+              <AppProgressBar
+                value={quotaPercent}
+                label={`${subscription.conversationsUsed.toLocaleString('en-IN')} / ${subscription.conversationLimit.toLocaleString('en-IN')} conversations`}
+              />
               {subscription.conversationsRemaining !== null &&
                 subscription.conversationsRemaining <= 0 && (
                   <Alert variant="warning" className="mt-4">
@@ -253,21 +228,22 @@ export function SubscriptionPanel() {
           )}
 
         {canCancel && (
-          <button
+          <AppButton
             type="button"
+            variant="secondary"
             onClick={() => void handleCancel()}
             disabled={isCancelling}
-            className="mt-8 w-full rounded-xl border border-neutral-300 px-4 py-3 text-sm font-semibold text-neutral-700 transition-colors hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-60"
+            className="mt-8 w-full"
           >
             {isCancelling ? 'Cancelling...' : 'Cancel subscription'}
-          </button>
+          </AppButton>
         )}
-      </div>
+      </AppCard>
 
       {showPlanPicker && (
-        <div className="mt-8">
-          <h3 className="text-base font-semibold text-neutral-900">Choose a plan</h3>
-          <p className="mt-1 text-sm text-neutral-500">
+        <div>
+          <h3 className="text-base font-semibold text-ink">Choose a plan</h3>
+          <p className="mt-1 text-sm text-ink-muted">
             All plans include the same features. Only conversation volume differs.
             {subscription.isTrialing && ' Your first payment is charged immediately when you subscribe.'}
           </p>
@@ -281,29 +257,46 @@ export function SubscriptionPanel() {
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             {plans.map((plan) => {
               const isBusy = busyPlanKey === plan.key
+              const isPremium = plan.key === 'premium'
 
               return (
-                <div
+                <AppCard
                   key={plan.key}
-                  className="flex flex-col rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm"
+                  padding="compact"
+                  className={[
+                    'hover-lift flex flex-col',
+                    isPremium ? 'border-accent/30 ring-1 ring-accent/15' : '',
+                  ].join(' ')}
                 >
-                  <p className="text-sm font-semibold text-neutral-900">{plan.label}</p>
-                  <p className="mt-2 text-2xl font-bold text-neutral-900">
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <p className="text-sm font-semibold text-ink">{plan.label}</p>
+                    {plan.key === 'basic' && (
+                      <SectionBadge variant="light" tone="teal">
+                        7-day trial
+                      </SectionBadge>
+                    )}
+                    {isPremium && (
+                      <SectionBadge variant="light" tone="violet">
+                        Popular
+                      </SectionBadge>
+                    )}
+                  </div>
+                  <p className="text-2xl font-bold tracking-tight text-ink">
                     {formatInr(plan.amountInr)}
-                    <span className="text-sm font-medium text-neutral-500">/month</span>
+                    <span className="text-sm font-medium text-ink-muted">/month</span>
                   </p>
-                  <p className="mt-2 text-sm text-neutral-600">
+                  <p className="mt-2 text-sm text-ink-muted">
                     {plan.conversationLimit.toLocaleString('en-IN')} conversations / month
                   </p>
-                  <button
+                  <AppButton
                     type="button"
                     disabled={!checkoutAvailable || isBusy || busyPlanKey !== null}
                     onClick={() => void handleSubscribe(plan)}
-                    className="mt-5 rounded-xl bg-neutral-900 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-neutral-400"
+                    className="mt-5 w-full"
                   >
                     {isBusy ? 'Opening checkout...' : `Subscribe to ${plan.label}`}
-                  </button>
-                </div>
+                  </AppButton>
+                </AppCard>
               )
             })}
           </div>

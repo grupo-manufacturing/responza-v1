@@ -1,24 +1,12 @@
 import { Link } from 'react-router-dom'
 
-import { LandingLogo } from '@/modules/landing/landing-ui'
+import { APP_INPUT_CLASS, AppFlowLayout } from '@/shared/ui/app-ui'
+import { LandingLogo } from '@/shared/ui/brand-ui'
 
-export const AUTH_INPUT_CLASS =
-  'w-full rounded-xl border border-border bg-white/90 px-3.5 py-2.5 text-sm text-ink outline-none transition-all duration-200 placeholder:text-ink-faint focus:border-accent focus:ring-2 focus:ring-accent/15'
+export const AUTH_INPUT_CLASS = APP_INPUT_CLASS
 
 export function AuthLayout({ children }: { readonly children: React.ReactNode }) {
-  return (
-    <div className="bg-hero-gradient bg-grid-light relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10 sm:px-6">
-      <div
-        className="pointer-events-none absolute top-1/4 -left-24 h-72 w-72 rounded-full bg-accent-soft/20 blur-3xl"
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute right-0 bottom-1/4 h-80 w-80 rounded-full bg-accent-warm/15 blur-3xl"
-        aria-hidden
-      />
-      <div className="relative w-full max-w-md">{children}</div>
-    </div>
-  )
+  return <AppFlowLayout>{children}</AppFlowLayout>
 }
 
 export function AuthHeader({

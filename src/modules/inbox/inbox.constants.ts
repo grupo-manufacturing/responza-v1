@@ -30,7 +30,6 @@ export const INBOX_PLATFORM_FILTERS: InboxPlatformFilter[] = [
   'all',
   'whatsapp',
   'instagram',
-  'indiamart',
 ]
 
 export function inboxPlatformFilterLabel(filter: InboxPlatformFilter): string {

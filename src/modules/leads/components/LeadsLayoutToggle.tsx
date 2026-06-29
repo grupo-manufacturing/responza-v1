@@ -1,12 +1,6 @@
-import type { LeadsLayoutMode } from './LeadsSearchBar'
+import { LEADS_POPOVER_PANEL_CLASS, leadsToolbarButtonClass } from '@/modules/leads/leads-ui'
 
-const toolbarButtonClassName = (active: boolean) =>
-  [
-    'relative inline-flex h-10 w-10 items-center justify-center rounded-lg ring-1 transition-colors',
-    active
-      ? 'bg-neutral-900 text-white ring-neutral-900'
-      : 'bg-neutral-100 text-neutral-500 ring-neutral-200/80 hover:bg-neutral-200/80 hover:text-neutral-900',
-  ].join(' ')
+import type { LeadsLayoutMode } from './LeadsSearchBar'
 
 type LeadsLayoutToggleProps = {
   layoutMode: LeadsLayoutMode
@@ -33,7 +27,7 @@ export function LeadsLayoutToggle({
         onClick={onToggle}
         aria-label="Change layout"
         aria-expanded={open}
-        className={toolbarButtonClassName(open)}
+        className={leadsToolbarButtonClass(open)}
       >
         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
           <path
@@ -48,7 +42,7 @@ export function LeadsLayoutToggle({
       {open && (
         <div
           ref={panelRef}
-          className="absolute right-0 z-20 mt-2 w-48 rounded-xl border border-neutral-200 bg-white py-1 shadow-lg"
+          className={`${LEADS_POPOVER_PANEL_CLASS} w-48 !p-1`}
           role="menu"
           aria-label="Layout options"
         >
@@ -60,10 +54,10 @@ export function LeadsLayoutToggle({
               aria-checked={layoutMode === mode}
               onClick={() => onSelect(mode)}
               className={[
-                'flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition-colors',
+                'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors',
                 layoutMode === mode
-                  ? 'bg-neutral-100 font-medium text-neutral-900'
-                  : 'text-neutral-700 hover:bg-neutral-50',
+                  ? 'bg-accent/10 font-medium text-accent'
+                  : 'text-ink-muted hover:bg-surface-muted hover:text-ink',
               ].join(' ')}
             >
               {mode === 'table' ? 'Table view' : 'Cards view'}

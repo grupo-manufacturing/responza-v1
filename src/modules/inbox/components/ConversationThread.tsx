@@ -8,6 +8,12 @@ import { ReactionPicker } from '@/modules/inbox/components/ReactionPicker'
 import { TranslateMessageButton } from '@/modules/inbox/components/TranslateMessageButton'
 import { formatInboxTimestamp } from '@/modules/inbox/inbox.constants'
 import {
+  inboundBubbleClass,
+  inboxThreadBackgroundClass,
+  outboundBubbleClass,
+  outboundMetaClass,
+} from '@/modules/inbox/inbox-ui'
+import {
   formatMessageListPreview,
   inferMediaContentTypeFromPlaceholder,
   isMediaContentType,
@@ -18,8 +24,6 @@ import { isTranslatableMessageContent } from '@/modules/inbox/translation.utils'
 import type { IntegrationPlatform } from '@/modules/integrations/integrations.constants'
 import type { Conversation, Message } from '@/modules/inbox/inbox.service'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
-
-const CHAT_BACKGROUND_CLASS = "bg-[url('/chat-bg.jpg')] bg-repeat bg-auto"
 
 type ConversationThreadProps = {
   readonly conversation: Conversation | null
@@ -40,29 +44,13 @@ type MessageTranslationState =
 
 const MESSAGE_ACTIONS_HEIGHT_CLASS = 'pt-9'
 
-function outboundBubbleClass(platform: IntegrationPlatform | null | undefined): string {
-  if (platform === 'whatsapp') {
-    return 'bg-[#DCF8C6] text-neutral-900'
-  }
-
-  return 'bg-neutral-900 text-white'
-}
-
-function outboundMetaClass(platform: IntegrationPlatform | null | undefined): string {
-  if (platform === 'whatsapp') {
-    return 'text-neutral-500'
-  }
-
-  return 'text-neutral-300'
-}
-
 function MessageReactions({ message }: { readonly message: Message }) {
   if (message.customerReaction === null && message.agentReaction === null) {
     return null
   }
 
   return (
-    <div className="absolute -top-2 right-1 z-10 inline-flex items-center gap-0.5 rounded-full border border-neutral-200 bg-white px-1.5 py-0.5 text-sm shadow-sm">
+    <div className="absolute -top-2 right-1 z-10 inline-flex items-center gap-0.5 rounded-full border border-border bg-white px-1.5 py-0.5 text-sm shadow-soft">
       {message.customerReaction !== null && <span>{message.customerReaction}</span>}
       {message.agentReaction !== null && <span>{message.agentReaction}</span>}
     </div>
@@ -208,7 +196,7 @@ export function ConversationThread({
   }
 
   return (
-    <div className={['flex min-h-0 flex-1 flex-col', CHAT_BACKGROUND_CLASS].join(' ')}>
+    <div className={['flex min-h-0 flex-1 flex-col', inboxThreadBackgroundClass(platform)].join(' ')}>
       {loading && (
         <div className="flex flex-1 items-center justify-center py-16">
           <Spinner />
@@ -217,7 +205,7 @@ export function ConversationThread({
 
       {!loading && conversation === null && (
         <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 text-center">
-          <p className="text-sm font-bold text-black-500">
+          <p className="text-sm text-ink-muted">
             Messages will appear here once you open a conversation.
           </p>
         </div>
@@ -235,7 +223,7 @@ export function ConversationThread({
           )}
 
           {messages.length === 0 && (
-            <p className="py-8 text-center text-sm text-neutral-500">
+            <p className="py-8 text-center text-sm text-ink-muted">
               No messages in this conversation yet.
             </p>
           )}
@@ -294,7 +282,7 @@ export function ConversationThread({
                       ].join(' ')}
                     >
                       {showActions && (
-                        <div className="absolute top-0 right-0 z-20 flex items-center gap-0.5 rounded-full border border-neutral-200 bg-white p-0.5 shadow-sm opacity-0 transition-opacity group-hover:opacity-100">
+                        <div className="absolute top-0 right-0 z-20 flex items-center gap-0.5 rounded-full border border-border bg-white/95 p-0.5 shadow-soft opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
                           {canReact && (
                             <ReactionPicker
                               disabled={reactDisabled}
@@ -327,7 +315,7 @@ export function ConversationThread({
                             : 'px-4 py-2.5',
                           isOutbound
                             ? outboundBubbleClass(platform)
-                            : 'border border-neutral-200 bg-white text-neutral-900',
+                            : inboundBubbleClass(),
                           message.status === 'failed' ? 'ring-2 ring-red-300' : '',
                         ].join(' ')}
                       >
@@ -365,7 +353,7 @@ export function ConversationThread({
                         <div
                           className={[
                             'mt-1 flex items-center justify-end gap-1.5 text-xs',
-                            isOutbound ? outboundMetaClass(platform) : 'text-neutral-400',
+                            isOutbound ? outboundMetaClass(platform) : 'text-ink-faint',
                           ].join(' ')}
                         >
                           {isOutbound && (
@@ -382,7 +370,7 @@ export function ConversationThread({
                       <button
                         type="button"
                         onClick={() => handleShowOriginal(message.id)}
-                        className="mt-1 self-start text-xs font-medium text-neutral-500 transition-colors hover:text-neutral-800"
+                        className="mt-1 self-start text-xs font-medium text-accent transition-colors hover:underline"
                       >
                         Show original
                       </button>

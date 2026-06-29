@@ -1,8 +1,8 @@
 export function InboxEmptyState() {
   return (
     <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 text-center">
-      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100">
-        <svg className="h-6 w-6 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-accent/10">
+        <svg className="h-6 w-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -11,8 +11,8 @@ export function InboxEmptyState() {
           />
         </svg>
       </div>
-      <p className="text-sm font-medium text-neutral-900">No conversations yet</p>
-      <p className="mt-1 max-w-xs text-sm text-neutral-500">
+      <p className="text-sm font-medium text-ink">No conversations yet</p>
+      <p className="mt-1 max-w-xs text-sm text-ink-muted">
         New messages will appear here once your connected platforms start receiving traffic.
       </p>
     </div>

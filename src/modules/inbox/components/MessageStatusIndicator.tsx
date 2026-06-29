@@ -17,10 +17,10 @@ function SingleCheck({ className }: { readonly className: string }) {
 
 function sentCheckClass(platform: IntegrationPlatform | null | undefined): string {
   if (platform === 'whatsapp') {
-    return 'h-3.5 w-3.5 text-neutral-500'
+    return 'h-3.5 w-3.5 text-ink-faint'
   }
 
-  return 'h-3.5 w-3.5 text-neutral-400'
+  return 'h-3.5 w-3.5 text-ink-faint'
 }
 
 function readCheckClass(): string {

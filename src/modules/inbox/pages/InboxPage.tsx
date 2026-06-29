@@ -32,13 +32,14 @@ import {
   updateThreadFirstPage,
 } from '@/modules/inbox/lib/inboxQueryData'
 import { formatMessageListPreview } from '@/modules/inbox/inbox.preview'
+import { INBOX_PANEL_HEADER_CLASS, INBOX_SHELL_CLASS } from '@/modules/inbox/inbox-ui'
 import { InboxService, type Message } from '@/modules/inbox/inbox.service'
 import { useSubscriptionGate } from '@/shared/hooks/useSubscriptionGate'
 import { useSession } from '@/shared/hooks/useSession'
 import { SessionStorage } from '@/shared/session/storage'
 import { getApiErrorDetails, getApiErrorMessage } from '@/shared/utils/api-error'
 
-const LIST_COLUMN_CLASS = 'w-full lg:w-[280px] lg:shrink-0'
+const LIST_COLUMN_CLASS = 'w-full lg:w-[300px] lg:shrink-0'
 
 type SendMessageErrorDetails = {
   message?: Message
@@ -369,16 +370,16 @@ export function InboxPage() {
         </Alert>
       )}
 
-      <div className="flex min-h-0 flex-1 overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
+      <div className={INBOX_SHELL_CLASS}>
         <div className="flex min-h-0 flex-1">
           <div
             className={[
               LIST_COLUMN_CLASS,
-              'flex min-h-0 flex-col border-neutral-200 lg:border-r',
+              'flex min-h-0 flex-col border-border lg:border-r',
               mobileShowThread ? 'hidden lg:flex' : 'flex',
             ].join(' ')}
           >
-            <div className="flex shrink-0 border-b border-neutral-200 px-3 py-2.5">
+            <div className={INBOX_PANEL_HEADER_CLASS}>
               <PlatformTabs value={platformFilter} onChange={handlePlatformFilterChange} />
             </div>
 
@@ -406,7 +407,7 @@ export function InboxPage() {
               mobileShowThread ? 'flex' : 'hidden lg:flex',
             ].join(' ')}
           >
-            <div className="flex shrink-0 border-b border-neutral-200 px-4 py-2.5">
+            <div className={INBOX_PANEL_HEADER_CLASS}>
               <ConversationThreadHeader
                 conversation={activeConversation}
                 participants={participants}

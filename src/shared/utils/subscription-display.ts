@@ -13,9 +13,9 @@ export function subscriptionStatusLabel(status: string): string {
 }
 
 export function subscriptionBadgeClass(status: string): string {
-  if (status === 'active') return 'bg-neutral-900 text-white ring-neutral-900'
-  if (status === 'trialing') return 'bg-neutral-100 text-neutral-800 ring-neutral-300'
-  return 'bg-neutral-100 text-neutral-500 ring-neutral-200'
+  if (status === 'active') return 'border border-accent/25 bg-accent/10 text-accent ring-accent/15'
+  if (status === 'trialing') return 'border border-accent-warm/25 bg-accent-warm/10 text-accent-warm ring-accent-warm/15'
+  return 'border border-border bg-surface-muted text-ink-muted ring-border'
 }
 
 export function subscriptionBadgeText(status: string, hasAccess: boolean): string {

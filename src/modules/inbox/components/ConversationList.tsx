@@ -4,6 +4,7 @@ import { Spinner } from '@/components/ui/Spinner'
 import { ContactAvatar } from '@/modules/inbox/components/ContactAvatar'
 import { InboxEmptyState } from '@/modules/inbox/components/InboxEmptyState'
 import { formatInboxTimestamp } from '@/modules/inbox/inbox.constants'
+import { listItemSelectedClass } from '@/modules/inbox/inbox-ui'
 import type { ConversationListItem } from '@/modules/inbox/inbox.service'
 
 type ConversationListProps = {
@@ -53,7 +54,7 @@ export function ConversationList({
   }
 
   return (
-    <ul className="min-h-0 flex-1 divide-y divide-neutral-100 overflow-y-auto">
+    <ul className="min-h-0 flex-1 divide-y divide-border overflow-y-auto">
       {conversations.map((conversation) => {
         const isSelected = conversation.id === selectedId
 
@@ -63,9 +64,8 @@ export function ConversationList({
               type="button"
               onClick={() => onSelect(conversation)}
               className={[
-                'flex w-full items-start gap-3 px-4 py-3 text-left transition-colors',
-                isSelected ? 'bg-neutral-100' : 'hover:bg-neutral-50',
-                conversation.platform === 'whatsapp' && isSelected ? 'border-l-2 border-[#25D366]' : '',
+                'flex w-full items-center gap-3 px-3 py-3 text-left transition-colors sm:px-4',
+                listItemSelectedClass(conversation.platform, isSelected),
               ].join(' ')}
             >
               <ContactAvatar
@@ -75,20 +75,15 @@ export function ConversationList({
               />
 
               <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="truncate text-sm font-medium text-neutral-900">
-                    {conversation.displayName}
-                  </p>
-                  <span className="shrink-0 text-xs text-neutral-500">
-                    {formatInboxTimestamp(conversation.lastMessageAt)}
-                  </span>
-                </div>
+                <p className="truncate text-sm font-medium text-ink">{conversation.displayName}</p>
                 {conversation.lastMessage !== null && conversation.lastMessage.length > 0 && (
-                  <p className="mt-0.5 truncate text-xs text-neutral-500">
-                    {conversation.lastMessage}
-                  </p>
+                  <p className="mt-0.5 truncate text-xs text-ink-muted">{conversation.lastMessage}</p>
                 )}
               </div>
+
+              <span className="shrink-0 self-center text-xs leading-none whitespace-nowrap text-ink-faint">
+                {formatInboxTimestamp(conversation.lastMessageAt)}
+              </span>
             </button>
           </li>
         )

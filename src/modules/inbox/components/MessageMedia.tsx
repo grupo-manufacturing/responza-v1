@@ -20,14 +20,14 @@ function mediaBorderClass(
   }
 
   if (isOutbound && platform === 'instagram') {
-    return 'border border-neutral-300'
+    return 'border border-border'
   }
 
   if (platform === 'instagram') {
     return 'border border-[#E1306C]/30'
   }
 
-  return 'border border-neutral-200'
+  return 'border border-border'
 }
 
 function mediaLoadErrorLabel(contentType: MediaContentType): string {
@@ -110,7 +110,7 @@ export function MessageMedia({
       className={[
         'inline-flex max-w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium underline-offset-2 hover:underline',
         borderClass,
-        isOutbound ? 'text-inherit' : 'text-neutral-900',
+        isOutbound ? 'text-inherit' : 'text-ink',
       ].join(' ')}
     >
       <span aria-hidden="true">📄</span>

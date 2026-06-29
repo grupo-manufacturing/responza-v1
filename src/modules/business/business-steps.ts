@@ -9,6 +9,7 @@ import {
   type CustomerTone,
 } from './business.constants'
 import type { CompleteBusinessPayload } from './business.service'
+import { APP_TEXTAREA_CLASS } from '@/shared/ui/app-ui'
 
 export type BusinessDetailsFormData = {
   brandAndProducts: string
@@ -135,8 +136,4 @@ export function canProceedStep(step: FormStep, formData: BusinessDetailsFormData
   return formData[step.field] !== ''
 }
 
-export const businessInputClassName =
-  'w-full resize-none rounded-xl border border-neutral-200 bg-white px-4 py-3 text-base leading-relaxed text-neutral-900 outline-none transition-all duration-300 placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-2 focus:ring-neutral-900/10'
-
-export const businessPrimaryButtonClassName =
-  'inline-flex items-center justify-center gap-2 rounded-xl bg-neutral-900 px-7 py-3 text-base font-semibold text-white transition-all duration-200 hover:bg-neutral-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50'
+export const businessInputClassName = `${APP_TEXTAREA_CLASS} px-4 py-3 text-base`

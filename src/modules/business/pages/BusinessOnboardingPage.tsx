@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 
+import { Alert } from '@/components/ui/Alert'
 import { Spinner, SpinnerOverlay } from '@/components/ui/Spinner'
 import { BusinessService } from '@/modules/business/business.service'
+import { AppButton, AppCard, AppFlowLayout, AppProgressBar } from '@/shared/ui/app-ui'
+import { LandingLogo } from '@/shared/ui/brand-ui'
 import { SessionStorage } from '@/shared/session/storage'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
 
@@ -11,7 +14,6 @@ import {
   BUSINESS_ONBOARDING_STEPS,
   EMPTY_BUSINESS_FORM,
   buildCompletePayload,
-  businessPrimaryButtonClassName,
   canProceedStep,
   type BusinessDetailsFormData,
 } from '../business-steps'
@@ -76,7 +78,7 @@ export function BusinessOnboardingPage() {
   const canProceed = canProceedStep(currentStepData, formData)
 
   if (isHydrating) {
-    return <SpinnerOverlay label="Preparing your setup..." className="bg-neutral-50" />
+    return <SpinnerOverlay label="Preparing your setup..." />
   }
 
   if (alreadyCompleted) {
@@ -84,42 +86,29 @@ export function BusinessOnboardingPage() {
   }
 
   return (
-    <div className="relative flex h-dvh flex-col overflow-hidden bg-neutral-50">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-        <div className="absolute -left-20 top-1/4 h-72 w-72 rounded-full bg-neutral-200/40 blur-3xl" />
-        <div className="absolute -right-16 bottom-1/4 h-80 w-80 rounded-full bg-neutral-300/30 blur-3xl" />
-        <div className="absolute left-1/2 top-8 h-56 w-56 -translate-x-1/2 rounded-full bg-white blur-3xl" />
-      </div>
-
-      <div className="relative mx-auto flex w-full max-w-4xl flex-1 flex-col gap-5 px-6 py-6 sm:gap-6 sm:px-8 sm:py-8">
+    <AppFlowLayout maxWidthClass="max-w-4xl">
+      <div className="flex flex-col gap-5 sm:gap-6">
         <header className="shrink-0 text-center">
-          <Link to="/" className="inline-flex items-center gap-2 transition-opacity hover:opacity-80">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-neutral-900 text-sm font-bold text-white shadow-md">
-              R
-            </div>
-            <span className="text-lg font-semibold text-neutral-900">Responza AI</span>
-          </Link>
-          <h1 className="mt-2 text-2xl font-bold text-neutral-900 sm:text-3xl">
-            Set up your business details
+          <div className="mb-4 flex justify-center">
+            <LandingLogo variant="light" />
+          </div>
+          <h1 className="text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+            Set up your <span className="text-accent-gradient">business details</span>
           </h1>
+          <p className="mt-2 text-sm text-ink-muted">
+            Help Responza learn your brand voice for smarter replies.
+          </p>
         </header>
 
-        <div className="flex shrink-0 items-center gap-3">
-          <div className="relative h-2.5 min-w-0 flex-1 overflow-hidden rounded-full bg-neutral-200">
-            <div
-              className="h-full rounded-full bg-neutral-900 transition-all duration-500 ease-out"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-          <span className="shrink-0 text-sm font-semibold text-neutral-600">
-            Step {currentStep + 1} of {BUSINESS_ONBOARDING_STEPS.length}
-          </span>
-        </div>
+        <AppProgressBar
+          value={progress}
+          label={`Step ${currentStep + 1} of ${BUSINESS_ONBOARDING_STEPS.length}`}
+        />
 
-        <div className="flex w-full shrink-0 flex-col gap-4 rounded-2xl border border-neutral-200 bg-white p-5 shadow-lg shadow-neutral-900/5 sm:gap-5 sm:p-8">
-          {error && (
-            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5">
-              <p className="text-sm text-red-600">{error}</p>
+        <AppCard padding="default" className="sm:p-8">
+          {error !== null && (
+            <div className="mb-4">
+              <Alert variant="error">{error}</Alert>
             </div>
           )}
 
@@ -130,23 +119,17 @@ export function BusinessOnboardingPage() {
             onChange={setFormData}
           />
 
-          <div className="mt-2 flex items-center justify-between gap-3 border-t border-neutral-200 pt-4">
-            <button
-              type="button"
+          <div className="mt-6 flex items-center justify-between gap-3 border-t border-border pt-5">
+            <AppButton
+              variant="secondary"
               onClick={() => setCurrentStep((prev) => prev - 1)}
               disabled={currentStep === 0 || isLoading}
-              className="inline-flex items-center rounded-xl border border-neutral-200 bg-white px-5 py-3 text-base font-medium text-neutral-600 transition-all duration-300 hover:border-neutral-400 hover:bg-neutral-50 hover:text-neutral-900 disabled:cursor-not-allowed disabled:opacity-40"
             >
               Back
-            </button>
+            </AppButton>
 
             {isLastStep ? (
-              <button
-                type="button"
-                onClick={() => void handleSave()}
-                disabled={!canProceed || isLoading}
-                className={businessPrimaryButtonClassName}
-              >
+              <AppButton onClick={() => void handleSave()} disabled={!canProceed || isLoading}>
                 {isLoading ? (
                   <>
                     <Spinner size="sm" variant="white" />
@@ -155,23 +138,18 @@ export function BusinessOnboardingPage() {
                 ) : (
                   'Save & finish setup'
                 )}
-              </button>
+              </AppButton>
             ) : (
-              <button
-                type="button"
-                onClick={handleNext}
-                disabled={!canProceed}
-                className={businessPrimaryButtonClassName}
-              >
+              <AppButton onClick={handleNext} disabled={!canProceed}>
                 Next
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
-              </button>
+              </AppButton>
             )}
           </div>
-        </div>
+        </AppCard>
       </div>
-    </div>
+    </AppFlowLayout>
   )
 }

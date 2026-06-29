@@ -3,7 +3,9 @@ import { useState } from 'react'
 import { Alert } from '@/components/ui/Alert'
 import { Modal } from '@/components/ui/Modal'
 import { leadStatusLabel } from '@/modules/leads/leads.constants'
+import { LEADS_STATUS_BADGE_CLASS } from '@/modules/leads/leads-ui'
 import { LeadsService, type Lead } from '@/modules/leads/leads.service'
+import { AppButton } from '@/shared/ui/app-ui'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
 
 import { LeadFormFields } from './LeadFormFields'
@@ -102,31 +104,27 @@ function LeadModalForm({
 
         <div className="flex flex-col gap-2 pt-2">
           <div className="flex flex-col gap-2 sm:flex-row">
-            <button
+            <AppButton
               type="submit"
               disabled={submitting || values.name.trim().length === 0}
-              className="flex-1 rounded-lg bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex-1"
             >
               {submitting ? 'Saving…' : isCreate ? 'Create lead' : 'Save changes'}
-            </button>
-            <button
-              type="button"
-              disabled={submitting}
-              onClick={onClose}
-              className="flex-1 rounded-lg border border-neutral-300 bg-white px-4 py-2.5 text-sm font-medium text-neutral-900 transition-colors hover:bg-neutral-50 disabled:opacity-50"
-            >
+            </AppButton>
+            <AppButton type="button" variant="secondary" disabled={submitting} onClick={onClose} className="flex-1">
               Cancel
-            </button>
+            </AppButton>
           </div>
           {!isCreate && lead !== null && (
-            <button
+            <AppButton
               type="button"
+              variant="secondary"
               disabled={submitting}
               onClick={() => onDeleteRequest(lead)}
-              className="w-full rounded-lg border border-red-200 bg-white px-4 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50"
+              className="w-full !border-red-200 !text-red-600 hover:!bg-red-50"
             >
               Delete lead
-            </button>
+            </AppButton>
           )}
         </div>
       </form>
@@ -155,50 +153,45 @@ export function LeadModal({
       <Modal open onClose={onClose} title={lead.name} description="Lead details">
         <dl className="space-y-4 text-sm">
           <div>
-            <dt className="font-medium text-neutral-500">Status</dt>
+            <dt className="font-medium text-ink-muted">Status</dt>
             <dd className="mt-1">
-              <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs font-medium text-neutral-800">
-                {leadStatusLabel(lead.status)}
-              </span>
+              <span className={LEADS_STATUS_BADGE_CLASS}>{leadStatusLabel(lead.status)}</span>
             </dd>
           </div>
           <div>
-            <dt className="font-medium text-neutral-500">Email</dt>
-            <dd className="mt-1 text-neutral-900">{lead.email ?? '—'}</dd>
+            <dt className="font-medium text-ink-muted">Email</dt>
+            <dd className="mt-1 text-ink">{lead.email ?? '—'}</dd>
           </div>
           <div>
-            <dt className="font-medium text-neutral-500">Phone</dt>
-            <dd className="mt-1 text-neutral-900">{lead.phone ?? '—'}</dd>
+            <dt className="font-medium text-ink-muted">Phone</dt>
+            <dd className="mt-1 text-ink">{lead.phone ?? '—'}</dd>
           </div>
           <div>
-            <dt className="font-medium text-neutral-500">Notes</dt>
-            <dd className="mt-1 whitespace-pre-wrap text-neutral-900">{lead.notes ?? '—'}</dd>
+            <dt className="font-medium text-ink-muted">Notes</dt>
+            <dd className="mt-1 whitespace-pre-wrap text-ink">{lead.notes ?? '—'}</dd>
           </div>
           <div>
-            <dt className="font-medium text-neutral-500">Created</dt>
-            <dd className="mt-1 text-neutral-900">{new Date(lead.createdAt).toLocaleString()}</dd>
+            <dt className="font-medium text-ink-muted">Created</dt>
+            <dd className="mt-1 text-ink">{new Date(lead.createdAt).toLocaleString()}</dd>
           </div>
           <div>
-            <dt className="font-medium text-neutral-500">Last updated</dt>
-            <dd className="mt-1 text-neutral-900">{new Date(lead.updatedAt).toLocaleString()}</dd>
+            <dt className="font-medium text-ink-muted">Last updated</dt>
+            <dd className="mt-1 text-ink">{new Date(lead.updatedAt).toLocaleString()}</dd>
           </div>
         </dl>
 
         <div className="mt-6 flex flex-col gap-2">
-          <button
+          <AppButton
             type="button"
+            variant="secondary"
             onClick={() => onDeleteRequest(lead)}
-            className="w-full rounded-lg border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
+            className="w-full !border-red-200 !text-red-600 hover:!bg-red-50"
           >
             Delete lead
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-900 transition-colors hover:bg-neutral-50"
-          >
+          </AppButton>
+          <AppButton type="button" variant="secondary" onClick={onClose} className="w-full">
             Close
-          </button>
+          </AppButton>
         </div>
       </Modal>
     )
@@ -222,29 +215,28 @@ export function LeadModal({
 
     return (
       <Modal open onClose={onClose} title="Delete lead" description="This action cannot be undone.">
-        <p className="text-sm text-neutral-700">
-          Permanently delete <span className="font-semibold text-neutral-900">{lead.name}</span>?
+        <p className="text-sm text-ink-muted">
+          Permanently delete <span className="font-semibold text-ink">{lead.name}</span>?
         </p>
 
-        {deleteError !== null && <Alert variant="error" className="mt-4">{deleteError}</Alert>}
+        {deleteError !== null && (
+          <Alert variant="error" className="mt-4">
+            {deleteError}
+          </Alert>
+        )}
 
         <div className="mt-6 flex flex-col gap-2 sm:flex-row">
-          <button
+          <AppButton
             type="button"
             disabled={deleting}
             onClick={() => void handleDelete()}
-            className="flex-1 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex-1 !bg-red-600 hover:!bg-red-700"
           >
             {deleting ? 'Deleting…' : 'Delete permanently'}
-          </button>
-          <button
-            type="button"
-            disabled={deleting}
-            onClick={onClose}
-            className="flex-1 rounded-lg border border-neutral-300 bg-white px-4 py-2.5 text-sm font-medium text-neutral-900 transition-colors hover:bg-neutral-50 disabled:opacity-50"
-          >
+          </AppButton>
+          <AppButton type="button" variant="secondary" disabled={deleting} onClick={onClose} className="flex-1">
             Cancel
-          </button>
+          </AppButton>
         </div>
       </Modal>
     )

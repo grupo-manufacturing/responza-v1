@@ -1,3 +1,4 @@
+import { AppButton } from '@/shared/ui/app-ui'
 import { ConnectedAccountProfile } from '@/modules/integrations/components/ConnectedAccountProfile'
 import {
   INTEGRATION_PLATFORM_DESCRIPTIONS,
@@ -26,17 +27,19 @@ type IntegrationRowProps = {
 
 function StatusIndicator({ connected }: { connected: boolean }) {
   return (
-    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-500">
+    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-ink-muted">
       <span
-        className={[
-          'h-1.5 w-1.5 rounded-full',
-          connected ? 'bg-emerald-500' : 'bg-neutral-300',
-        ].join(' ')}
+        className={['h-1.5 w-1.5 rounded-full', connected ? 'bg-emerald-500' : 'bg-border'].join(' ')}
         aria-hidden
       />
       {connected ? 'Connected' : 'Not connected'}
     </span>
   )
+}
+
+const CONNECT_BUTTON_CLASS: Partial<Record<IntegrationPlatform, string>> = {
+  whatsapp: '!bg-brand-whatsapp hover:!bg-brand-whatsapp/90',
+  instagram: '!bg-gradient-to-r !from-[#405DE6] !to-brand-instagram hover:opacity-90',
 }
 
 export function IntegrationRow({
@@ -61,18 +64,11 @@ export function IntegrationRow({
             ? 'Reconnect'
             : 'Connect'
 
-  const connectButtonClass =
-    platform === 'whatsapp'
-      ? 'bg-[#128C7E] hover:bg-[#0f7a6d]'
-      : platform === 'instagram'
-        ? 'bg-neutral-900 hover:bg-neutral-800'
-        : 'bg-neutral-900 hover:bg-neutral-800'
-
   return (
-    <article className="px-6 py-5">
+    <article className="px-5 py-5 sm:px-6">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 flex-1 gap-4">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-neutral-100 bg-neutral-50 p-1.5">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-border bg-surface-muted/80 p-2">
             <img
               src={INTEGRATION_PLATFORM_LOGOS[platform]}
               alt=""
@@ -82,9 +78,7 @@ export function IntegrationRow({
 
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-              <h2 className="text-base font-semibold text-neutral-900">
-                {integrationPlatformLabel(platform)}
-              </h2>
+              <h2 className="text-base font-semibold text-ink">{integrationPlatformLabel(platform)}</h2>
               {!comingSoon && <StatusIndicator connected={isConnected} />}
             </div>
 
@@ -94,7 +88,7 @@ export function IntegrationRow({
                   displayName={whatsappDetails.display_name}
                   profilePictureUrl={whatsappDetails.profile_picture_url}
                   fallbackInitial={whatsappDetails.display_name ?? 'W'}
-                  avatarClassName="bg-[#DCF8C6] text-[#128C7E]"
+                  avatarClassName="bg-brand-whatsapp/15 text-brand-whatsapp"
                 />
               </div>
             ) : platform === 'instagram' && isConnected && instagramDetails !== null ? (
@@ -105,47 +99,41 @@ export function IntegrationRow({
                   }
                   profilePictureUrl={instagramDetails.profile_picture_url}
                   fallbackInitial={instagramDetails.username ?? 'I'}
-                  avatarClassName="bg-gradient-to-br from-[#405DE6] to-[#E1306C] text-white"
+                  avatarClassName="bg-gradient-to-br from-[#405DE6] to-brand-instagram text-white"
                 />
               </div>
             ) : (
-              <p className="mt-1.5 text-sm leading-relaxed text-neutral-500">
+              <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">
                 {INTEGRATION_PLATFORM_DESCRIPTIONS[platform]}
               </p>
             )}
 
-            {!isConnected && (
-              <p className="sr-only">{integrationStatusLabel(status)}</p>
-            )}
+            {!isConnected && <p className="sr-only">{integrationStatusLabel(status)}</p>}
           </div>
         </div>
 
         <div className="flex shrink-0 sm:pl-4">
           {comingSoon ? (
-            <span className="inline-flex items-center justify-center rounded-lg border border-dashed border-neutral-300 bg-neutral-50 px-4 py-2 text-sm font-medium text-neutral-600">
-              Coming Soon !
+            <span className="inline-flex items-center justify-center rounded-[var(--radius-pill)] border border-dashed border-border bg-surface-muted px-4 py-2 text-sm font-medium text-ink-muted">
+              Coming soon
             </span>
           ) : (
-            <div className="flex gap-2">
-              <button
-                type="button"
+            <div className="flex flex-wrap gap-2">
+              <AppButton
                 disabled={busy}
                 onClick={() => onConnect(platform)}
-                className={[
-                  'inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50',
-                  connectButtonClass,
-                ].join(' ')}
+                className={['!px-4 !py-2', CONNECT_BUTTON_CLASS[platform] ?? ''].join(' ')}
               >
                 {connectLabel}
-              </button>
-              <button
-                type="button"
+              </AppButton>
+              <AppButton
+                variant="secondary"
                 disabled={busy || !isConnected}
                 onClick={() => onDisconnect(platform)}
-                className="inline-flex items-center justify-center rounded-lg border border-neutral-200 bg-white px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:border-neutral-300 hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="!px-4 !py-2"
               >
                 {busy && isConnected ? 'Disconnecting…' : 'Disconnect'}
-              </button>
+              </AppButton>
             </div>
           )}
         </div>

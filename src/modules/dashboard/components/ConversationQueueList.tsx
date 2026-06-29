@@ -7,6 +7,9 @@ import type { IntegrationPlatform } from '@/modules/integrations/integrations.co
 
 const MAX_VISIBLE_ITEMS = 5
 
+const QUEUE_ACTION_CLASS =
+  'inline-flex items-center rounded-[var(--radius-pill)] border border-border bg-white/80 px-3 py-1.5 text-xs font-medium leading-none text-ink transition-colors hover:border-accent/30 hover:bg-accent/5 hover:text-accent'
+
 type ConversationQueueListProps = {
   readonly conversations: ConversationListItem[]
   readonly emptyMessage: string
@@ -25,13 +28,13 @@ export function ConversationQueueList({
   if (conversations.length === 0) {
     return (
       <div className="flex h-full items-center justify-center px-6 py-10 text-center">
-        <p className="text-sm text-neutral-600">{emptyMessage}</p>
+        <p className="text-sm text-ink-muted">{emptyMessage}</p>
       </div>
     )
   }
 
   return (
-    <ul className="divide-y divide-neutral-100">
+    <ul className="divide-y divide-border">
       {conversations.slice(0, MAX_VISIBLE_ITEMS).map((conversation) => {
         const platform = isIntegrationPlatform(conversation.platform)
           ? conversation.platform
@@ -39,7 +42,7 @@ export function ConversationQueueList({
 
         return (
           <li key={conversation.id}>
-            <div className="flex items-center gap-3 px-5 py-3">
+            <div className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-surface-muted/60">
               <ContactAvatar
                 displayName={conversation.displayName}
                 avatarUrl={conversation.avatarUrl}
@@ -48,25 +51,20 @@ export function ConversationQueueList({
               />
 
               <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="truncate text-sm font-medium text-neutral-900">
-                    {conversation.displayName}
-                  </p>
-                  <span className="shrink-0 text-xs text-neutral-500">
-                    {formatInboxTimestamp(conversation.lastMessageAt)}
-                  </span>
-                </div>
+                <p className="truncate text-sm font-medium text-ink">{conversation.displayName}</p>
                 {conversation.lastMessage !== null && conversation.lastMessage.length > 0 && (
-                  <p className="mt-0.5 truncate text-xs text-neutral-500">{conversation.lastMessage}</p>
+                  <p className="mt-0.5 truncate text-xs text-ink-muted">{conversation.lastMessage}</p>
                 )}
               </div>
 
-              <Link
-                to={`/inbox?conversation=${conversation.id}`}
-                className="shrink-0 rounded-lg border border-neutral-200 px-3 py-1.5 text-xs font-medium text-neutral-900 transition-colors hover:bg-neutral-50"
-              >
-                {actionLabel}
-              </Link>
+              <div className="flex shrink-0 items-center gap-2">
+                <span className="text-xs leading-none whitespace-nowrap text-ink-faint">
+                  {formatInboxTimestamp(conversation.lastMessageAt)}
+                </span>
+                <Link to={`/inbox?conversation=${conversation.id}`} className={QUEUE_ACTION_CLASS}>
+                  {actionLabel}
+                </Link>
+              </div>
             </div>
           </li>
         )

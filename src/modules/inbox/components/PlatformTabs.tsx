@@ -3,7 +3,7 @@ import {
   inboxPlatformFilterLabel,
   type InboxPlatformFilter,
 } from '@/modules/inbox/inbox.constants'
-import { platformTabActiveClass } from '@/modules/inbox/components/PlatformBadge'
+import { platformTabActiveClass } from '@/modules/inbox/inbox-ui'
 
 type PlatformTabsProps = {
   readonly value: InboxPlatformFilter
@@ -13,7 +13,7 @@ type PlatformTabsProps = {
 export function PlatformTabs({ value, onChange }: PlatformTabsProps) {
   return (
     <div className="w-full overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      <div className="flex min-w-max gap-1">
+      <div className="flex min-w-max gap-1.5">
         {INBOX_PLATFORM_FILTERS.map((filter) => {
           const isActive = value === filter
           const label = inboxPlatformFilterLabel(filter)
@@ -25,7 +25,7 @@ export function PlatformTabs({ value, onChange }: PlatformTabsProps) {
               aria-pressed={isActive}
               onClick={() => onChange(filter)}
               className={[
-                'shrink-0 rounded-lg px-2.5 py-2 text-xs font-medium whitespace-nowrap transition-colors',
+                'shrink-0 rounded-[var(--radius-pill)] px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-all duration-200',
                 platformTabActiveClass(filter, isActive),
               ].join(' ')}
             >

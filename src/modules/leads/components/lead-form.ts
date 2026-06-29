@@ -1,8 +1,10 @@
 import type { LeadStatus } from '@/modules/leads/leads.constants'
 import type { Lead } from '@/modules/leads/leads.service'
+import { APP_INPUT_CLASS, APP_TEXTAREA_CLASS } from '@/shared/ui/app-ui'
 
-export const leadInputClassName =
-  'mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-1 focus:ring-neutral-900'
+export const leadInputClassName = APP_INPUT_CLASS
+
+export const leadTextareaClassName = `${APP_TEXTAREA_CLASS} mt-1`
 
 export type LeadFormValues = {
   name: string

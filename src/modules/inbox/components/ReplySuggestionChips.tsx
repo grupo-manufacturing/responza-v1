@@ -30,15 +30,13 @@ export function ReplySuggestionChips({
           <button
             key={`${index}-${suggestion.slice(0, 24)}`}
             type="button"
-            onClick={() => {
-              onSelect(suggestion)
-            }}
+            onClick={() => onSelect(suggestion)}
             disabled={disabled}
             className={[
-              'min-w-0 rounded-2xl border border-violet-200/90 bg-violet-50/95 px-2.5 py-1.5 text-left text-[11px] leading-snug text-violet-900 shadow-sm backdrop-blur-sm transition-colors',
+              'min-w-0 rounded-2xl border border-accent-violet/25 bg-accent-violet/10 px-2.5 py-1.5 text-left text-[11px] leading-snug text-ink shadow-soft backdrop-blur-sm transition-colors',
               disabled
                 ? 'cursor-not-allowed opacity-50'
-                : 'hover:border-violet-300 hover:bg-violet-100/95',
+                : 'hover:border-accent-violet/40 hover:bg-accent-violet/15',
             ].join(' ')}
           >
             <span className="line-clamp-3">{suggestion}</span>
@@ -50,7 +48,7 @@ export function ReplySuggestionChips({
         onClick={onDismiss}
         aria-label="Dismiss suggestions"
         title="Dismiss suggestions"
-        className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-neutral-200/80 bg-white/90 text-neutral-500 shadow-sm backdrop-blur-sm transition-colors hover:bg-white hover:text-neutral-700"
+        className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border bg-white/90 text-ink-muted shadow-soft backdrop-blur-sm transition-colors hover:bg-surface-muted hover:text-ink"
       >
         <DismissSuggestionsIcon />
       </button>
