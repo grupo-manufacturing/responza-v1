@@ -3,29 +3,30 @@ import { Navigate, useNavigate } from 'react-router-dom'
 
 import { Alert } from '@/components/ui/Alert'
 import { Spinner, SpinnerOverlay } from '@/components/ui/Spinner'
-import { BusinessService } from '@/modules/business/business.service'
-import { AppButton, AppCard, AppFlowLayout, AppProgressBar } from '@/shared/ui/app-ui'
+import { BusinessOnboardingForm } from '@/modules/business/components/BusinessOnboardingForm'
+import {
+  BUSINESS_DESCRIPTION_MIN_LENGTH,
+  EMPTY_BUSINESS_ONBOARDING_FORM,
+  canSubmitBusinessOnboarding,
+  optionalUrlForPayload,
+  type BusinessOnboardingFormData,
+} from '@/modules/business/business-onboarding'
+import { BusinessService, type CatalogueFile } from '@/modules/business/business.service'
+import { AppButton, AppCard, AppFlowLayout } from '@/shared/ui/app-ui'
 import { LandingLogo } from '@/shared/ui/brand-ui'
 import { SessionStorage } from '@/shared/session/storage'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
 
-import { BusinessStepForm } from '../components/BusinessStepForm'
-import {
-  BUSINESS_ONBOARDING_STEPS,
-  EMPTY_BUSINESS_FORM,
-  buildCompletePayload,
-  canProceedStep,
-  type BusinessDetailsFormData,
-} from '../business-steps'
-
 export function BusinessOnboardingPage() {
   const navigate = useNavigate()
-  const [currentStep, setCurrentStep] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
   const [isHydrating, setIsHydrating] = useState(true)
   const [alreadyCompleted, setAlreadyCompleted] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [formData, setFormData] = useState<BusinessDetailsFormData>(EMPTY_BUSINESS_FORM)
+  const [formData, setFormData] = useState<BusinessOnboardingFormData>(EMPTY_BUSINESS_ONBOARDING_FORM)
+  const [catalogueFiles, setCatalogueFiles] = useState<CatalogueFile[]>([])
+  const [uploadingCatalogue, setUploadingCatalogue] = useState(false)
+  const [removingCatalogueId, setRemovingCatalogueId] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -33,9 +34,20 @@ export function BusinessOnboardingPage() {
     void BusinessService.getBusiness()
       .then(({ profile }) => {
         if (cancelled) return
+
         if (profile.completed) {
           setAlreadyCompleted(true)
+          return
         }
+
+        setFormData({
+          brandName: profile.brandName ?? '',
+          websiteUrl: profile.websiteUrl ?? '',
+          facebookPageUrl: profile.facebookPageUrl ?? '',
+          instagramPageUrl: profile.instagramPageUrl ?? '',
+          businessDescription: profile.businessDescription ?? '',
+        })
+        setCatalogueFiles(profile.catalogueFiles)
       })
       .catch(() => {
       })
@@ -50,10 +62,29 @@ export function BusinessOnboardingPage() {
     }
   }, [])
 
-  const handleNext = () => {
+  const handleUploadCatalogue = async (file: File) => {
+    setUploadingCatalogue(true)
     setError(null)
-    if (currentStep < BUSINESS_ONBOARDING_STEPS.length - 1) {
-      setCurrentStep((prev) => prev + 1)
+
+    try {
+      const result = await BusinessService.uploadCatalogue(file)
+      setCatalogueFiles(result.profile.catalogueFiles)
+    } finally {
+      setUploadingCatalogue(false)
+    }
+  }
+
+  const handleRemoveCatalogue = async (fileId: string) => {
+    setRemovingCatalogueId(fileId)
+    setError(null)
+
+    try {
+      const result = await BusinessService.deleteCatalogue(fileId)
+      setCatalogueFiles(result.profile.catalogueFiles)
+    } catch (err: unknown) {
+      setError(getApiErrorMessage(err, 'Could not remove catalogue file. Please try again.'))
+    } finally {
+      setRemovingCatalogueId(null)
     }
   }
 
@@ -62,7 +93,13 @@ export function BusinessOnboardingPage() {
     setError(null)
 
     try {
-      await BusinessService.completeBusiness(buildCompletePayload(formData))
+      await BusinessService.completeBusiness({
+        brandName: formData.brandName.trim(),
+        websiteUrl: optionalUrlForPayload(formData.websiteUrl),
+        facebookPageUrl: optionalUrlForPayload(formData.facebookPageUrl),
+        instagramPageUrl: optionalUrlForPayload(formData.instagramPageUrl),
+        businessDescription: formData.businessDescription.trim(),
+      })
       SessionStorage.setBusinessDetailsCompleted(true)
       navigate('/dashboard', { replace: true })
     } catch (err: unknown) {
@@ -72,10 +109,7 @@ export function BusinessOnboardingPage() {
     }
   }
 
-  const currentStepData = BUSINESS_ONBOARDING_STEPS[currentStep]
-  const isLastStep = currentStep === BUSINESS_ONBOARDING_STEPS.length - 1
-  const progress = ((currentStep + 1) / BUSINESS_ONBOARDING_STEPS.length) * 100
-  const canProceed = canProceedStep(currentStepData, formData)
+  const canSubmit = canSubmitBusinessOnboarding(formData)
 
   if (isHydrating) {
     return <SpinnerOverlay />
@@ -86,24 +120,20 @@ export function BusinessOnboardingPage() {
   }
 
   return (
-    <AppFlowLayout maxWidthClass="max-w-4xl">
+    <AppFlowLayout maxWidthClass="max-w-3xl">
       <div className="flex flex-col gap-5 sm:gap-6">
         <header className="shrink-0 text-center">
           <div className="mb-4 flex justify-center">
             <LandingLogo variant="light" />
           </div>
           <h1 className="text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-            Set up your <span className="text-accent-gradient">business details</span>
+            Tell us about your <span className="text-accent-gradient">business</span>
           </h1>
           <p className="mt-2 text-sm text-ink-muted">
-            Help Responza learn your brand voice for smarter replies.
+            A few thoughtful details help our AI understand your brand before you start replying to
+            customers.
           </p>
         </header>
-
-        <AppProgressBar
-          value={progress}
-          label={`Step ${currentStep + 1} of ${BUSINESS_ONBOARDING_STEPS.length}`}
-        />
 
         <AppCard padding="default" className="sm:p-8">
           {error !== null && (
@@ -112,42 +142,35 @@ export function BusinessOnboardingPage() {
             </div>
           )}
 
-          <BusinessStepForm
-            step={currentStepData}
-            stepIndex={currentStep}
+          <BusinessOnboardingForm
             formData={formData}
+            catalogueFiles={catalogueFiles}
+            uploadingCatalogue={uploadingCatalogue}
+            removingCatalogueId={removingCatalogueId}
             onChange={setFormData}
+            onUploadCatalogue={handleUploadCatalogue}
+            onRemoveCatalogue={handleRemoveCatalogue}
           />
 
-          <div className="mt-6 flex items-center justify-between gap-3 border-t border-border pt-5">
-            <AppButton
-              variant="secondary"
-              onClick={() => setCurrentStep((prev) => prev - 1)}
-              disabled={currentStep === 0 || isLoading}
-            >
-              Back
+          <div className="mt-8 flex justify-end border-t border-border pt-5">
+            <AppButton onClick={() => void handleSave()} disabled={!canSubmit || isLoading}>
+              {isLoading ? (
+                <>
+                  <Spinner size="sm" variant="white" />
+                  Saving...
+                </>
+              ) : (
+                'Save & finish setup'
+              )}
             </AppButton>
-
-            {isLastStep ? (
-              <AppButton onClick={() => void handleSave()} disabled={!canProceed || isLoading}>
-                {isLoading ? (
-                  <>
-                    <Spinner size="sm" variant="white" />
-                    Saving...
-                  </>
-                ) : (
-                  'Save & finish setup'
-                )}
-              </AppButton>
-            ) : (
-              <AppButton onClick={handleNext} disabled={!canProceed}>
-                Next
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </AppButton>
-            )}
           </div>
+
+          {!canSubmit && formData.businessDescription.trim().length > 0 && (
+            <p className="mt-3 text-right text-xs text-ink-faint">
+              Add your brand name and at least {BUSINESS_DESCRIPTION_MIN_LENGTH} characters about your
+              business to continue.
+            </p>
+          )}
         </AppCard>
       </div>
     </AppFlowLayout>
