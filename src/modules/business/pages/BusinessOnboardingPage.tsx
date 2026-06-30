@@ -7,8 +7,9 @@ import { BusinessOnboardingForm } from '@/modules/business/components/BusinessOn
 import {
   BUSINESS_DESCRIPTION_MIN_LENGTH,
   EMPTY_BUSINESS_ONBOARDING_FORM,
+  businessProfileToFormData,
   canSubmitBusinessOnboarding,
-  optionalUrlForPayload,
+  formDataToBusinessPayload,
   type BusinessOnboardingFormData,
 } from '@/modules/business/business-onboarding'
 import { BusinessService, type CatalogueFile } from '@/modules/business/business.service'
@@ -40,13 +41,7 @@ export function BusinessOnboardingPage() {
           return
         }
 
-        setFormData({
-          brandName: profile.brandName ?? '',
-          websiteUrl: profile.websiteUrl ?? '',
-          facebookPageUrl: profile.facebookPageUrl ?? '',
-          instagramPageUrl: profile.instagramPageUrl ?? '',
-          businessDescription: profile.businessDescription ?? '',
-        })
+        setFormData(businessProfileToFormData(profile))
         setCatalogueFiles(profile.catalogueFiles)
       })
       .catch(() => {
@@ -93,13 +88,7 @@ export function BusinessOnboardingPage() {
     setError(null)
 
     try {
-      await BusinessService.completeBusiness({
-        brandName: formData.brandName.trim(),
-        websiteUrl: optionalUrlForPayload(formData.websiteUrl),
-        facebookPageUrl: optionalUrlForPayload(formData.facebookPageUrl),
-        instagramPageUrl: optionalUrlForPayload(formData.instagramPageUrl),
-        businessDescription: formData.businessDescription.trim(),
-      })
+      await BusinessService.completeBusiness(formDataToBusinessPayload(formData))
       SessionStorage.setBusinessDetailsCompleted(true)
       navigate('/dashboard', { replace: true })
     } catch (err: unknown) {

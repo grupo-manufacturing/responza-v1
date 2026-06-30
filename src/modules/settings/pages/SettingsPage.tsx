@@ -1,18 +1,20 @@
 import { useSearchParams } from 'react-router-dom'
 
+import { BusinessProfilePanel } from '@/modules/settings/components/BusinessProfilePanel'
 import { GeneralSettingsPanel } from '@/modules/settings/components/GeneralSettingsPanel'
 import { SubscriptionPanel } from '@/modules/settings/components/SubscriptionPanel'
 import { AppPage, AppPageHeader } from '@/shared/ui/app-ui'
 
 const TABS = [
   { id: 'general', label: 'General' },
+  { id: 'profile', label: 'Profile' },
   { id: 'subscription', label: 'Subscription' },
 ] as const
 
 type SettingsTab = (typeof TABS)[number]['id']
 
 function isSettingsTab(value: string | null): value is SettingsTab {
-  return value === 'general' || value === 'subscription'
+  return value === 'general' || value === 'profile' || value === 'subscription'
 }
 
 export function SettingsPage() {
@@ -28,11 +30,11 @@ export function SettingsPage() {
     <AppPage className="max-w-4xl">
       <AppPageHeader
         title="Settings"
-        description="Manage your account, translation preferences, and subscription."
+        description="Manage your account, business profile, translation preferences, and subscription."
       />
 
       <nav
-        className="mb-6 flex max-w-sm rounded-[var(--radius-pill)] border border-border bg-surface-muted/80 p-1"
+        className="mb-6 flex max-w-lg rounded-[var(--radius-pill)] border border-border bg-surface-muted/80 p-1"
         aria-label="Settings sections"
       >
         {TABS.map((tab) => (
@@ -53,6 +55,8 @@ export function SettingsPage() {
       </nav>
 
       {activeTab === 'general' && <GeneralSettingsPanel />}
+
+      {activeTab === 'profile' && <BusinessProfilePanel />}
 
       {activeTab === 'subscription' && <SubscriptionPanel />}
     </AppPage>

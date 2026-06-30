@@ -47,3 +47,50 @@ export function optionalUrlForPayload(value: string): string | null {
   const trimmed = value.trim()
   return trimmed.length > 0 ? trimmed : null
 }
+
+export function businessProfileToFormData(profile: {
+  brandName: string | null
+  websiteUrl: string | null
+  facebookPageUrl: string | null
+  instagramPageUrl: string | null
+  businessDescription: string | null
+}): BusinessOnboardingFormData {
+  return {
+    brandName: profile.brandName ?? '',
+    websiteUrl: profile.websiteUrl ?? '',
+    facebookPageUrl: profile.facebookPageUrl ?? '',
+    instagramPageUrl: profile.instagramPageUrl ?? '',
+    businessDescription: profile.businessDescription ?? '',
+  }
+}
+
+export function formDataToBusinessPayload(
+  formData: BusinessOnboardingFormData,
+): {
+  brandName: string
+  websiteUrl: string | null
+  facebookPageUrl: string | null
+  instagramPageUrl: string | null
+  businessDescription: string
+} {
+  return {
+    brandName: formData.brandName.trim(),
+    websiteUrl: optionalUrlForPayload(formData.websiteUrl),
+    facebookPageUrl: optionalUrlForPayload(formData.facebookPageUrl),
+    instagramPageUrl: optionalUrlForPayload(formData.instagramPageUrl),
+    businessDescription: formData.businessDescription.trim(),
+  }
+}
+
+export function isSameBusinessFormData(
+  left: BusinessOnboardingFormData,
+  right: BusinessOnboardingFormData,
+): boolean {
+  return (
+    left.brandName === right.brandName &&
+    left.websiteUrl === right.websiteUrl &&
+    left.facebookPageUrl === right.facebookPageUrl &&
+    left.instagramPageUrl === right.instagramPageUrl &&
+    left.businessDescription === right.businessDescription
+  )
+}

@@ -50,6 +50,11 @@ export class BusinessService {
     return response.data
   }
 
+  static async updateBusiness(data: CompleteBusinessPayload): Promise<BusinessResponse> {
+    const response = await api.patch<BusinessResponse>('/business', data)
+    return response.data
+  }
+
   static async uploadCatalogue(file: File): Promise<UploadCatalogueResponse> {
     const formData = new FormData()
     formData.append('file', file)

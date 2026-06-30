@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 
 import { Spinner } from '@/components/ui/Spinner'
 import {
@@ -21,6 +21,7 @@ type BusinessOnboardingFormProps = {
   readonly onChange: (data: BusinessOnboardingFormData) => void
   readonly onUploadCatalogue: (file: File) => Promise<void>
   readonly onRemoveCatalogue: (fileId: string) => Promise<void>
+  readonly intro?: ReactNode
 }
 
 function formatFileSize(bytes: number): string {
@@ -58,6 +59,7 @@ export function BusinessOnboardingForm({
   onChange,
   onUploadCatalogue,
   onRemoveCatalogue,
+  intro,
 }: BusinessOnboardingFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [catalogueError, setCatalogueError] = useState<string | null>(null)
@@ -85,11 +87,15 @@ export function BusinessOnboardingForm({
 
   return (
     <div className="space-y-6">
-      <p className="rounded-xl border border-accent/15 bg-accent/5 px-4 py-3 text-sm leading-relaxed text-ink-muted">
-        Please share a few details about your business. This helps our AI understand your brand,
-        products, and how you communicate — so replies and insights feel accurate and on-brand.
-        Website, catalogue, and social links are optional, but they give the AI more context.
-      </p>
+      {intro !== undefined ? (
+        intro
+      ) : (
+        <p className="rounded-xl border border-accent/15 bg-accent/5 px-4 py-3 text-sm leading-relaxed text-ink-muted">
+          Please share a few details about your business. This helps our AI understand your brand,
+          products, and how you communicate — so replies and insights feel accurate and on-brand.
+          Website, catalogue, and social links are optional, but they give the AI more context.
+        </p>
+      )}
 
       <div>
         <FieldLabel>What is your brand name?</FieldLabel>
