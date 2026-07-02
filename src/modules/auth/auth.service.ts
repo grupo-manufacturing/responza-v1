@@ -69,6 +69,7 @@ export class AuthService {
   static async patchMe(data: {
     name?: string
     preferredTranslationLanguage?: TranslationLanguage | null
+    agentEnabled?: boolean
   }): Promise<MeResponse> {
     const response = await api.patch<MeResponse>('/auth/me', data)
     return response.data
