@@ -1,9 +1,5 @@
 import api from '@/shared/api/client'
 
-export interface RewriteDraftResponse {
-  rewritten: string
-}
-
 export interface TranslateMessageResponse {
   translated: string
   targetLanguage: string
@@ -71,10 +67,6 @@ async function runAiJob<T>(path: string, body: unknown): Promise<T> {
 }
 
 export class AiService {
-  static async rewriteDraft(draft: string): Promise<RewriteDraftResponse> {
-    return runAiJob<RewriteDraftResponse>('/ai/rewrite', { draft })
-  }
-
   static async translateMessage(messageId: string): Promise<TranslateMessageResponse> {
     return runAiJob<TranslateMessageResponse>('/ai/translate', { messageId })
   }

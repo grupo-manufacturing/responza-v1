@@ -85,19 +85,6 @@ function SuggestReplyIcon() {
   )
 }
 
-function RewriteIcon() {
-  return (
-    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.75}
-        d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-      />
-    </svg>
-  )
-}
-
 function composerPlaceholder(disabled: boolean, hasAttachment: boolean): string {
   if (disabled) {
     return 'Select a conversation to reply'
@@ -117,10 +104,6 @@ function composerActionIconClass(enabled: boolean, enabledClassName: string): st
     composerActionButtonClass,
     enabled ? enabledClassName : 'cursor-not-allowed opacity-40',
   ].join(' ')
-}
-
-function isAiBusy(rewriting: boolean, suggesting: boolean): boolean {
-  return rewriting || suggesting
 }
 
 function AttachmentPreview({
@@ -192,21 +175,18 @@ export function MessageComposer({
   const [content, setContent] = useState('')
   const [attachment, setAttachment] = useState<SelectedAttachment | null>(null)
   const [attachmentError, setAttachmentError] = useState<string | null>(null)
-  const [rewriting, setRewriting] = useState(false)
   const [suggesting, setSuggesting] = useState(false)
-  const [rewriteError, setRewriteError] = useState<string | null>(null)
   const [suggestError, setSuggestError] = useState<string | null>(null)
   const [suggestions, setSuggestions] = useState<string[]>([])
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const aiBusy = isAiBusy(rewriting, suggesting)
+  const aiBusy = suggesting
   const attachmentsSupported = platform !== 'indiamart'
   const canSend =
     !disabled &&
     !sending &&
     !aiBusy &&
     (attachment !== null || content.trim().length > 0)
-  const canRewrite = !disabled && !sending && !aiBusy && content.trim().length > 0
   const canSuggest =
     !disabled && !sending && !aiBusy && conversationId !== null
   const canAttach = !disabled && !sending && !aiBusy && attachmentsSupported
@@ -254,7 +234,6 @@ export function MessageComposer({
 
     setContent('')
     clearAttachment()
-    setRewriteError(null)
     setSuggestions([])
   }
 
@@ -285,28 +264,6 @@ export function MessageComposer({
     event.target.value = ''
   }
 
-  const handleRewrite = async () => {
-    const trimmed = content.trim()
-    if (trimmed.length === 0 || disabled || sending || aiBusy) {
-      return
-    }
-
-    setRewriting(true)
-    setRewriteError(null)
-
-    try {
-      const { rewritten } = await AiService.rewriteDraft(trimmed)
-      setContent(rewritten)
-      requestAnimationFrame(() => {
-        textareaRef.current?.focus()
-      })
-    } catch (err: unknown) {
-      setRewriteError(getApiErrorMessage(err, 'Could not rewrite message. Please try again.'))
-    } finally {
-      setRewriting(false)
-    }
-  }
-
   const handleSuggestReply = async () => {
     if (conversationId === null || disabled || sending || aiBusy) {
       return
@@ -332,7 +289,6 @@ export function MessageComposer({
     }
 
     setContent(suggestion)
-    setRewriteError(null)
     setSuggestError(null)
     requestAnimationFrame(() => {
       textareaRef.current?.focus()
@@ -408,7 +364,6 @@ export function MessageComposer({
             value={content}
             onChange={(event) => {
               setContent(event.target.value)
-              setRewriteError(null)
             }}
             placeholder={composerPlaceholder(disabled, attachment !== null)}
             disabled={composerDisabled}
@@ -431,21 +386,6 @@ export function MessageComposer({
             {suggesting ? <Spinner size="sm" variant="muted" /> : <SuggestReplyIcon />}
           </button>
           <button
-            type="button"
-            onClick={() => {
-              void handleRewrite()
-            }}
-            disabled={!canRewrite}
-            aria-label={rewriting ? 'Rewriting message' : 'Rewrite message'}
-            title="Rewrite message"
-            className={composerActionIconClass(
-              canRewrite,
-              'text-ink-muted hover:bg-surface-muted hover:text-ink',
-            )}
-          >
-            {rewriting ? <Spinner size="sm" variant="muted" /> : <RewriteIcon />}
-          </button>
-          <button
             type="submit"
             disabled={!canSend}
             aria-label={sending ? 'Sending message' : 'Send message'}
@@ -462,11 +402,6 @@ export function MessageComposer({
         {suggestError !== null && (
           <p className="mt-2 text-xs text-red-600" role="alert">
             {suggestError}
-          </p>
-        )}
-        {rewriteError !== null && (
-          <p className="mt-2 text-xs text-red-600" role="alert">
-            {rewriteError}
           </p>
         )}
       </form>
