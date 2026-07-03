@@ -1,4 +1,7 @@
+import axios from 'axios'
+
 import api from '@/shared/api/client'
+import { getApiBaseUrl } from '@/shared/config/env'
 
 import type { AuthSession, MeResponse, RegisterPendingResponse } from './auth.types'
 import type { TranslationLanguage } from '@/shared/session/storage'
@@ -12,6 +15,12 @@ interface AuthApiResponse {
   businessDetails: AuthSession['businessDetails']
 }
 
+export type AuthTokenRefreshResponse = {
+  accessToken: string
+  refreshToken: string
+  expiresIn: number
+}
+
 export interface TranslationLanguageOption {
   code: TranslationLanguage
   label: string
@@ -20,6 +29,19 @@ export interface TranslationLanguageOption {
 export class AuthService {
   static async login(data: { email: string; password: string }): Promise<AuthSession> {
     const response = await api.post<AuthApiResponse>('/auth/login', data)
+    return response.data
+  }
+
+  static async refresh(refreshToken: string): Promise<AuthTokenRefreshResponse> {
+    const response = await axios.post<AuthTokenRefreshResponse>(
+      `${getApiBaseUrl()}/auth/refresh`,
+      { refreshToken },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    )
     return response.data
   }
 
