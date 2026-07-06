@@ -31,6 +31,7 @@ export type BillingPlansCatalog = {
   plans: BillingPlanPublic[]
   razorpayConfigured: boolean
   checkoutAvailable: boolean
+  razorpayMode: 'test' | 'live' | 'unknown'
 }
 
 export type CheckoutSession = {

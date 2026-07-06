@@ -31,6 +31,7 @@ export function SubscriptionPanel() {
   const [subscription, setSubscription] = useState<SubscriptionDetails | null>(null)
   const [plans, setPlans] = useState<BillingPlanPublic[]>([])
   const [checkoutAvailable, setCheckoutAvailable] = useState(false)
+  const [razorpayMode, setRazorpayMode] = useState<'test' | 'live' | 'unknown'>('unknown')
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
@@ -53,6 +54,7 @@ export function SubscriptionPanel() {
     setSubscription(subscriptionData)
     setPlans(plansData.plans)
     setCheckoutAvailable(plansData.checkoutAvailable)
+    setRazorpayMode(plansData.razorpayMode)
   }, [])
 
   useEffect(() => {
@@ -153,6 +155,12 @@ export function SubscriptionPanel() {
 
   return (
     <div className="max-w-3xl space-y-8">
+      {razorpayMode === 'test' && (
+        <Alert variant="warning">
+          Razorpay is in <strong>test mode</strong>. Checkout uses test cards only — no real charges.
+          Switch to live keys in your server environment when you are ready to bill customers.
+        </Alert>
+      )}
       {actionError !== null && <Alert variant="error">{actionError}</Alert>}
       {successMessage !== null && <Alert variant="success">{successMessage}</Alert>}
 
