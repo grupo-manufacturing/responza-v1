@@ -4,7 +4,6 @@ import { Alert } from '@/components/ui/Alert'
 import { Select } from '@/components/ui/Select'
 import { SpinnerSection } from '@/components/ui/Spinner'
 import { AuthService } from '@/modules/auth/auth.service'
-import { BusinessAgentSettingsCard } from '@/modules/settings/components/BusinessAgentSettingsCard'
 import { AppButton, AppCard, AppLabel, APP_INPUT_CLASS } from '@/shared/ui/app-ui'
 import { applySessionProfile } from '@/shared/hooks/useSession'
 import type { TranslationLanguage } from '@/shared/session/storage'
@@ -38,15 +37,6 @@ export function GeneralSettingsPanel() {
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [agentEnabled, setAgentEnabled] = useState(false)
-  const [agentDailyLimit, setAgentDailyLimit] = useState(10)
-  const [agentRepliesUsedToday, setAgentRepliesUsedToday] = useState(0)
-  const [businessProfileCompleted, setBusinessProfileCompleted] = useState(false)
-  const [isSavingAgent, setIsSavingAgent] = useState(false)
-  const [agentMessage, setAgentMessage] = useState<{
-    variant: 'success' | 'error'
-    text: string
-  } | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -66,10 +56,6 @@ export function GeneralSettingsPanel() {
             label: language.label,
           })),
         )
-        setAgentEnabled(me.organization.agentEnabled)
-        setAgentDailyLimit(me.organization.agentDailyLimit)
-        setAgentRepliesUsedToday(me.organization.agentRepliesUsedToday)
-        setBusinessProfileCompleted(me.businessDetails.completed)
         applySessionProfile(me)
       })
       .catch(() => {
@@ -116,10 +102,6 @@ export function GeneralSettingsPanel() {
       const preferred = me.organization.preferredTranslationLanguage ?? ''
       setTargetLanguage(preferred)
       setSavedTargetLanguage(preferred)
-      setAgentEnabled(me.organization.agentEnabled)
-      setAgentDailyLimit(me.organization.agentDailyLimit)
-      setAgentRepliesUsedToday(me.organization.agentRepliesUsedToday)
-      setBusinessProfileCompleted(me.businessDetails.completed)
       applySessionProfile(me)
       setAccountMessage({ variant: 'success', text: 'Account settings updated.' })
     } catch (err: unknown) {
@@ -318,22 +300,6 @@ export function GeneralSettingsPanel() {
           </form>
         </div>
       </AppCard>
-
-      <BusinessAgentSettingsCard
-        agentEnabled={agentEnabled}
-        agentDailyLimit={agentDailyLimit}
-        agentRepliesUsedToday={agentRepliesUsedToday}
-        businessProfileCompleted={businessProfileCompleted}
-        isSaving={isSavingAgent}
-        message={agentMessage}
-        onAgentEnabledChange={setAgentEnabled}
-        onAgentUsageChange={({ agentDailyLimit: nextLimit, agentRepliesUsedToday: nextUsed }) => {
-          setAgentDailyLimit(nextLimit)
-          setAgentRepliesUsedToday(nextUsed)
-        }}
-        onMessageChange={setAgentMessage}
-        onSavingChange={setIsSavingAgent}
-      />
     </div>
   )
 }
