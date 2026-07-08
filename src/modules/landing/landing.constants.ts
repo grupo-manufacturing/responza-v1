@@ -5,22 +5,46 @@ import {
   type IntegrationPlatform,
 } from '@/modules/integrations/integrations.constants'
 
-export const LANDING_PLATFORMS = INTEGRATION_PLATFORMS.map((platform) => ({
+export type LandingPlatform = IntegrationPlatform | 'gmail'
+
+const LANDING_INTEGRATION_PLATFORMS: readonly LandingPlatform[] = [...INTEGRATION_PLATFORMS, 'gmail']
+
+const LANDING_PLATFORM_LABELS: Record<LandingPlatform, string> = {
+  ...INTEGRATION_PLATFORM_LABELS,
+  gmail: 'Gmail',
+}
+
+const LANDING_PLATFORM_LOGOS: Record<LandingPlatform, string> = {
+  ...INTEGRATION_PLATFORM_LOGOS,
+  gmail: '/gmail.png',
+}
+
+export const LANDING_PLATFORMS = LANDING_INTEGRATION_PLATFORMS.map((platform) => ({
   platform,
-  label: INTEGRATION_PLATFORM_LABELS[platform],
-  logo: INTEGRATION_PLATFORM_LOGOS[platform],
+  label: LANDING_PLATFORM_LABELS[platform],
+  logo: LANDING_PLATFORM_LOGOS[platform],
 }))
 
-export const PLATFORM_GLOW: Record<IntegrationPlatform, string> = {
+export const PLATFORM_GLOW: Record<LandingPlatform, string> = {
   whatsapp: 'shadow-[0_8px_24px_rgb(37_211_102/0.18)]',
   instagram: 'shadow-[0_8px_24px_rgb(225_48_108/0.16)]',
   indiamart: 'shadow-[0_8px_24px_rgb(245_158_11/0.16)]',
+  gmail: 'shadow-[0_8px_24px_rgb(234_67_53/0.18)]',
 }
 
-export const PLATFORM_RING: Record<IntegrationPlatform, string> = {
+export const PLATFORM_RING: Record<LandingPlatform, string> = {
   whatsapp: 'ring-emerald-500/20',
   instagram: 'ring-pink-500/15',
   indiamart: 'ring-amber-500/20',
+  gmail: 'ring-red-500/20',
+}
+
+export function landingPlatformLogoClass(platform: LandingPlatform): string {
+  if (platform === 'indiamart') {
+    return 'h-8 w-auto max-w-full object-contain'
+  }
+
+  return 'h-full w-full object-contain'
 }
 
 export const LANDING_AVATARS = {

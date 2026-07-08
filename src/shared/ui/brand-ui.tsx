@@ -157,9 +157,9 @@ export function BrandMark({ size = 'md' }: { readonly size?: 'sm' | 'md' }) {
 export function LandingLogo({ variant = 'dark' }: { readonly variant?: 'light' | 'dark' }) {
   const textClass = variant === 'dark' ? 'text-on-dark' : 'text-ink'
   return (
-    <Link to="/" className={`inline-flex items-center gap-2.5 ${textClass}`}>
+    <Link to="/" className={`inline-flex min-w-0 items-center gap-2.5 ${textClass}`}>
       <BrandMark size="sm" />
-      <span className="text-sm font-semibold tracking-wide">RESPONZA</span>
+      <span className="hidden truncate text-sm font-semibold tracking-wide min-[400px]:inline">RESPONZA AI</span>
     </Link>
   )
 }

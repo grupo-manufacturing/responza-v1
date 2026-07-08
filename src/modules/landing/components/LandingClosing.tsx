@@ -1,8 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
-import { INTEGRATION_PLATFORM_LOGOS } from '@/modules/integrations/integrations.constants'
-
 import { LANDING_FAQS } from '../landing.constants'
 import { LandingButton, LandingLogo, Reveal, SectionDivider } from '../landing-ui'
 
@@ -23,7 +21,7 @@ export function LandingClosing() {
               Frequently asked questions
             </h2>
             <p className="mt-4 text-center text-base text-on-dark-muted">
-              Everything you need to know about Responza — from setup to billing.
+              Everything you need to know about Responza from setup to billing.
             </p>
           </Reveal>
           <div className="mt-10 space-y-3 sm:mt-12">
@@ -103,11 +101,6 @@ export function LandingClosing() {
               <p className="mt-3 max-w-xs text-sm leading-relaxed text-on-dark-muted">
                 One intelligent inbox for WhatsApp, Instagram, and the leads that matter.
               </p>
-              <div className="mt-4 flex items-center gap-3">
-                <img src={INTEGRATION_PLATFORM_LOGOS.whatsapp} alt="WhatsApp" className="h-5 w-5 object-contain opacity-80" />
-                <img src={INTEGRATION_PLATFORM_LOGOS.instagram} alt="Instagram" className="h-5 w-5 object-contain opacity-80" />
-                <img src={INTEGRATION_PLATFORM_LOGOS.indiamart} alt="IndiaMART" className="h-5 w-auto max-h-5 object-contain opacity-80" />
-              </div>
             </div>
             <div className="flex gap-10 text-sm sm:gap-12">
               <div className="space-y-2">

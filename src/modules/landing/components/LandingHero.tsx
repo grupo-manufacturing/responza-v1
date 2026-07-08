@@ -1,11 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
-import {
-  INTEGRATION_PLATFORM_LOGOS,
-  integrationPlatformLogoClass,
-} from '@/modules/integrations/integrations.constants'
+import { INTEGRATION_PLATFORM_LOGOS } from '@/modules/integrations/integrations.constants'
 
-import { LANDING_AVATARS, LANDING_PLATFORMS, NAV_LINKS, PLATFORM_GLOW, PLATFORM_RING } from '../landing.constants'
+import { LANDING_AVATARS, LANDING_PLATFORMS, NAV_LINKS, PLATFORM_GLOW, PLATFORM_RING, landingPlatformLogoClass } from '../landing.constants'
 import { LandingButton, LandingLogo, ProfilePhoto, Reveal } from '../landing-ui'
 
 function LandingNavbar({ variant = 'dark' }: { readonly variant?: 'light' | 'dark' }) {
@@ -16,59 +13,90 @@ function LandingNavbar({ variant = 'dark' }: { readonly variant?: 'light' | 'dar
     variant === 'dark' ? 'text-on-dark-muted hover:text-on-dark' : 'text-ink-muted hover:text-ink'
   const closeMenu = () => setMenuOpen(false)
 
+  useEffect(() => {
+    if (!menuOpen) return
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closeMenu()
+    }
+    const onResize = () => {
+      if (window.matchMedia('(min-width: 1024px)').matches) closeMenu()
+    }
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    window.addEventListener('keydown', onKeyDown)
+    window.addEventListener('resize', onResize)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', onKeyDown)
+      window.removeEventListener('resize', onResize)
+    }
+  }, [menuOpen])
+
   return (
     <header className="fixed top-0 right-0 left-0 z-50 px-3 pt-3 sm:px-6 sm:pt-4">
-      <div className={`mx-auto max-w-6xl rounded-[var(--radius-pill)] ${shellClass}`}>
-        <div className="flex h-14 items-center justify-between px-3 sm:px-5">
-          <LandingLogo variant={variant} />
-          <nav className="hidden items-center gap-5 md:flex">
+      <div
+        className={[
+          'mx-auto max-w-6xl rounded-2xl lg:rounded-[var(--radius-pill)]',
+          shellClass,
+          menuOpen ? 'shadow-card' : '',
+        ].join(' ')}
+      >
+        <div className="flex h-14 items-center gap-3 px-3 sm:gap-4 sm:px-5">
+          <div className="min-w-0 shrink-0">
+            <LandingLogo variant={variant} />
+          </div>
+
+          <nav className="hidden items-center justify-center gap-6 lg:flex lg:flex-1">
             {NAV_LINKS.map((link) => (
               <a key={link.href} href={link.href} className={`text-sm transition-colors ${linkClass}`}>
                 {link.label}
               </a>
             ))}
           </nav>
-          <div className="flex items-center gap-1.5 sm:gap-2">
+
+          <div className="hidden shrink-0 items-center gap-2 lg:flex">
             {variant === 'light' ? (
               <LandingButton
                 to="/auth?mode=login"
                 variant="ghost"
-                className="!text-ink-muted hover:!text-ink hidden px-4 sm:inline-flex"
+                className="!text-ink-muted hover:!text-ink px-4"
               >
                 Sign in
               </LandingButton>
             ) : (
-              <LandingButton to="/auth?mode=login" variant="secondary" className="hidden px-4 sm:inline-flex">
+              <LandingButton to="/auth?mode=login" variant="secondary" className="px-4">
                 Sign in
               </LandingButton>
             )}
-            <LandingButton
-              to="/auth?mode=register"
-              variant="primary"
-              showChevron
-              className="hidden px-4 text-xs sm:inline-flex sm:text-sm"
-            >
+            <LandingButton to="/auth?mode=register" variant="primary" showChevron className="px-4">
               Get started
             </LandingButton>
-            <button
-              type="button"
-              onClick={() => setMenuOpen((prev) => !prev)}
-              className={`inline-flex rounded-lg p-2 md:hidden ${linkClass}`}
-              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-              aria-expanded={menuOpen}
-            >
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                {menuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
-            </button>
           </div>
+
+          <button
+            type="button"
+            onClick={() => setMenuOpen((prev) => !prev)}
+            className={`ml-auto inline-flex shrink-0 rounded-lg p-2 touch-manipulation lg:hidden ${linkClass}`}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+            aria-controls="landing-mobile-nav"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+              {menuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
         </div>
+
         {menuOpen && (
-          <div className={`border-t px-4 py-3 md:hidden ${menuBorderClass}`}>
+          <div id="landing-mobile-nav" className={`border-t px-4 py-3 lg:hidden ${menuBorderClass}`}>
             <nav className="flex flex-col gap-1">
               {NAV_LINKS.map((link) => (
                 <a
@@ -163,7 +191,7 @@ export function LandingHero() {
               One inbox, <span className="text-accent-gradient">every conversation.</span>
             </h1>
             <p className="mt-5 max-w-lg text-base leading-relaxed text-ink-muted sm:mt-6 sm:text-lg">
-              Responza brings WhatsApp and Instagram into a single workspace — with AI that suggests replies,
+              Responza AI brings WhatsApp and Instagram into a single workspace with AI that suggests replies,
               translates messages, and helps you close leads faster.
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap sm:items-center">
@@ -179,22 +207,6 @@ export function LandingHero() {
               </LandingButton>
             </div>
             <p className="mt-4 text-xs text-ink-faint">No credit card required · 7-day free trial</p>
-            <div className="mt-6 flex items-center gap-3">
-              {LANDING_PLATFORMS.slice(0, 2).map(({ platform, logo, label }) => (
-                <div
-                  key={platform}
-                  className="flex items-center gap-2 rounded-[var(--radius-pill)] border border-border/80 bg-white/80 px-3 py-1.5 shadow-soft"
-                >
-                  <img
-                    src={logo}
-                    alt={label}
-                    className={integrationPlatformLogoClass(platform)}
-                    style={{ height: 18, width: 18 }}
-                  />
-                  <span className="text-xs text-ink-muted">{label}</span>
-                </div>
-              ))}
-            </div>
           </Reveal>
           <Reveal delay={150} className="mx-auto w-full max-w-md lg:max-w-none">
             <HeroVisual />
@@ -202,23 +214,23 @@ export function LandingHero() {
         </div>
       </section>
 
-      <section className="border-y border-border bg-surface-muted py-10 sm:py-12">
+      <section className="border-y border-border bg-surface-muted py-16 sm:py-24">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <Reveal>
             <p className="text-center text-[10px] font-medium tracking-widest text-ink-faint uppercase">
               Integrations
             </p>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-4 sm:gap-5">
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-5 sm:mt-12 sm:gap-6">
               {LANDING_PLATFORMS.map(({ platform, label, logo }, index) => (
                 <Reveal key={platform} delay={index * 80} className="inline-block">
                   <div
-                    className={`flex h-16 w-16 items-center justify-center rounded-2xl border border-border bg-white ring-1 sm:h-20 sm:w-20 ${PLATFORM_RING[platform]} ${PLATFORM_GLOW[platform]} hover-lift`}
+                    className={`flex h-20 w-20 items-center justify-center rounded-2xl border border-border bg-white p-3 ring-1 sm:h-24 sm:w-24 sm:p-4 ${PLATFORM_RING[platform]} ${PLATFORM_GLOW[platform]} hover-lift`}
                   >
                     <img
                       src={logo}
                       alt={label}
-                      className={integrationPlatformLogoClass(platform)}
-                      style={platform === 'indiamart' ? { maxHeight: 40 } : { height: 40, width: 40 }}
+                      className={landingPlatformLogoClass(platform)}
+                      style={platform === 'indiamart' ? { maxHeight: 44 } : { height: 44, width: 44 }}
                     />
                   </div>
                 </Reveal>
