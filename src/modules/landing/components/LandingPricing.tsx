@@ -26,6 +26,7 @@ function CheckIcon({ className }: { readonly className: string }) {
 
 function PricingCard({
   label,
+  description,
   amountInr,
   conversationLimit,
   interval,
@@ -33,6 +34,7 @@ function PricingCard({
   freeTrial = false,
 }: {
   readonly label: string
+  readonly description: string
   readonly amountInr: number
   readonly conversationLimit: number
   readonly interval: BillingPlanInterval
@@ -66,11 +68,13 @@ function PricingCard({
           </span>
         )}
       </div>
+      <p className={`mt-2 text-sm leading-relaxed ${mutedClass}`}>{description}</p>
       <div className="mt-4">
         <p className="text-3xl font-semibold tracking-tight sm:text-4xl">
           {formatInr(amountInr)}
           <span className={`text-sm font-normal ${faintClass}`}>{billingIntervalSuffix(interval)}</span>
         </p>
+        <p className={`mt-1 text-xs ${faintClass}`}>GST inclusive</p>
       </div>
       <div
         className={[
@@ -84,6 +88,9 @@ function PricingCard({
         <p className={`mt-0.5 text-sm font-medium ${highlight ? 'text-on-dark' : 'text-ink'}`}>
           {conversationQuotaLabel(interval, conversationLimit)}
         </p>
+        {interval === 'yearly' && (
+          <p className={`mt-1 text-xs ${faintClass}`}>Equivalent to 2,500 conversations per month</p>
+        )}
       </div>
       <ul className="mt-5 flex-1 space-y-2.5">
         {PLAN_FEATURES.map((feature) => (
@@ -112,17 +119,29 @@ export function LandingPricing() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <Reveal className="mx-auto max-w-2xl text-center">
           <h2 className="text-2xl font-semibold tracking-tight text-ink sm:text-4xl">
-            Simple, conversation-based pricing
+            Two simple plans. Every feature included.
           </h2>
           <p className="mt-4 text-base text-ink-muted">
-            All plans include every feature. Only conversation volume differs. GST inclusive.
+            Start with a 3-day free trial, then choose Basic monthly or Responza Annual. Same powerful
+            inbox, AI tools, and lead management — only conversation volume changes.
           </p>
         </Reveal>
-        <div className="mt-12 grid items-stretch gap-5 sm:mt-16 sm:grid-cols-2 sm:gap-6 lg:max-w-4xl lg:mx-auto">
+
+        <div className="mx-auto mt-6 flex max-w-3xl flex-wrap items-center justify-center gap-3 text-center text-sm text-ink-muted">
+          <span className="rounded-[var(--radius-pill)] border border-border bg-white px-3 py-1.5 shadow-soft">
+            Basic · {formatInr(499)}/month · 1,000 conversations
+          </span>
+          <span className="rounded-[var(--radius-pill)] border border-accent/20 bg-accent/5 px-3 py-1.5 text-ink">
+            Responza Annual · {formatInr(4_999)}/year · 30,000 conversations
+          </span>
+        </div>
+
+        <div className="mt-12 grid items-stretch gap-5 sm:mt-16 sm:grid-cols-2 sm:gap-6 lg:mx-auto lg:max-w-4xl">
           {PRICING_PLANS.map((plan, index) => (
             <Reveal key={plan.key} delay={index * 80} className="h-full">
               <PricingCard
                 label={plan.label}
+                description={plan.description}
                 amountInr={plan.amountInr}
                 conversationLimit={plan.conversationLimit}
                 interval={plan.interval}

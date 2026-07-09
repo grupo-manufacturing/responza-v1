@@ -216,7 +216,9 @@ export function LandingHero() {
                 Sign in
               </LandingButton>
             </div>
-            <p className="mt-4 text-xs text-ink-faint">No credit card required · 3-day free trial</p>
+            <p className="mt-4 text-xs text-ink-faint">
+              No credit card required · 3-day free trial · Plans from ₹499/month
+            </p>
           </Reveal>
           <Reveal delay={150} className="mx-auto w-full max-w-md lg:max-w-none">
             <HeroVisual />

@@ -65,6 +65,7 @@ export const PRICING_PLANS = [
     interval: 'monthly' as const,
     highlight: false,
     freeTrial: true,
+    description: 'For teams getting started with a unified inbox.',
   },
   {
     key: 'premium',
@@ -74,6 +75,7 @@ export const PRICING_PLANS = [
     interval: 'yearly' as const,
     highlight: true,
     freeTrial: false,
+    description: 'Best value — full year of Pro access with a higher conversation quota.',
   },
 ] as const
 
@@ -128,6 +130,14 @@ export const LANDING_FAQS = [
   {
     q: 'How do I connect WhatsApp or Instagram?',
     a: 'Go to Integrations after signing up and follow the guided OAuth or Embedded Signup flow. Most teams are connected in under two minutes.',
+  },
+  {
+    q: 'What are your pricing plans?',
+    a: 'Basic is ₹499/month with 1,000 conversations per month. Responza Annual is ₹4,999/year with 30,000 conversations per year. All plans include the same features — only conversation volume differs. GST inclusive.',
+  },
+  {
+    q: 'Is there a free trial?',
+    a: 'Yes. Every new account gets a 3-day free trial with full access to core features. No credit card required to start.',
   },
 ] as const
 

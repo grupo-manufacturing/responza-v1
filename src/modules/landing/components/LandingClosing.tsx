@@ -88,7 +88,9 @@ export function LandingClosing() {
                 Sign in
               </LandingButton>
             </div>
-            <p className="mt-4 text-xs text-on-dark-muted">No credit card required · Cancel anytime</p>
+            <p className="mt-4 text-xs text-on-dark-muted">
+              No credit card required · 3-day free trial · Plans from ₹499/month
+            </p>
           </Reveal>
         </div>
       </section>
