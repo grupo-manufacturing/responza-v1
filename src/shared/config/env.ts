@@ -98,34 +98,3 @@ export function getSupabaseUrl(): string {
 export function getSupabaseAnonKey(): string {
   return import.meta.env.VITE_SUPABASE_ANON_KEY?.trim() ?? ''
 }
-
-export function getOnboardingWelcomeVideoId(): string {
-  const raw = import.meta.env.VITE_ONBOARDING_WELCOME_VIDEO_ID?.trim() ?? ''
-  if (raw.length === 0) {
-    return ''
-  }
-
-  try {
-    if (raw.includes('youtu.be/')) {
-      const id = raw.split('youtu.be/')[1]?.split(/[?&#]/)[0]?.trim()
-      return id ?? ''
-    }
-
-    if (raw.includes('youtube.com') || raw.includes('youtube-nocookie.com')) {
-      const url = new URL(raw)
-      const fromQuery = url.searchParams.get('v')?.trim()
-      if (fromQuery !== undefined && fromQuery.length > 0) {
-        return fromQuery
-      }
-
-      const embedSegment = url.pathname.split('/embed/')[1]
-      if (embedSegment !== undefined) {
-        return embedSegment.split(/[?&#]/)[0]?.trim() ?? ''
-      }
-    }
-  } catch {
-    return raw
-  }
-
-  return raw
-}

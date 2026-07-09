@@ -105,7 +105,7 @@ export function BusinessOnboardingPage() {
     try {
       await BusinessService.completeBusiness(formDataToBusinessPayload(formData))
       SessionStorage.setBusinessDetailsCompleted(true)
-      navigate('/welcome', { replace: true })
+      navigate('/dashboard', { replace: true })
     } catch (err: unknown) {
       const apiFieldErrors = getApiValidationFieldErrors(err)
       if (apiFieldErrors !== null) {

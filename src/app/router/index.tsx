@@ -20,11 +20,6 @@ const BusinessOnboardingPage = lazy(() =>
     default: m.BusinessOnboardingPage,
   })),
 )
-const OnboardingWelcomePage = lazy(() =>
-  import('@/modules/business/pages/OnboardingWelcomePage').then((m) => ({
-    default: m.OnboardingWelcomePage,
-  })),
-)
 const DashboardPage = lazy(() =>
   import('@/modules/dashboard/pages/DashboardPage').then((m) => ({ default: m.DashboardPage })),
 )
@@ -64,10 +59,6 @@ export const router = createBrowserRouter([
       {
         path: '/business',
         element: suspense(<BusinessOnboardingPage />),
-      },
-      {
-        path: '/welcome',
-        element: suspense(<OnboardingWelcomePage />),
       },
       {
         path: '/business-details',

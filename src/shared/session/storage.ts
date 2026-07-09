@@ -3,7 +3,6 @@ import type { SubscriptionDetails } from '@/modules/settings/subscription.servic
 const ORGANIZATION_STORAGE_KEY = 'organization'
 const SUBSCRIPTION_STORAGE_KEY = 'subscription'
 const BUSINESS_DETAILS_COMPLETED_KEY = 'businessDetailsCompleted'
-const ONBOARDING_WELCOME_SEEN_KEY = 'onboardingWelcomeSeen'
 
 export type TranslationLanguage =
   | 'hindi'
@@ -55,14 +54,6 @@ export class SessionStorage {
     localStorage.setItem(BUSINESS_DETAILS_COMPLETED_KEY, String(completed))
   }
 
-  static isOnboardingWelcomeSeen(): boolean {
-    return localStorage.getItem(ONBOARDING_WELCOME_SEEN_KEY) === 'true'
-  }
-
-  static setOnboardingWelcomeSeen(seen: boolean): void {
-    localStorage.setItem(ONBOARDING_WELCOME_SEEN_KEY, String(seen))
-  }
-
   static getStoredOrganization(): StoredOrganization | null {
     const raw = localStorage.getItem(ORGANIZATION_STORAGE_KEY)
     if (!raw) return null
@@ -89,7 +80,6 @@ export class SessionStorage {
     localStorage.removeItem(ORGANIZATION_STORAGE_KEY)
     localStorage.removeItem(SUBSCRIPTION_STORAGE_KEY)
     localStorage.removeItem(BUSINESS_DETAILS_COMPLETED_KEY)
-    localStorage.removeItem(ONBOARDING_WELCOME_SEEN_KEY)
   }
 
   static isAuthenticated(): boolean {
