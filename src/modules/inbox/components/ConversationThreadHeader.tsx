@@ -1,5 +1,4 @@
 import { Spinner } from '@/components/ui/Spinner'
-import { ProChip } from '@/components/common/ProChip'
 import { ContactAvatar } from '@/modules/inbox/components/ContactAvatar'
 import { INBOX_ICON_BUTTON_CLASS } from '@/modules/inbox/inbox-ui'
 import type { Conversation, Participant } from '@/modules/inbox/inbox.service'
@@ -21,7 +20,6 @@ type ConversationThreadHeaderProps = {
   readonly onBack?: () => void
   readonly analyticsLoading?: boolean
   readonly analyticsDisabled?: boolean
-  readonly analyticsProLocked?: boolean
   readonly onAnalyze?: () => void
 }
 
@@ -71,7 +69,6 @@ export function ConversationThreadHeader({
   onBack,
   analyticsLoading = false,
   analyticsDisabled = false,
-  analyticsProLocked = false,
   onAnalyze,
 }: ConversationThreadHeaderProps) {
   const { displayName, avatarUrl } = resolveContactPresentation(
@@ -119,18 +116,12 @@ export function ConversationThreadHeader({
           title="AI Analytics"
           className={[
             INBOX_ICON_BUTTON_CLASS,
-            'relative',
             !analyticsDisabled && !analyticsLoading
               ? 'text-accent-violet hover:bg-accent-violet/10 hover:text-accent-violet'
               : '',
           ].join(' ')}
         >
           {analyticsLoading ? <Spinner size="sm" variant="muted" /> : <AnalyticsIcon />}
-          {analyticsProLocked && (
-            <span className="absolute -top-1 -right-1">
-              <ProChip className="!px-1 !py-0 text-[8px]" />
-            </span>
-          )}
         </button>
       )}
     </div>

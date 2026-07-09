@@ -74,7 +74,6 @@ export function InboxPage() {
 
   const organizationId = me?.organization.id ?? SessionStorage.getStoredOrganization()?.id ?? null
   const subscription = me?.subscription ?? SessionStorage.getStoredSubscription()
-  const analyticsProLocked = !canAccessAiAnalytics(subscription)
 
   useInboxRealtime({
     organizationId,
@@ -412,7 +411,6 @@ export function InboxPage() {
                 onBack={() => setMobileShowThread(false)}
                 analyticsLoading={analyticsLoading}
                 analyticsDisabled={selectedConversationId === null || threadLoading}
-                analyticsProLocked={analyticsProLocked}
                 onAnalyze={() => {
                   void handleAnalyzeConversation()
                 }}
