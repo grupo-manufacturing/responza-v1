@@ -1,10 +1,12 @@
 import { Spinner } from '@/components/ui/Spinner'
+import { SubscriptionRequired } from '@/components/common/SubscriptionRequired'
 import type { ConversationAnalyticsResponse } from '@/modules/ai/ai.service'
 import { INBOX_ICON_BUTTON_CLASS } from '@/modules/inbox/inbox-ui'
 
 type ConversationAnalyticsPanelProps = {
   readonly open: boolean
   readonly loading: boolean
+  readonly locked?: boolean
   readonly data: ConversationAnalyticsResponse | null
   readonly error: string | null
   readonly onClose: () => void
@@ -27,6 +29,7 @@ function leadScoreTone(score: number): string {
 export function ConversationAnalyticsPanel({
   open,
   loading,
+  locked = false,
   data,
   error,
   onClose,
@@ -52,19 +55,21 @@ export function ConversationAnalyticsPanel({
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
-        {loading && (
+        {locked && <SubscriptionRequired variant="pro" embedded />}
+
+        {!locked && loading && (
           <div className="flex flex-col items-center justify-center gap-3 py-16">
             <Spinner size="md" variant="muted" />
           </div>
         )}
 
-        {!loading && error !== null && (
+        {!locked && !loading && error !== null && (
           <p className="rounded-xl border border-red-200/80 bg-red-50 px-3 py-2.5 text-sm text-red-700" role="alert">
             {error}
           </p>
         )}
 
-        {!loading && error === null && data !== null && (
+        {!locked && !loading && error === null && data !== null && (
           <div className="space-y-5">
             <section>
               <h3 className="text-xs font-medium tracking-wide text-ink-faint uppercase">Lead score</h3>

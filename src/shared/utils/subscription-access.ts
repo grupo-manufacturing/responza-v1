@@ -14,7 +14,7 @@ export function canAccessDashboard(
   return !isTrialSubscription(subscription)
 }
 
-export function canAccessInboxAi(
+export function canAccessAiAnalytics(
   subscription: SubscriptionLike | null | undefined,
 ): boolean {
   return !isTrialSubscription(subscription)

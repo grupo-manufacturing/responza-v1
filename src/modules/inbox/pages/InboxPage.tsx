@@ -39,7 +39,7 @@ import { useIntegrationsGate } from '@/shared/hooks/useIntegrationsGate'
 import { useSession } from '@/shared/hooks/useSession'
 import { SessionStorage } from '@/shared/session/storage'
 import { getApiErrorDetails, getApiErrorMessage } from '@/shared/utils/api-error'
-import { canAccessInboxAi } from '@/shared/utils/subscription-access'
+import { canAccessAiAnalytics } from '@/shared/utils/subscription-access'
 
 const LIST_COLUMN_CLASS = 'w-full lg:w-[300px] lg:shrink-0'
 
@@ -61,6 +61,7 @@ export function InboxPage() {
   const [mobileShowThread, setMobileShowThread] = useState(initialConversationId !== null)
   const [analyticsLoading, setAnalyticsLoading] = useState(false)
   const [analyticsOpen, setAnalyticsOpen] = useState(false)
+  const [analyticsLocked, setAnalyticsLocked] = useState(false)
   const [analyticsData, setAnalyticsData] = useState<ConversationAnalyticsResponse | null>(null)
   const [analyticsError, setAnalyticsError] = useState<string | null>(null)
   const queryClient = useInboxQueryClient()
@@ -72,6 +73,8 @@ export function InboxPage() {
   const threadQuery = useInboxThread(selectedConversationId, queriesEnabled)
 
   const organizationId = me?.organization.id ?? SessionStorage.getStoredOrganization()?.id ?? null
+  const subscription = me?.subscription ?? SessionStorage.getStoredSubscription()
+  const analyticsProLocked = !canAccessAiAnalytics(subscription)
 
   useInboxRealtime({
     organizationId,
@@ -93,6 +96,7 @@ export function InboxPage() {
 
   useEffect(() => {
     setAnalyticsOpen(false)
+    setAnalyticsLocked(false)
     setAnalyticsData(null)
     setAnalyticsError(null)
     setAnalyticsLoading(false)
@@ -163,9 +167,19 @@ export function InboxPage() {
       return
     }
 
+    setAnalyticsOpen(true)
+
+    if (!canAccessAiAnalytics(subscription)) {
+      setAnalyticsLocked(true)
+      setAnalyticsData(null)
+      setAnalyticsError(null)
+      setAnalyticsLoading(false)
+      return
+    }
+
+    setAnalyticsLocked(false)
     setAnalyticsLoading(true)
     setAnalyticsError(null)
-    setAnalyticsOpen(true)
 
     try {
       const result = await AiService.analyzeConversation(selectedConversationId)
@@ -313,8 +327,6 @@ export function InboxPage() {
       : undefined
 
   const activePlatform: IntegrationPlatform | null = selectedListItem?.platform ?? null
-  const subscription = me?.subscription ?? SessionStorage.getStoredSubscription()
-  const aiEnabled = canAccessInboxAi(subscription)
   const conversationLimitReached =
     subscription?.conversationQuotaEnforced === true &&
     subscription.conversationsRemaining !== null &&
@@ -400,13 +412,10 @@ export function InboxPage() {
                 onBack={() => setMobileShowThread(false)}
                 analyticsLoading={analyticsLoading}
                 analyticsDisabled={selectedConversationId === null || threadLoading}
-                onAnalyze={
-                  aiEnabled
-                    ? () => {
-                        void handleAnalyzeConversation()
-                      }
-                    : undefined
-                }
+                analyticsProLocked={analyticsProLocked}
+                onAnalyze={() => {
+                  void handleAnalyzeConversation()
+                }}
               />
             </div>
 
@@ -419,25 +428,22 @@ export function InboxPage() {
               onLoadOlder={handleLoadOlderMessages}
               platform={activePlatform}
               actionsDisabled={threadLoading}
-              aiEnabled={aiEnabled}
             />
             <MessageComposer
               conversationId={selectedConversationId}
               disabled={selectedConversationId === null || threadLoading}
               sending={sending}
               platform={activePlatform}
-              aiEnabled={aiEnabled}
               onSend={handleSendMessage}
             />
-            {aiEnabled && (
-              <ConversationAnalyticsPanel
-                open={analyticsOpen}
-                loading={analyticsLoading}
-                data={analyticsData}
-                error={analyticsError}
-                onClose={() => setAnalyticsOpen(false)}
-              />
-            )}
+            <ConversationAnalyticsPanel
+              open={analyticsOpen}
+              loading={analyticsLoading}
+              locked={analyticsLocked}
+              data={analyticsData}
+              error={analyticsError}
+              onClose={() => setAnalyticsOpen(false)}
+            />
           </div>
         </div>
       </div>

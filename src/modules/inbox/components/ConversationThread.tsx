@@ -33,7 +33,6 @@ type ConversationThreadProps = {
   readonly onLoadOlder: () => void
   readonly platform?: IntegrationPlatform | null
   readonly actionsDisabled?: boolean
-  readonly aiEnabled?: boolean
 }
 
 type MessageTranslationState =
@@ -52,7 +51,6 @@ export function ConversationThread({
   onLoadOlder,
   platform = null,
   actionsDisabled = false,
-  aiEnabled = true,
 }: ConversationThreadProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const previousMessageCountRef = useRef(messages.length)
@@ -218,7 +216,6 @@ export function ConversationThread({
             {messages.map((message) => {
               const isOutbound = message.direction === 'outbound'
               const canTranslate =
-                aiEnabled &&
                 isTranslatableMessageContent(message.content, message.contentType)
               const translation = translations[message.id]
               const isTranslating = translation?.status === 'loading'

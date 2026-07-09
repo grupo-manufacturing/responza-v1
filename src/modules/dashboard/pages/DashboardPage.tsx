@@ -7,9 +7,12 @@ import { DashboardActionPanel } from '@/modules/dashboard/components/DashboardAc
 import { DashboardStatsRow } from '@/modules/dashboard/components/DashboardStatsRow'
 import { LeadQueueList } from '@/modules/dashboard/components/LeadQueueList'
 import { useDashboard } from '@/modules/dashboard/hooks/useDashboard'
+import { useSession } from '@/shared/hooks/useSession'
+import { SessionStorage } from '@/shared/session/storage'
 import { AppButtonLink, AppPage, AppPageHeader } from '@/shared/ui/app-ui'
+import { isTrialSubscription } from '@/shared/utils/subscription-access'
 
-export function DashboardPage() {
+function DashboardPageContent() {
   const {
     data,
     loading,
@@ -105,4 +108,15 @@ export function DashboardPage() {
       )}
     </AppPage>
   )
+}
+
+export function DashboardPage() {
+  const { me } = useSession()
+  const subscription = me?.subscription ?? SessionStorage.getStoredSubscription()
+
+  if (isTrialSubscription(subscription)) {
+    return <SubscriptionRequired variant="pro" />
+  }
+
+  return <DashboardPageContent />
 }
