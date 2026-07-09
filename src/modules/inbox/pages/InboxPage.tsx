@@ -347,8 +347,8 @@ export function InboxPage() {
     <div className="flex h-[calc(100vh-7rem)] flex-col">
       {conversationLimitReached && (
         <Alert variant="warning" className="mb-3 shrink-0">
-          Monthly conversation limit reached. Upgrade your plan to start new conversations. You can
-          still reply in existing threads.
+          Conversation limit reached for this billing period. Upgrade your plan to start new
+          conversations. You can still reply in existing threads.
         </Alert>
       )}
 

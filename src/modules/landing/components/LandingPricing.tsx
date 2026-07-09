@@ -2,6 +2,11 @@ import { Link } from 'react-router-dom'
 
 import { PLAN_FEATURES, PRICING_PLANS } from '../landing.constants'
 import { Reveal } from '../landing-ui'
+import {
+  billingIntervalSuffix,
+  conversationQuotaLabel,
+  type BillingPlanInterval,
+} from '@/shared/utils/billing-display'
 
 function formatInr(amount: number): string {
   return new Intl.NumberFormat('en-IN', {
@@ -23,45 +28,48 @@ function PricingCard({
   label,
   amountInr,
   conversationLimit,
+  interval,
   highlight = false,
   freeTrial = false,
 }: {
   readonly label: string
   readonly amountInr: number
   readonly conversationLimit: number
+  readonly interval: BillingPlanInterval
   readonly highlight?: boolean
   readonly freeTrial?: boolean
 }) {
   const mutedClass = highlight ? 'text-on-dark-muted' : 'text-ink-muted'
   const faintClass = highlight ? 'text-on-dark-muted' : 'text-ink-faint'
   const checkClass = highlight ? 'text-accent-soft' : 'text-accent'
+  const quotaPeriodLabel = interval === 'yearly' ? 'Annual quota' : 'Monthly quota'
 
   return (
     <article
       className={[
         'hover-lift relative flex h-full flex-col rounded-[var(--radius-card-lg)] border p-6 sm:p-7',
         highlight
-          ? 'z-10 border-accent/35 bg-gradient-to-b from-ink via-ink to-surface-dark text-on-dark shadow-card ring-1 ring-accent/25 lg:-mt-2 lg:mb-2 lg:scale-[1.02]'
+          ? 'z-10 border-accent/35 bg-gradient-to-b from-ink via-ink to-surface-dark text-on-dark shadow-card ring-1 ring-accent/25'
           : 'border-border bg-white shadow-soft',
       ].join(' ')}
     >
       {highlight && (
         <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-[var(--radius-pill)] bg-accent px-3 py-1 text-[10px] font-semibold tracking-wide text-white uppercase">
-          Most popular
+          Best value
         </span>
       )}
       <div className="flex items-start justify-between gap-2">
         <p className={`text-sm font-semibold tracking-wide uppercase ${mutedClass}`}>{label}</p>
         {freeTrial && (
           <span className="shrink-0 rounded-[var(--radius-pill)] border border-accent/25 bg-accent/10 px-2 py-0.5 text-[10px] font-medium text-accent">
-            7-day trial
+            3-day trial
           </span>
         )}
       </div>
       <div className="mt-4">
         <p className="text-3xl font-semibold tracking-tight sm:text-4xl">
           {formatInr(amountInr)}
-          <span className={`text-sm font-normal ${faintClass}`}>/mo</span>
+          <span className={`text-sm font-normal ${faintClass}`}>{billingIntervalSuffix(interval)}</span>
         </p>
       </div>
       <div
@@ -71,10 +79,10 @@ function PricingCard({
         ].join(' ')}
       >
         <p className={`text-xs font-medium uppercase tracking-wide ${highlight ? 'text-accent-soft' : 'text-accent'}`}>
-          Monthly quota
+          {quotaPeriodLabel}
         </p>
         <p className={`mt-0.5 text-sm font-medium ${highlight ? 'text-on-dark' : 'text-ink'}`}>
-          {conversationLimit.toLocaleString('en-IN')} conversations
+          {conversationQuotaLabel(interval, conversationLimit)}
         </p>
       </div>
       <ul className="mt-5 flex-1 space-y-2.5">
@@ -110,13 +118,14 @@ export function LandingPricing() {
             All plans include every feature. Only conversation volume differs. GST inclusive.
           </p>
         </Reveal>
-        <div className="mt-12 grid items-stretch gap-5 sm:mt-16 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4 lg:gap-4">
+        <div className="mt-12 grid items-stretch gap-5 sm:mt-16 sm:grid-cols-2 sm:gap-6 lg:max-w-4xl lg:mx-auto">
           {PRICING_PLANS.map((plan, index) => (
             <Reveal key={plan.key} delay={index * 80} className="h-full">
               <PricingCard
                 label={plan.label}
                 amountInr={plan.amountInr}
                 conversationLimit={plan.conversationLimit}
+                interval={plan.interval}
                 highlight={plan.highlight}
                 freeTrial={plan.freeTrial}
               />

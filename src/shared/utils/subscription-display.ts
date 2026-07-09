@@ -1,6 +1,8 @@
+import { formatPlanLabel } from '@/shared/utils/billing-display'
+
 export function subscriptionPlanLabel(status: string, plan: string): string {
   if (status === 'trialing') return 'Free trial'
-  if (status === 'active') return plan === 'free' ? 'Free plan' : plan
+  if (status === 'active') return plan === 'free' ? 'Free plan' : formatPlanLabel(plan)
   if (status === 'expired') return 'Trial ended'
   return 'No active plan'
 }

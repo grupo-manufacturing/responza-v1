@@ -17,7 +17,11 @@ import {
   subscriptionBadgeText,
   subscriptionPlanLabel,
 } from '@/shared/utils/subscription-display'
-import { getApiErrorMessage } from '@/shared/utils/api-error'
+import {
+  billingIntervalSuffix,
+  conversationQuotaLabel,
+  formatPlanLabel,
+} from '@/shared/utils/billing-display'
 
 function formatInr(amount: number): string {
   return new Intl.NumberFormat('en-IN', {
@@ -187,7 +191,7 @@ export function SubscriptionPanel() {
         <ul className="mt-6 space-y-3 text-sm text-ink-muted">
           <li className="flex gap-2">
             <span className="font-medium text-ink">Plan</span>
-            <span>{subscription.plan}</span>
+            <span>{formatPlanLabel(subscription.plan)}</span>
           </li>
           <li className="flex gap-2">
             <span className="font-medium text-ink">Status</span>
@@ -223,13 +227,13 @@ export function SubscriptionPanel() {
             <div className="mt-6">
               <AppProgressBar
                 value={quotaPercent}
-                label={`${subscription.conversationsUsed.toLocaleString('en-IN')} / ${subscription.conversationLimit.toLocaleString('en-IN')} conversations`}
+                label={`${subscription.conversationsUsed.toLocaleString('en-IN')} / ${subscription.conversationLimit.toLocaleString('en-IN')} conversations this billing period`}
               />
               {subscription.conversationsRemaining !== null &&
                 subscription.conversationsRemaining <= 0 && (
                   <Alert variant="warning" className="mt-4">
-                    You have reached your monthly conversation limit. Upgrade your plan to start new
-                    conversations. You can still reply in existing threads.
+                    You have reached your conversation limit for this billing period. Upgrade your plan
+                    to start new conversations. You can still reply in existing threads.
                   </Alert>
                 )}
             </div>
@@ -280,21 +284,23 @@ export function SubscriptionPanel() {
                     <p className="text-sm font-semibold text-ink">{plan.label}</p>
                     {plan.key === 'basic' && (
                       <SectionBadge variant="light" tone="teal">
-                        7-day trial
+                        3-day trial
                       </SectionBadge>
                     )}
                     {isPremium && (
                       <SectionBadge variant="light" tone="violet">
-                        Popular
+                        Annual
                       </SectionBadge>
                     )}
                   </div>
                   <p className="text-2xl font-bold tracking-tight text-ink">
                     {formatInr(plan.amountInr)}
-                    <span className="text-sm font-medium text-ink-muted">/month</span>
+                    <span className="text-sm font-medium text-ink-muted">
+                      {billingIntervalSuffix(plan.interval)}
+                    </span>
                   </p>
                   <p className="mt-2 text-sm text-ink-muted">
-                    {plan.conversationLimit.toLocaleString('en-IN')} conversations / month
+                    {conversationQuotaLabel(plan.interval, plan.conversationLimit)}
                   </p>
                   <AppButton
                     type="button"

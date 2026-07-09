@@ -229,7 +229,7 @@ export function AuthForm() {
           {!isLogin && (
             <div className="flex justify-center pt-1">
               <SectionBadge variant="light" tone="teal">
-                7-day free trial on Basic
+                3-day free trial on Basic
               </SectionBadge>
             </div>
           )}

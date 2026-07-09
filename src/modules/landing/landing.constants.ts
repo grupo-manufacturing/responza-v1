@@ -57,10 +57,24 @@ export const LANDING_AVATARS = {
 } as const
 
 export const PRICING_PLANS = [
-  { key: 'basic', label: 'Basic', amountInr: 499, conversationLimit: 1_000, highlight: false, freeTrial: true },
-  { key: 'premium', label: 'Premium', amountInr: 5_000, conversationLimit: 2_500, highlight: true, freeTrial: false },
-  { key: 'scale', label: 'Scale', amountInr: 10_000, conversationLimit: 7_000, highlight: false, freeTrial: false },
-  { key: 'enterprise', label: 'Enterprise', amountInr: 20_000, conversationLimit: 25_000, highlight: false, freeTrial: false },
+  {
+    key: 'basic',
+    label: 'Basic',
+    amountInr: 499,
+    conversationLimit: 1_000,
+    interval: 'monthly' as const,
+    highlight: false,
+    freeTrial: true,
+  },
+  {
+    key: 'premium',
+    label: 'Responza Annual',
+    amountInr: 4_999,
+    conversationLimit: 30_000,
+    interval: 'yearly' as const,
+    highlight: true,
+    freeTrial: false,
+  },
 ] as const
 
 export const PLAN_FEATURES = [

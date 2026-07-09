@@ -24,7 +24,7 @@ export type BillingPlanPublic = {
   amountPaise: number
   amountInr: number
   currency: 'INR'
-  interval: 'monthly'
+  interval: 'monthly' | 'yearly'
 }
 
 export type BillingPlansCatalog = {
