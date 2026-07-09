@@ -16,79 +16,58 @@ export function DashboardTrialPreview() {
         description="See what needs your attention and jump straight into action."
       />
 
-      <div className="space-y-6">
-        <ProLockedSection
-          title="Upgrade to unlock insights"
-          description="Subscribe to see live counts for replies, nudges, leads, and workspace performance."
-        >
+      <ProLockedSection className="min-h-[70vh]">
+        <div className="space-y-6">
           <DashboardStatsRow
             stats={data.stats}
             needsReplyCount={data.needsReply.length}
             toNudgeCount={data.toNudge.length}
             leadsCount={data.leadsToFollowUp.length}
           />
-        </ProLockedSection>
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          <DashboardActionPanel
-            title="Conversations that need your reply"
-            description="Customers are waiting for a response."
-            viewAllHref="/inbox"
-            viewAllLabel="Open inbox"
-          >
-            <ProLockedSection
-              className="min-h-[220px]"
-              title="Upgrade to unlock reply queue"
-              description="Subscribe to prioritize customers waiting for your response."
+          <div className="grid gap-6 lg:grid-cols-2">
+            <DashboardActionPanel
+              title="Conversations that need your reply"
+              description="Customers are waiting for a response."
+              viewAllHref="/inbox"
+              viewAllLabel="Open inbox"
             >
               <ConversationQueueList
                 conversations={data.needsReply}
                 emptyMessage="All caught up — no conversations need a reply."
                 actionLabel="Reply"
               />
-            </ProLockedSection>
-          </DashboardActionPanel>
+            </DashboardActionPanel>
 
-          <DashboardActionPanel
-            title="Leads to follow up on"
-            description="Active leads that may need your attention."
-            viewAllHref="/leads"
-            viewAllLabel="Open leads"
-          >
-            <ProLockedSection
-              className="min-h-[220px]"
-              title="Upgrade to unlock lead follow-ups"
-              description="Subscribe to see which leads need your attention next."
+            <DashboardActionPanel
+              title="Leads to follow up on"
+              description="Active leads that may need your attention."
+              viewAllHref="/leads"
+              viewAllLabel="Open leads"
             >
               <LeadQueueList
                 leads={data.leadsToFollowUp}
                 emptyMessage="No leads need follow-up right now."
               />
-            </ProLockedSection>
-          </DashboardActionPanel>
+            </DashboardActionPanel>
 
-          <div className="lg:col-span-2">
-            <DashboardActionPanel
-              title="Conversations to nudge"
-              description="You replied, but the customer has gone quiet."
-              viewAllHref="/inbox"
-              viewAllLabel="Open inbox"
-            >
-              <ProLockedSection
-                className="min-h-[220px]"
-                title="Upgrade to unlock nudge queue"
-                description="Subscribe to find quiet conversations worth re-engaging."
+            <div className="lg:col-span-2">
+              <DashboardActionPanel
+                title="Conversations to nudge"
+                description="You replied, but the customer has gone quiet."
+                viewAllHref="/inbox"
+                viewAllLabel="Open inbox"
               >
                 <ConversationQueueList
                   conversations={data.toNudge}
                   emptyMessage="No conversations need a follow-up nudge."
                   actionLabel="Nudge"
                 />
-              </ProLockedSection>
-            </DashboardActionPanel>
+              </DashboardActionPanel>
+            </div>
           </div>
         </div>
-      </div>
+      </ProLockedSection>
     </AppPage>
   )
 }

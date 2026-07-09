@@ -1,10 +1,8 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 
 import { BrandMark } from '@/shared/ui/brand-ui'
-import { ProChip } from '@/components/common/ProChip'
 import { clearSessionCache, useSession } from '@/shared/hooks/useSession'
 import { SessionStorage } from '@/shared/session/storage'
-import { isTrialSubscription } from '@/shared/utils/subscription-access'
 
 import { SIDEBAR_NAVIGATION } from './sidebar.config'
 import { SidebarAccountFooter } from './SidebarAccountFooter'
@@ -63,8 +61,6 @@ export function AppSidebar({
   const storedOrg = SessionStorage.getStoredOrganization()
   const organizationName = me?.organization.name ?? storedOrg?.name ?? ''
   const subscriptionStatus = me?.subscription.status ?? SessionStorage.getStoredSubscription()?.status ?? ''
-  const subscription = me?.subscription ?? SessionStorage.getStoredSubscription()
-  const showProFeatures = isTrialSubscription(subscription)
   const isProfileLoading = sessionLoading && organizationName.length === 0
 
   const handleLogout = () => {
@@ -150,9 +146,8 @@ export function AppSidebar({
                 >
                   {item.icon}
                 </span>
-                <span className={['flex min-w-0 flex-1 items-center gap-2 truncate', collapsed ? 'lg:hidden' : ''].join(' ')}>
-                  <span className="truncate">{item.name}</span>
-                  {showProFeatures && item.requiresPro === true && <ProChip />}
+                <span className={['truncate', collapsed ? 'lg:hidden' : ''].join(' ')}>
+                  {item.name}
                 </span>
               </>
             )}
