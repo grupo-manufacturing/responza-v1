@@ -5,6 +5,7 @@ import { SpinnerSection } from '@/components/ui/Spinner'
 import { ConversationQueueList } from '@/modules/dashboard/components/ConversationQueueList'
 import { DashboardActionPanel } from '@/modules/dashboard/components/DashboardActionPanel'
 import { DashboardStatsRow } from '@/modules/dashboard/components/DashboardStatsRow'
+import { DashboardTrialPreview } from '@/modules/dashboard/components/DashboardTrialPreview'
 import { LeadQueueList } from '@/modules/dashboard/components/LeadQueueList'
 import { useDashboard } from '@/modules/dashboard/hooks/useDashboard'
 import { useSession } from '@/shared/hooks/useSession'
@@ -115,7 +116,7 @@ export function DashboardPage() {
   const subscription = me?.subscription ?? SessionStorage.getStoredSubscription()
 
   if (isTrialSubscription(subscription)) {
-    return <SubscriptionRequired variant="pro" />
+    return <DashboardTrialPreview />
   }
 
   return <DashboardPageContent />

@@ -3,6 +3,8 @@ import { AppButtonLink, AppGateCard } from '@/shared/ui/app-ui'
 type SubscriptionRequiredProps = {
   readonly variant?: 'expired' | 'pro'
   readonly embedded?: boolean
+  readonly title?: string
+  readonly description?: string
 }
 
 const COPY = {
@@ -16,14 +18,21 @@ const COPY = {
   },
 } as const
 
-export function SubscriptionRequired({ variant = 'expired', embedded = false }: SubscriptionRequiredProps) {
+export function SubscriptionRequired({
+  variant = 'expired',
+  embedded = false,
+  title,
+  description,
+}: SubscriptionRequiredProps) {
   const copy = COPY[variant]
+  const resolvedTitle = title ?? copy.title
+  const resolvedDescription = description ?? copy.description
 
   if (embedded) {
     return (
       <div className="px-2 py-10 text-center">
-        <h2 className="text-base font-semibold text-ink sm:text-lg">{copy.title}</h2>
-        <p className="mt-2 text-sm leading-relaxed text-ink-muted">{copy.description}</p>
+        <h2 className="text-base font-semibold text-ink sm:text-lg">{resolvedTitle}</h2>
+        <p className="mt-2 text-sm leading-relaxed text-ink-muted">{resolvedDescription}</p>
         <AppButtonLink to="/settings?tab=subscription" className="mt-6">
           View subscription
         </AppButtonLink>
@@ -33,8 +42,8 @@ export function SubscriptionRequired({ variant = 'expired', embedded = false }: 
 
   return (
     <AppGateCard
-      title={copy.title}
-      description={copy.description}
+      title={resolvedTitle}
+      description={resolvedDescription}
       actionLabel="View subscription"
       actionTo="/settings?tab=subscription"
     />
