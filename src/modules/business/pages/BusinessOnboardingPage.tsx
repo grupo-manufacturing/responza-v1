@@ -2,13 +2,12 @@ import { useEffect, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 
 import { Alert } from '@/components/ui/Alert'
-import { Spinner, SpinnerOverlay } from '@/components/ui/Spinner'
-import { BusinessOnboardingForm } from '@/modules/business/components/BusinessOnboardingForm'
+import { SpinnerOverlay } from '@/components/ui/Spinner'
+import { BusinessOnboardingWizard } from '@/modules/business/components/BusinessOnboardingWizard'
 import {
-  BUSINESS_DESCRIPTION_MIN_LENGTH,
   EMPTY_BUSINESS_ONBOARDING_FORM,
   businessProfileToFormData,
-  canSubmitBusinessOnboarding,
+  findFirstOnboardingStepWithErrors,
   formDataToBusinessPayload,
   hasBusinessOnboardingFieldErrors,
   mapApiFieldErrorsToBusinessForm,
@@ -17,7 +16,7 @@ import {
   type BusinessOnboardingFormData,
 } from '@/modules/business/business-onboarding'
 import { BusinessService, type CatalogueFile } from '@/modules/business/business.service'
-import { AppButton, AppCard, AppFlowLayout } from '@/shared/ui/app-ui'
+import { AppCard, AppFlowLayout } from '@/shared/ui/app-ui'
 import { LandingLogo } from '@/shared/ui/brand-ui'
 import { SessionStorage } from '@/shared/session/storage'
 import { getApiErrorMessage, getApiValidationFieldErrors } from '@/shared/utils/api-error'
@@ -30,6 +29,7 @@ export function BusinessOnboardingPage() {
   const [error, setError] = useState<string | null>(null)
   const [formData, setFormData] = useState<BusinessOnboardingFormData>(EMPTY_BUSINESS_ONBOARDING_FORM)
   const [fieldErrors, setFieldErrors] = useState<BusinessOnboardingFieldErrors>({})
+  const [stepIndex, setStepIndex] = useState(0)
   const [catalogueFiles, setCatalogueFiles] = useState<CatalogueFile[]>([])
   const [uploadingCatalogue, setUploadingCatalogue] = useState(false)
   const [removingCatalogueId, setRemovingCatalogueId] = useState<string | null>(null)
@@ -95,6 +95,7 @@ export function BusinessOnboardingPage() {
     setFieldErrors(nextFieldErrors)
 
     if (hasBusinessOnboardingFieldErrors(nextFieldErrors)) {
+      setStepIndex(findFirstOnboardingStepWithErrors(nextFieldErrors))
       return
     }
 
@@ -108,7 +109,9 @@ export function BusinessOnboardingPage() {
     } catch (err: unknown) {
       const apiFieldErrors = getApiValidationFieldErrors(err)
       if (apiFieldErrors !== null) {
-        setFieldErrors(mapApiFieldErrorsToBusinessForm(apiFieldErrors))
+        const mappedErrors = mapApiFieldErrorsToBusinessForm(apiFieldErrors)
+        setFieldErrors(mappedErrors)
+        setStepIndex(findFirstOnboardingStepWithErrors(mappedErrors))
         setError(null)
       } else {
         setError(getApiErrorMessage(err, 'Something went wrong. Please try again.'))
@@ -131,8 +134,6 @@ export function BusinessOnboardingPage() {
     setError(null)
   }
 
-  const canSubmit = canSubmitBusinessOnboarding(formData)
-
   if (isHydrating) {
     return <SpinnerOverlay />
   }
@@ -142,59 +143,41 @@ export function BusinessOnboardingPage() {
   }
 
   return (
-    <AppFlowLayout maxWidthClass="max-w-3xl">
+    <AppFlowLayout maxWidthClass="max-w-xl">
       <div className="flex flex-col gap-5 sm:gap-6">
         <header className="shrink-0 text-center">
           <div className="mb-4 flex justify-center">
             <LandingLogo variant="light" />
           </div>
           <h1 className="text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-            Tell us about your <span className="text-accent-gradient">business</span>
+            Set up your <span className="text-accent-gradient">business profile</span>
           </h1>
           <p className="mt-2 text-sm text-ink-muted">
-            A few thoughtful details help our AI understand your brand before you start replying to
-            customers.
+            A quick guided setup so Responza AI understands your brand before you start replying.
           </p>
         </header>
 
-        <AppCard padding="default" className="sm:p-8">
+        <AppCard padding="default" className="overflow-hidden sm:p-8">
           {error !== null && (
             <div className="mb-4">
               <Alert variant="error">{error}</Alert>
             </div>
           )}
 
-          <BusinessOnboardingForm
+          <BusinessOnboardingWizard
             formData={formData}
             catalogueFiles={catalogueFiles}
             uploadingCatalogue={uploadingCatalogue}
             removingCatalogueId={removingCatalogueId}
             fieldErrors={fieldErrors}
+            initialStepIndex={stepIndex}
+            isSaving={isLoading}
             onChange={setFormData}
             onFieldEdit={handleFieldEdit}
             onUploadCatalogue={handleUploadCatalogue}
             onRemoveCatalogue={handleRemoveCatalogue}
+            onComplete={() => void handleSave()}
           />
-
-          <div className="mt-8 flex justify-end border-t border-border pt-5">
-            <AppButton onClick={() => void handleSave()} disabled={!canSubmit || isLoading}>
-              {isLoading ? (
-                <>
-                  <Spinner size="sm" variant="white" />
-                  Saving...
-                </>
-              ) : (
-                'Save & finish setup'
-              )}
-            </AppButton>
-          </div>
-
-          {!canSubmit && (
-            <p className="mt-3 text-right text-xs text-ink-faint">
-              Enter your brand name and at least {BUSINESS_DESCRIPTION_MIN_LENGTH} characters about your
-              business to continue.
-            </p>
-          )}
         </AppCard>
       </div>
     </AppFlowLayout>

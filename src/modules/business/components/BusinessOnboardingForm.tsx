@@ -148,7 +148,9 @@ export function BusinessOnboardingForm({
       <div>
         <FieldLabel optional>Your shop&apos;s website</FieldLabel>
         <input
-          type="url"
+          type="text"
+          inputMode="url"
+          autoComplete="url"
           value={formData.websiteUrl}
           onChange={(event) => updateField('websiteUrl', event.target.value)}
           placeholder="https://yourshop.com"
@@ -221,7 +223,9 @@ export function BusinessOnboardingForm({
         <div>
           <FieldLabel optional>Facebook page link</FieldLabel>
           <input
-            type="url"
+            type="text"
+            inputMode="url"
+            autoComplete="url"
             value={formData.facebookPageUrl}
             onChange={(event) => updateField('facebookPageUrl', event.target.value)}
             placeholder="https://facebook.com/yourpage"
@@ -233,7 +237,9 @@ export function BusinessOnboardingForm({
         <div>
           <FieldLabel optional>Instagram page link</FieldLabel>
           <input
-            type="url"
+            type="text"
+            inputMode="url"
+            autoComplete="url"
             value={formData.instagramPageUrl}
             onChange={(event) => updateField('instagramPageUrl', event.target.value)}
             placeholder="https://instagram.com/yourpage"

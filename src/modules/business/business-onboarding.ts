@@ -153,3 +153,105 @@ export function mapApiFieldErrorsToBusinessForm(
 
   return mapped
 }
+
+export type BusinessOnboardingStepId =
+  | 'brandName'
+  | 'websiteUrl'
+  | 'catalogue'
+  | 'facebookPageUrl'
+  | 'instagramPageUrl'
+  | 'businessDescription'
+
+export type BusinessOnboardingStep = {
+  readonly id: BusinessOnboardingStepId
+  readonly title: string
+  readonly subtitle: string
+  readonly required: boolean
+  readonly field?: keyof BusinessOnboardingFormData
+}
+
+export const BUSINESS_ONBOARDING_STEPS: readonly BusinessOnboardingStep[] = [
+  {
+    id: 'brandName',
+    title: 'What is your brand name?',
+    subtitle: 'This is how customers know you — and how Responza AI will refer to your business.',
+    required: true,
+    field: 'brandName',
+  },
+  {
+    id: 'websiteUrl',
+    title: "Your shop's website",
+    subtitle: 'Optional, but helps the AI learn about your products and policies from your site.',
+    required: false,
+    field: 'websiteUrl',
+  },
+  {
+    id: 'catalogue',
+    title: 'Upload your catalogue',
+    subtitle: 'Share brochures or product lists so the AI can answer with accurate details. Up to 5 files, 10 MB each.',
+    required: false,
+  },
+  {
+    id: 'facebookPageUrl',
+    title: 'Facebook page link',
+    subtitle: 'Optional. Add your public Facebook page if you use it for customer conversations.',
+    required: false,
+    field: 'facebookPageUrl',
+  },
+  {
+    id: 'instagramPageUrl',
+    title: 'Instagram page link',
+    subtitle: 'Optional. Your Instagram profile gives the AI extra context about your brand voice.',
+    required: false,
+    field: 'instagramPageUrl',
+  },
+  {
+    id: 'businessDescription',
+    title: 'Tell us about your business',
+    subtitle:
+      'What you sell, who you serve, your tone, policies, and common questions — the more detail, the smarter the AI.',
+    required: true,
+    field: 'businessDescription',
+  },
+] as const
+
+export function validateBusinessOnboardingStep(
+  stepId: BusinessOnboardingStepId,
+  formData: BusinessOnboardingFormData,
+): BusinessOnboardingFieldErrors {
+  const step = BUSINESS_ONBOARDING_STEPS.find((item) => item.id === stepId)
+  if (step === undefined || step.field === undefined) {
+    return {}
+  }
+
+  const allErrors = validateBusinessOnboardingForm(formData)
+  const message = allErrors[step.field]
+
+  if (message === undefined) {
+    return {}
+  }
+
+  return { [step.field]: message }
+}
+
+export function canProceedFromOnboardingStep(
+  stepId: BusinessOnboardingStepId,
+  formData: BusinessOnboardingFormData,
+): boolean {
+  if (stepId === 'catalogue') {
+    return true
+  }
+
+  return !hasBusinessOnboardingFieldErrors(validateBusinessOnboardingStep(stepId, formData))
+}
+
+export function findFirstOnboardingStepWithErrors(errors: BusinessOnboardingFieldErrors): number {
+  for (let index = 0; index < BUSINESS_ONBOARDING_STEPS.length; index += 1) {
+    const step = BUSINESS_ONBOARDING_STEPS[index]
+    if (step.field !== undefined && errors[step.field] !== undefined) {
+      return index
+    }
+  }
+
+  return 0
+}
