@@ -21,7 +21,9 @@ import {
   billingIntervalSuffix,
   conversationQuotaLabel,
   formatPlanLabel,
+  planBillingInterval,
 } from '@/shared/utils/billing-display'
+import { getApiErrorMessage } from '@/shared/utils/api-error'
 
 function formatInr(amount: number): string {
   return new Intl.NumberFormat('en-IN', {
@@ -157,6 +159,8 @@ export function SubscriptionPanel() {
       ? Math.min(100, (subscription.conversationsUsed / subscription.conversationLimit) * 100)
       : 0
 
+  const usageQuotaPeriod = planBillingInterval(subscription.plan) === 'yearly' ? 'year' : 'month'
+
   return (
     <div className="max-w-3xl space-y-8">
       {razorpayMode === 'test' && (
@@ -227,7 +231,7 @@ export function SubscriptionPanel() {
             <div className="mt-6">
               <AppProgressBar
                 value={quotaPercent}
-                label={`${subscription.conversationsUsed.toLocaleString('en-IN')} / ${subscription.conversationLimit.toLocaleString('en-IN')} conversations this billing period`}
+                label={`${subscription.conversationsUsed.toLocaleString('en-IN')} / ${subscription.conversationLimit.toLocaleString('en-IN')} conversations / ${usageQuotaPeriod}`}
               />
               {subscription.conversationsRemaining !== null &&
                 subscription.conversationsRemaining <= 0 && (
@@ -302,6 +306,7 @@ export function SubscriptionPanel() {
                   <p className="mt-2 text-sm text-ink-muted">
                     {conversationQuotaLabel(plan.interval, plan.conversationLimit)}
                   </p>
+                  <p className="mt-1 text-xs text-ink-faint">GST inclusive</p>
                   <AppButton
                     type="button"
                     disabled={!checkoutAvailable || isBusy || busyPlanKey !== null}

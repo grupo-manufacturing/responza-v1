@@ -88,9 +88,6 @@ function PricingCard({
         <p className={`mt-0.5 text-sm font-medium ${highlight ? 'text-on-dark' : 'text-ink'}`}>
           {conversationQuotaLabel(interval, conversationLimit)}
         </p>
-        {interval === 'yearly' && (
-          <p className={`mt-1 text-xs ${faintClass}`}>Equivalent to 2,500 conversations per month</p>
-        )}
       </div>
       <ul className="mt-5 flex-1 space-y-2.5">
         {PLAN_FEATURES.map((feature) => (
@@ -132,7 +129,7 @@ export function LandingPricing() {
             Basic · {formatInr(499)}/month · 1,000 conversations
           </span>
           <span className="rounded-[var(--radius-pill)] border border-accent/20 bg-accent/5 px-3 py-1.5 text-ink">
-            Responza Annual · {formatInr(4_999)}/year · 30,000 conversations
+            Responza Annual · {formatInr(4_999)}/year · 30,000 conversations / year
           </span>
         </div>
 
