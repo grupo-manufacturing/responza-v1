@@ -180,12 +180,12 @@ export function LandingFeatures() {
           <Reveal>
             <SectionDivider label="Features" variant="dark" />
             <h2 className="mt-10 text-2xl font-semibold tracking-tight text-on-dark sm:text-4xl">
-              Responza brings together all your customer conversations — and uses{' '}
+              Responza AI brings together all your customer conversations and uses{' '}
               <span className="text-accent-gradient-dark">AI</span> to help you respond with clarity and speed.
             </h2>
             <p className="mt-6 text-base leading-relaxed text-on-dark-muted">
               Whether messages arrive on WhatsApp or Instagram, your team sees one inbox, one history, and one
-              place to act — without switching between apps.
+              place to act without switching between apps.
             </p>
           </Reveal>
         </div>
@@ -202,7 +202,7 @@ export function LandingFeatures() {
         }
         description={
           <p>
-            WhatsApp and Instagram conversations arrive in a single inbox — sorted by latest activity, with
+            WhatsApp and Instagram conversations arrive in a single inbox sorted by latest activity, with
             platform context always visible.
           </p>
         }

@@ -18,6 +18,7 @@ import {
   AuthDivider,
   AuthHeader,
   AuthModeToggle,
+  AuthPasswordInput,
   AuthPrimaryButton,
   GoogleIcon,
 } from '../auth-ui'
@@ -210,16 +211,15 @@ export function AuthForm() {
             <label htmlFor="password" className="mb-1.5 block text-xs font-medium text-ink-muted">
               Password
             </label>
-            <input
+            <AuthPasswordInput
+              key={isLogin ? 'login-password' : 'register-password'}
               id="password"
               name="password"
-              type="password"
-              required
               value={formData.password}
               onChange={handleInputChange}
-              className={AUTH_INPUT_CLASS}
               placeholder={isLogin ? 'Enter password' : 'Min 8 characters'}
               minLength={isLogin ? 1 : 8}
+              autoComplete={isLogin ? 'current-password' : 'new-password'}
             />
           </div>
 

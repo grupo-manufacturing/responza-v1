@@ -17,7 +17,7 @@ type ConversationQueueListProps = {
 }
 
 function isIntegrationPlatform(value: string): value is IntegrationPlatform {
-  return value === 'whatsapp' || value === 'instagram' || value === 'indiamart'
+  return value === 'whatsapp' || value === 'instagram'
 }
 
 export function ConversationQueueList({

@@ -68,10 +68,6 @@ export function platformTabActiveClass(filter: InboxPlatformFilter, isActive: bo
     return 'border border-brand-instagram/30 bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#FCAF45] text-white shadow-soft'
   }
 
-  if (filter === 'indiamart') {
-    return 'border border-[#2E3192]/30 bg-[#2E3192] text-white shadow-soft'
-  }
-
   return 'border border-ink/10 bg-ink text-on-dark shadow-soft'
 }
 

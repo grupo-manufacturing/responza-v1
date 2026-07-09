@@ -99,7 +99,7 @@ export function AppSidebar({
                 ' ',
               )}
             >
-              RESPONZA
+              RESPONZA AI
             </span>
           </div>
           {onToggleCollapse !== undefined && (

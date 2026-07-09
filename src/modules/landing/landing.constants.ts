@@ -1,21 +1,23 @@
-import {
-  INTEGRATION_PLATFORM_LABELS,
-  INTEGRATION_PLATFORM_LOGOS,
-  INTEGRATION_PLATFORMS,
-  type IntegrationPlatform,
-} from '@/modules/integrations/integrations.constants'
+export type LandingPlatform = 'whatsapp' | 'instagram' | 'indiamart' | 'gmail'
 
-export type LandingPlatform = IntegrationPlatform | 'gmail'
-
-const LANDING_INTEGRATION_PLATFORMS: readonly LandingPlatform[] = [...INTEGRATION_PLATFORMS, 'gmail']
+const LANDING_INTEGRATION_PLATFORMS: readonly LandingPlatform[] = [
+  'whatsapp',
+  'instagram',
+  'indiamart',
+  'gmail',
+]
 
 const LANDING_PLATFORM_LABELS: Record<LandingPlatform, string> = {
-  ...INTEGRATION_PLATFORM_LABELS,
+  whatsapp: 'WhatsApp',
+  instagram: 'Instagram',
+  indiamart: 'IndiaMART',
   gmail: 'Gmail',
 }
 
 const LANDING_PLATFORM_LOGOS: Record<LandingPlatform, string> = {
-  ...INTEGRATION_PLATFORM_LOGOS,
+  whatsapp: '/whatsapp.png',
+  instagram: '/instagram.png',
+  indiamart: '/indiamart.png',
   gmail: '/gmail.png',
 }
 
@@ -74,14 +76,14 @@ export const AI_FEATURES = [
     tone: 'violet' as const,
     title: 'Respond faster with smart suggestions',
     description:
-      'Responza reads conversation context and drafts replies that match your tone. Edit, send, or ignore — you stay in control.',
+      'Responza AI reads conversation context and drafts replies that match your tone. Edit, send, or ignore you stay in control.',
   },
   {
     label: 'Translation',
     tone: 'warm' as const,
     title: "Speak your customer's language",
     description:
-      'Incoming messages are translated instantly so your team can reply confidently — no copy-pasting into external tools.',
+      'Incoming messages are translated instantly so your team can reply confidently no copy-pasting into external tools.',
   },
   {
     label: 'Analytics',
@@ -94,16 +96,16 @@ export const AI_FEATURES = [
 
 export const LANDING_FAQS = [
   {
-    q: 'How is Responza different from using WhatsApp and Instagram separately?',
-    a: 'Responza unifies both channels in one inbox with shared history, AI suggestions, lead tracking, and analytics — so your team never context-switches between apps.',
+    q: 'How is Responza AI different from using WhatsApp and Instagram separately?',
+    a: 'Responza AI unifies both channels in one inbox with shared history, AI suggestions, lead tracking, and analytics — so your team never context-switches between apps.',
   },
   {
     q: 'How do AI reply suggestions work?',
-    a: 'Responza uses your business profile and conversation context to draft replies. You review and edit before sending — nothing goes out without your approval.',
+    a: 'Responza AI uses your business profile and conversation context to draft replies. You review and edit before sending — nothing goes out without your approval.',
   },
   {
-    q: 'Can I still message customers outside of Responza?',
-    a: 'Yes. Messages sent from WhatsApp or Instagram directly still sync into your Responza inbox when channels are connected.',
+    q: 'Can I still message customers outside of Responza AI?',
+    a: 'Yes. Messages sent from WhatsApp or Instagram directly still sync into your Responza AI inbox when channels are connected.',
   },
   {
     q: 'Is my data private and secure?',

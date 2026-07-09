@@ -18,7 +18,6 @@ const sizeClasses = {
 const platformTextClass: Record<IntegrationPlatform, string> = {
   whatsapp: 'text-brand-whatsapp',
   instagram: 'text-brand-instagram',
-  indiamart: 'text-ink-muted',
 }
 
 export function PlatformBadge({ platform, size = 'sm', showLabel = false }: PlatformBadgeProps) {

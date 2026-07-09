@@ -181,7 +181,7 @@ export function MessageComposer({
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const aiBusy = suggesting
-  const attachmentsSupported = platform !== 'indiamart'
+  const attachmentsSupported = true
   const canSend =
     !disabled &&
     !sending &&

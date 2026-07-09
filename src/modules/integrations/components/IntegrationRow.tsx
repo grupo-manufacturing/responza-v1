@@ -6,7 +6,6 @@ import {
   integrationPlatformLabel,
   integrationPlatformLogoClass,
   integrationStatusLabel,
-  isIntegrationComingSoon,
   type IntegrationPlatform,
   type IntegrationStatus,
 } from '@/modules/integrations/integrations.constants'
@@ -51,7 +50,6 @@ export function IntegrationRow({
   onConnect,
   onDisconnect,
 }: IntegrationRowProps) {
-  const comingSoon = isIntegrationComingSoon(platform)
   const isConnected = status === 'connected'
   const connectLabel =
     platform === 'whatsapp' && busy && !isConnected
@@ -79,7 +77,7 @@ export function IntegrationRow({
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <h2 className="text-base font-semibold text-ink">{integrationPlatformLabel(platform)}</h2>
-              {!comingSoon && <StatusIndicator connected={isConnected} />}
+              <StatusIndicator connected={isConnected} />
             </div>
 
             {platform === 'whatsapp' && isConnected && whatsappDetails !== null ? (
@@ -113,29 +111,23 @@ export function IntegrationRow({
         </div>
 
         <div className="flex shrink-0 sm:pl-4">
-          {comingSoon ? (
-            <span className="inline-flex items-center justify-center rounded-[var(--radius-pill)] border border-dashed border-border bg-surface-muted px-4 py-2 text-sm font-medium text-ink-muted">
-              Coming soon
-            </span>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              <AppButton
-                disabled={busy}
-                onClick={() => onConnect(platform)}
-                className={['!px-4 !py-2', CONNECT_BUTTON_CLASS[platform] ?? ''].join(' ')}
-              >
-                {connectLabel}
-              </AppButton>
-              <AppButton
-                variant="secondary"
-                disabled={busy || !isConnected}
-                onClick={() => onDisconnect(platform)}
-                className="!px-4 !py-2"
-              >
-                {busy && isConnected ? 'Disconnecting…' : 'Disconnect'}
-              </AppButton>
-            </div>
-          )}
+          <div className="flex flex-wrap gap-2">
+            <AppButton
+              disabled={busy}
+              onClick={() => onConnect(platform)}
+              className={['!px-4 !py-2', CONNECT_BUTTON_CLASS[platform] ?? ''].join(' ')}
+            >
+              {connectLabel}
+            </AppButton>
+            <AppButton
+              variant="secondary"
+              disabled={busy || !isConnected}
+              onClick={() => onDisconnect(platform)}
+              className="!px-4 !py-2"
+            >
+              {busy && isConnected ? 'Disconnecting…' : 'Disconnect'}
+            </AppButton>
+          </div>
         </div>
       </div>
     </article>

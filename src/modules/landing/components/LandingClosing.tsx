@@ -21,7 +21,7 @@ export function LandingClosing() {
               Frequently asked questions
             </h2>
             <p className="mt-4 text-center text-base text-on-dark-muted">
-              Everything you need to know about Responza from setup to billing.
+              Everything you need to know about Responza AI from setup to billing.
             </p>
           </Reveal>
           <div className="mt-10 space-y-3 sm:mt-12">
@@ -78,7 +78,7 @@ export function LandingClosing() {
               <span className="text-accent-gradient-dark">closing conversations.</span>
             </h2>
             <p className="mt-4 text-base text-on-dark-muted">
-              Join businesses using Responza to respond faster and convert more customers.
+              Join businesses using Responza AI to respond faster and convert more customers.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <LandingButton to="/auth?mode=register" variant="secondary" showChevron className="w-full sm:w-auto">
@@ -124,7 +124,7 @@ export function LandingClosing() {
             </div>
           </div>
           <p className="mt-10 text-center text-xs text-on-dark-muted">
-            © {new Date().getFullYear()} Responza. All rights reserved.
+            © {new Date().getFullYear()} Responza AI. All rights reserved.
           </p>
         </div>
       </footer>

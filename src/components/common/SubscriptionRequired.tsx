@@ -4,7 +4,7 @@ export function SubscriptionRequired() {
   return (
     <AppGateCard
       title="Your free trial has ended"
-      description="Subscribe to continue using Responza."
+      description="Subscribe to continue using Responza AI."
       actionLabel="View subscription"
       actionTo="/settings?tab=subscription"
     />

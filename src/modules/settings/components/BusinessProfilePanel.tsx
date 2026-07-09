@@ -48,7 +48,7 @@ export function BusinessProfilePanel() {
         onRemoveCatalogue={handleRemoveCatalogue}
         intro={
           <p className="rounded-xl border border-accent/15 bg-accent/5 px-4 py-3 text-sm leading-relaxed text-ink-muted">
-            Keep this information up to date so Responza&apos;s AI understands your brand, products,
+            Keep this information up to date so Responza AI understands your brand, products,
             and how you communicate with customers. Website, catalogue, and social links are
             optional, but they help the AI give more accurate replies and insights.
           </p>
