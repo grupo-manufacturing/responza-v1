@@ -11,12 +11,14 @@ export function BusinessProfilePanel() {
     loadError,
     formData,
     setFormData,
+    fieldErrors,
     catalogueFiles,
     uploadingCatalogue,
     removingCatalogueId,
     isSaving,
     saveMessage,
     canSave,
+    handleFieldEdit,
     handleUploadCatalogue,
     handleRemoveCatalogue,
     handleSave,
@@ -43,7 +45,9 @@ export function BusinessProfilePanel() {
         catalogueFiles={catalogueFiles}
         uploadingCatalogue={uploadingCatalogue}
         removingCatalogueId={removingCatalogueId}
+        fieldErrors={fieldErrors}
         onChange={setFormData}
+        onFieldEdit={handleFieldEdit}
         onUploadCatalogue={handleUploadCatalogue}
         onRemoveCatalogue={handleRemoveCatalogue}
         intro={

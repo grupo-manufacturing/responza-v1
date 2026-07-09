@@ -10,6 +10,7 @@ import type { CatalogueFile } from '@/modules/business/business.service'
 import {
   BUSINESS_DESCRIPTION_MIN_LENGTH,
   CATALOGUE_ACCEPT,
+  type BusinessOnboardingFieldErrors,
   type BusinessOnboardingFormData,
 } from '@/modules/business/business-onboarding'
 
@@ -18,7 +19,9 @@ type BusinessOnboardingFormProps = {
   readonly catalogueFiles: CatalogueFile[]
   readonly uploadingCatalogue: boolean
   readonly removingCatalogueId: string | null
+  readonly fieldErrors?: BusinessOnboardingFieldErrors
   readonly onChange: (data: BusinessOnboardingFormData) => void
+  readonly onFieldEdit?: (field: keyof BusinessOnboardingFormData) => void
   readonly onUploadCatalogue: (file: File) => Promise<void>
   readonly onRemoveCatalogue: (fileId: string) => Promise<void>
   readonly intro?: ReactNode
@@ -38,17 +41,43 @@ function formatFileSize(bytes: number): string {
 
 function FieldLabel({
   children,
+  required = false,
   optional = false,
 }: {
   readonly children: string
+  readonly required?: boolean
   readonly optional?: boolean
 }) {
   return (
     <label className="mb-1.5 block text-sm font-medium text-ink">
       {children}
+      {required && <span className="text-red-500"> *</span>}
       {optional && <span className="ml-1 font-normal text-ink-faint">(optional)</span>}
     </label>
   )
+}
+
+function FieldError({ message }: { readonly message?: string }) {
+  if (message === undefined || message.length === 0) {
+    return null
+  }
+
+  return <p className="mt-1.5 text-xs text-red-600">{message}</p>
+}
+
+function fieldInputClass(hasError: boolean): string {
+  return [
+    APP_INPUT_CLASS,
+    hasError ? 'border-red-300 focus:border-red-400 focus:ring-red-100' : '',
+  ].join(' ')
+}
+
+function fieldTextareaClass(hasError: boolean): string {
+  return [
+    APP_TEXTAREA_CLASS,
+    'px-4 py-3 text-base',
+    hasError ? 'border-red-300 focus:border-red-400 focus:ring-red-100' : '',
+  ].join(' ')
 }
 
 export function BusinessOnboardingForm({
@@ -56,7 +85,9 @@ export function BusinessOnboardingForm({
   catalogueFiles,
   uploadingCatalogue,
   removingCatalogueId,
+  fieldErrors = {},
   onChange,
+  onFieldEdit,
   onUploadCatalogue,
   onRemoveCatalogue,
   intro,
@@ -69,6 +100,7 @@ export function BusinessOnboardingForm({
     value: BusinessOnboardingFormData[K],
   ) => {
     onChange({ ...formData, [field]: value })
+    onFieldEdit?.(field)
   }
 
   const handleCatalogueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,8 +112,12 @@ export function BusinessOnboardingForm({
     }
 
     setCatalogueError(null)
-    void onUploadCatalogue(file).catch(() => {
-      setCatalogueError('Could not upload this file. Please try a PDF, Word, Excel, PowerPoint, or text file under 10 MB.')
+    void onUploadCatalogue(file).catch((error: unknown) => {
+      const message =
+        error instanceof Error && error.message.length > 0
+          ? error.message
+          : 'Could not upload this file. Please try a PDF, Word, Excel, PowerPoint, or text file under 10 MB.'
+      setCatalogueError(message)
     })
   }
 
@@ -98,14 +134,15 @@ export function BusinessOnboardingForm({
       )}
 
       <div>
-        <FieldLabel>What is your brand name?</FieldLabel>
+        <FieldLabel required>What is your brand name?</FieldLabel>
         <input
           type="text"
           value={formData.brandName}
           onChange={(event) => updateField('brandName', event.target.value)}
           placeholder="e.g., StyleHub"
-          className={APP_INPUT_CLASS}
+          className={fieldInputClass(fieldErrors.brandName !== undefined)}
         />
+        <FieldError message={fieldErrors.brandName} />
       </div>
 
       <div>
@@ -115,8 +152,9 @@ export function BusinessOnboardingForm({
           value={formData.websiteUrl}
           onChange={(event) => updateField('websiteUrl', event.target.value)}
           placeholder="https://yourshop.com"
-          className={APP_INPUT_CLASS}
+          className={fieldInputClass(fieldErrors.websiteUrl !== undefined)}
         />
+        <FieldError message={fieldErrors.websiteUrl} />
       </div>
 
       <div>
@@ -150,9 +188,7 @@ export function BusinessOnboardingForm({
           )}
         </AppButton>
 
-        {catalogueError !== null && (
-          <p className="mt-2 text-sm text-red-600">{catalogueError}</p>
-        )}
+        <FieldError message={catalogueError ?? undefined} />
 
         {catalogueFiles.length > 0 && (
           <ul className="mt-3 space-y-2">
@@ -189,8 +225,9 @@ export function BusinessOnboardingForm({
             value={formData.facebookPageUrl}
             onChange={(event) => updateField('facebookPageUrl', event.target.value)}
             placeholder="https://facebook.com/yourpage"
-            className={APP_INPUT_CLASS}
+            className={fieldInputClass(fieldErrors.facebookPageUrl !== undefined)}
           />
+          <FieldError message={fieldErrors.facebookPageUrl} />
         </div>
 
         <div>
@@ -200,13 +237,14 @@ export function BusinessOnboardingForm({
             value={formData.instagramPageUrl}
             onChange={(event) => updateField('instagramPageUrl', event.target.value)}
             placeholder="https://instagram.com/yourpage"
-            className={APP_INPUT_CLASS}
+            className={fieldInputClass(fieldErrors.instagramPageUrl !== undefined)}
           />
+          <FieldError message={fieldErrors.instagramPageUrl} />
         </div>
       </div>
 
       <div>
-        <FieldLabel>Tell us about your business in detail</FieldLabel>
+        <FieldLabel required>Tell us about your business in detail</FieldLabel>
         <p className="mb-2 text-sm text-ink-muted">
           Include what you sell, who your customers are, pricing approach, policies, and anything else
           the AI should know when replying on your behalf.
@@ -216,11 +254,12 @@ export function BusinessOnboardingForm({
           onChange={(event) => updateField('businessDescription', event.target.value)}
           placeholder="Describe your products, services, target customers, tone, policies, and common questions you receive..."
           rows={6}
-          className={`${APP_TEXTAREA_CLASS} px-4 py-3 text-base`}
+          className={fieldTextareaClass(fieldErrors.businessDescription !== undefined)}
         />
         <p className="mt-1.5 text-xs text-ink-faint">
           At least {BUSINESS_DESCRIPTION_MIN_LENGTH} characters.
         </p>
+        <FieldError message={fieldErrors.businessDescription} />
       </div>
     </div>
   )

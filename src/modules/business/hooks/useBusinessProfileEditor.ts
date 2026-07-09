@@ -4,16 +4,21 @@ import {
   businessProfileToFormData,
   canSubmitBusinessOnboarding,
   formDataToBusinessPayload,
+  hasBusinessOnboardingFieldErrors,
   isSameBusinessFormData,
+  mapApiFieldErrorsToBusinessForm,
+  validateBusinessOnboardingForm,
+  type BusinessOnboardingFieldErrors,
   type BusinessOnboardingFormData,
 } from '@/modules/business/business-onboarding'
 import { BusinessService, type CatalogueFile } from '@/modules/business/business.service'
-import { getApiErrorMessage } from '@/shared/utils/api-error'
+import { getApiErrorMessage, getApiValidationFieldErrors } from '@/shared/utils/api-error'
 
 export function useBusinessProfileEditor() {
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [formData, setFormData] = useState<BusinessOnboardingFormData | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<BusinessOnboardingFieldErrors>({})
   const [savedFormData, setSavedFormData] = useState<BusinessOnboardingFormData | null>(null)
   const [catalogueFiles, setCatalogueFiles] = useState<CatalogueFile[]>([])
   const [uploadingCatalogue, setUploadingCatalogue] = useState(false)
@@ -64,6 +69,8 @@ export function useBusinessProfileEditor() {
         variant: 'success',
         text: 'Catalogue file uploaded.',
       })
+    } catch (err: unknown) {
+      throw new Error(getApiErrorMessage(err, 'Could not upload catalogue file. Please try again.'))
     } finally {
       setUploadingCatalogue(false)
     }
@@ -91,7 +98,14 @@ export function useBusinessProfileEditor() {
   }
 
   const handleSave = async () => {
-    if (formData === null || !canSubmitBusinessOnboarding(formData)) {
+    if (formData === null) {
+      return
+    }
+
+    const nextFieldErrors = validateBusinessOnboardingForm(formData)
+    setFieldErrors(nextFieldErrors)
+
+    if (hasBusinessOnboardingFieldErrors(nextFieldErrors)) {
       return
     }
 
@@ -104,18 +118,42 @@ export function useBusinessProfileEditor() {
       setFormData(nextFormData)
       setSavedFormData(nextFormData)
       setCatalogueFiles(result.profile.catalogueFiles)
+      setFieldErrors({})
       setSaveMessage({
         variant: 'success',
         text: 'Business profile updated.',
       })
     } catch (err: unknown) {
-      setSaveMessage({
-        variant: 'error',
-        text: getApiErrorMessage(err, 'Could not save business profile. Please try again.'),
-      })
+      const apiFieldErrors = getApiValidationFieldErrors(err)
+      if (apiFieldErrors !== null) {
+        setFieldErrors(mapApiFieldErrorsToBusinessForm(apiFieldErrors))
+        setSaveMessage(null)
+      } else {
+        setSaveMessage({
+          variant: 'error',
+          text: getApiErrorMessage(err, 'Could not save business profile. Please try again.'),
+        })
+      }
     } finally {
       setIsSaving(false)
     }
+  }
+
+  const handleFieldEdit = (field: keyof BusinessOnboardingFormData) => {
+    setFieldErrors((current) => {
+      if (current[field] === undefined) {
+        return current
+      }
+
+      const next = { ...current }
+      delete next[field]
+      return next
+    })
+    setSaveMessage(null)
+  }
+
+  const handleFormChange = (nextFormData: BusinessOnboardingFormData) => {
+    setFormData(nextFormData)
   }
 
   const isDirty =
@@ -130,13 +168,15 @@ export function useBusinessProfileEditor() {
     isLoading,
     loadError,
     formData,
-    setFormData,
+    setFormData: handleFormChange,
+    fieldErrors,
     catalogueFiles,
     uploadingCatalogue,
     removingCatalogueId,
     isSaving,
     saveMessage,
     canSave,
+    handleFieldEdit,
     handleUploadCatalogue,
     handleRemoveCatalogue,
     handleSave,

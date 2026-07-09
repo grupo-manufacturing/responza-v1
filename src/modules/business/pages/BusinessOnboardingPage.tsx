@@ -10,13 +10,17 @@ import {
   businessProfileToFormData,
   canSubmitBusinessOnboarding,
   formDataToBusinessPayload,
+  hasBusinessOnboardingFieldErrors,
+  mapApiFieldErrorsToBusinessForm,
+  validateBusinessOnboardingForm,
+  type BusinessOnboardingFieldErrors,
   type BusinessOnboardingFormData,
 } from '@/modules/business/business-onboarding'
 import { BusinessService, type CatalogueFile } from '@/modules/business/business.service'
 import { AppButton, AppCard, AppFlowLayout } from '@/shared/ui/app-ui'
 import { LandingLogo } from '@/shared/ui/brand-ui'
 import { SessionStorage } from '@/shared/session/storage'
-import { getApiErrorMessage } from '@/shared/utils/api-error'
+import { getApiErrorMessage, getApiValidationFieldErrors } from '@/shared/utils/api-error'
 
 export function BusinessOnboardingPage() {
   const navigate = useNavigate()
@@ -25,6 +29,7 @@ export function BusinessOnboardingPage() {
   const [alreadyCompleted, setAlreadyCompleted] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [formData, setFormData] = useState<BusinessOnboardingFormData>(EMPTY_BUSINESS_ONBOARDING_FORM)
+  const [fieldErrors, setFieldErrors] = useState<BusinessOnboardingFieldErrors>({})
   const [catalogueFiles, setCatalogueFiles] = useState<CatalogueFile[]>([])
   const [uploadingCatalogue, setUploadingCatalogue] = useState(false)
   const [removingCatalogueId, setRemovingCatalogueId] = useState<string | null>(null)
@@ -64,6 +69,8 @@ export function BusinessOnboardingPage() {
     try {
       const result = await BusinessService.uploadCatalogue(file)
       setCatalogueFiles(result.profile.catalogueFiles)
+    } catch (err: unknown) {
+      throw new Error(getApiErrorMessage(err, 'Could not upload catalogue file. Please try again.'))
     } finally {
       setUploadingCatalogue(false)
     }
@@ -84,6 +91,13 @@ export function BusinessOnboardingPage() {
   }
 
   const handleSave = async () => {
+    const nextFieldErrors = validateBusinessOnboardingForm(formData)
+    setFieldErrors(nextFieldErrors)
+
+    if (hasBusinessOnboardingFieldErrors(nextFieldErrors)) {
+      return
+    }
+
     setIsLoading(true)
     setError(null)
 
@@ -92,10 +106,29 @@ export function BusinessOnboardingPage() {
       SessionStorage.setBusinessDetailsCompleted(true)
       navigate('/dashboard', { replace: true })
     } catch (err: unknown) {
-      setError(getApiErrorMessage(err, 'Something went wrong. Please try again.'))
+      const apiFieldErrors = getApiValidationFieldErrors(err)
+      if (apiFieldErrors !== null) {
+        setFieldErrors(mapApiFieldErrorsToBusinessForm(apiFieldErrors))
+        setError(null)
+      } else {
+        setError(getApiErrorMessage(err, 'Something went wrong. Please try again.'))
+      }
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleFieldEdit = (field: keyof BusinessOnboardingFormData) => {
+    setFieldErrors((current) => {
+      if (current[field] === undefined) {
+        return current
+      }
+
+      const next = { ...current }
+      delete next[field]
+      return next
+    })
+    setError(null)
   }
 
   const canSubmit = canSubmitBusinessOnboarding(formData)
@@ -136,7 +169,9 @@ export function BusinessOnboardingPage() {
             catalogueFiles={catalogueFiles}
             uploadingCatalogue={uploadingCatalogue}
             removingCatalogueId={removingCatalogueId}
+            fieldErrors={fieldErrors}
             onChange={setFormData}
+            onFieldEdit={handleFieldEdit}
             onUploadCatalogue={handleUploadCatalogue}
             onRemoveCatalogue={handleRemoveCatalogue}
           />
@@ -154,9 +189,9 @@ export function BusinessOnboardingPage() {
             </AppButton>
           </div>
 
-          {!canSubmit && formData.businessDescription.trim().length > 0 && (
+          {!canSubmit && (
             <p className="mt-3 text-right text-xs text-ink-faint">
-              Add your brand name and at least {BUSINESS_DESCRIPTION_MIN_LENGTH} characters about your
+              Enter your brand name and at least {BUSINESS_DESCRIPTION_MIN_LENGTH} characters about your
               business to continue.
             </p>
           )}
