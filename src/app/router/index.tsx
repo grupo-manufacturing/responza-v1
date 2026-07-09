@@ -1,6 +1,7 @@
 import { lazy } from 'react'
 import { Navigate, createBrowserRouter } from 'react-router-dom'
 
+import { PaidPlanRoute } from '@/app/guards/PaidPlanRoute'
 import { ProtectedRoute } from '@/app/guards/ProtectedRoute'
 import { PageSuspense } from '@/components/ui/Spinner'
 import { AppLayout } from '@/layouts/AppLayout'
@@ -67,7 +68,10 @@ export const router = createBrowserRouter([
       {
         element: <AppLayout />,
         children: [
-          { path: '/dashboard', element: <DashboardPage /> },
+          {
+            element: <PaidPlanRoute />,
+            children: [{ path: '/dashboard', element: <DashboardPage /> }],
+          },
           { path: '/leads', element: <LeadsPage /> },
           { path: '/inbox', element: <InboxPage /> },
           { path: '/integrations', element: <IntegrationsPage /> },

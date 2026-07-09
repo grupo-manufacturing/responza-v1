@@ -2,11 +2,15 @@ import type { NavigateFunction } from 'react-router-dom'
 
 import type { AuthSession } from '@/modules/auth/auth.types'
 import { SessionStorage } from '@/shared/session/storage'
+import {
+  resolveDefaultAppPath,
+  sanitizePostAuthDestination,
+} from '@/shared/utils/subscription-access'
 
 export function completeAuthSession(
   response: AuthSession,
   navigate: NavigateFunction,
-  from = '/dashboard',
+  from?: string,
 ): void {
   SessionStorage.saveTokens(response.accessToken, response.refreshToken)
   SessionStorage.saveSessionProfile(response)
@@ -16,5 +20,9 @@ export function completeAuthSession(
     return
   }
 
-  navigate(from, { replace: true })
+  const destination = sanitizePostAuthDestination(
+    from ?? resolveDefaultAppPath(response.subscription),
+    response.subscription,
+  )
+  navigate(destination, { replace: true })
 }

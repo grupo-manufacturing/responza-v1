@@ -9,6 +9,7 @@ import type { AuthFormData } from '@/modules/auth/auth.types'
 import { completeAuthSession } from '@/modules/auth/lib/completeAuthSession'
 import { isGoogleAuthConfigured, startGoogleOAuth } from '@/modules/auth/lib/googleOAuth'
 import { getApiErrorMessage, isEmailNotVerifiedError } from '@/shared/utils/api-error'
+import { resolveDefaultAppPath } from '@/shared/utils/subscription-access'
 
 import {
   AUTH_INPUT_CLASS,
@@ -39,7 +40,9 @@ export function AuthForm() {
     name: '',
   })
 
-  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/dashboard'
+  const from =
+    (location.state as { from?: { pathname: string } })?.from?.pathname ||
+    resolveDefaultAppPath(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

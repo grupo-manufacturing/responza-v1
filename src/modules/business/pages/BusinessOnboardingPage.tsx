@@ -20,6 +20,7 @@ import { AppCard, AppFlowLayout } from '@/shared/ui/app-ui'
 import { LandingLogo } from '@/shared/ui/brand-ui'
 import { SessionStorage } from '@/shared/session/storage'
 import { getApiErrorMessage, getApiValidationFieldErrors } from '@/shared/utils/api-error'
+import { resolveDefaultAppPath } from '@/shared/utils/subscription-access'
 
 export function BusinessOnboardingPage() {
   const navigate = useNavigate()
@@ -105,7 +106,7 @@ export function BusinessOnboardingPage() {
     try {
       await BusinessService.completeBusiness(formDataToBusinessPayload(formData))
       SessionStorage.setBusinessDetailsCompleted(true)
-      navigate('/dashboard', { replace: true })
+      navigate(resolveDefaultAppPath(SessionStorage.getStoredSubscription()), { replace: true })
     } catch (err: unknown) {
       const apiFieldErrors = getApiValidationFieldErrors(err)
       if (apiFieldErrors !== null) {
@@ -139,7 +140,7 @@ export function BusinessOnboardingPage() {
   }
 
   if (alreadyCompleted) {
-    return <Navigate to="/dashboard" replace />
+    return <Navigate to={resolveDefaultAppPath(SessionStorage.getStoredSubscription())} replace />
   }
 
   return (

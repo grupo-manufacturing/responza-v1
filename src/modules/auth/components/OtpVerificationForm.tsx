@@ -5,6 +5,7 @@ import { Spinner } from '@/components/ui/Spinner'
 import { AuthService } from '@/modules/auth/auth.service'
 import { completeAuthSession } from '@/modules/auth/lib/completeAuthSession'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
+import { resolveDefaultAppPath } from '@/shared/utils/subscription-access'
 
 import {
   AUTH_INPUT_CLASS,
@@ -37,7 +38,7 @@ export function OtpVerificationForm() {
   const [resendMessage, setResendMessage] = useState<string | null>(null)
   const [cooldown, setCooldown] = useState(0)
 
-  const from = state.from?.pathname || '/dashboard'
+  const from = state.from?.pathname || resolveDefaultAppPath(null)
 
   useEffect(() => {
     if (email.length === 0) {

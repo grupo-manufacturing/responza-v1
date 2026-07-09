@@ -14,7 +14,7 @@ export function getGoogleOAuthRedirectUri(nextPath?: string): string {
   return redirectTo.toString()
 }
 
-export async function startGoogleOAuth(nextPath = '/dashboard'): Promise<void> {
+export async function startGoogleOAuth(nextPath = '/inbox'): Promise<void> {
   const supabase = getAuthSupabaseClient()
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
@@ -83,5 +83,5 @@ export function readGoogleOAuthNextPath(): string {
     return next
   }
 
-  return '/dashboard'
+  return '/inbox'
 }

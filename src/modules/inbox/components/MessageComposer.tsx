@@ -35,6 +35,7 @@ type MessageComposerProps = {
   readonly disabled: boolean
   readonly sending: boolean
   readonly platform?: IntegrationPlatform | null
+  readonly aiEnabled?: boolean
   readonly onSend: (input: SendComposerInput) => Promise<void>
 }
 
@@ -170,6 +171,7 @@ export function MessageComposer({
   disabled,
   sending,
   platform = null,
+  aiEnabled = true,
   onSend,
 }: MessageComposerProps) {
   const [content, setContent] = useState('')
@@ -188,7 +190,7 @@ export function MessageComposer({
     !aiBusy &&
     (attachment !== null || content.trim().length > 0)
   const canSuggest =
-    !disabled && !sending && !aiBusy && conversationId !== null
+    aiEnabled && !disabled && !sending && !aiBusy && conversationId !== null
   const canAttach = !disabled && !sending && !aiBusy && attachmentsSupported
 
   useEffect(() => {
@@ -304,7 +306,7 @@ export function MessageComposer({
 
   return (
     <div className="relative shrink-0">
-      {suggestions.length > 0 && (
+      {aiEnabled && suggestions.length > 0 && (
         <div className="absolute bottom-full left-0 right-0 z-10 px-4 pb-2">
           <ReplySuggestionChips
             suggestions={suggestions}
@@ -370,21 +372,23 @@ export function MessageComposer({
             rows={1}
             className="min-h-[36px] max-h-28 flex-1 resize-none border-0 bg-transparent py-1.5 text-sm text-ink outline-none placeholder:text-ink-faint disabled:cursor-not-allowed"
           />
-          <button
-            type="button"
-            onClick={() => {
-              void handleSuggestReply()
-            }}
-            disabled={!canSuggest}
-            aria-label={suggesting ? 'Generating reply suggestions' : 'Suggest reply'}
-            title="Suggest reply"
-            className={composerActionIconClass(
-              canSuggest,
-              'text-accent-violet hover:bg-accent-violet/10 hover:text-accent-violet',
-            )}
-          >
-            {suggesting ? <Spinner size="sm" variant="muted" /> : <SuggestReplyIcon />}
-          </button>
+          {aiEnabled && (
+            <button
+              type="button"
+              onClick={() => {
+                void handleSuggestReply()
+              }}
+              disabled={!canSuggest}
+              aria-label={suggesting ? 'Generating reply suggestions' : 'Suggest reply'}
+              title="Suggest reply"
+              className={composerActionIconClass(
+                canSuggest,
+                'text-accent-violet hover:bg-accent-violet/10 hover:text-accent-violet',
+              )}
+            >
+              {suggesting ? <Spinner size="sm" variant="muted" /> : <SuggestReplyIcon />}
+            </button>
+          )}
           <button
             type="submit"
             disabled={!canSend}
@@ -399,7 +403,7 @@ export function MessageComposer({
             {attachmentError}
           </p>
         )}
-        {suggestError !== null && (
+        {aiEnabled && suggestError !== null && (
           <p className="mt-2 text-xs text-red-600" role="alert">
             {suggestError}
           </p>

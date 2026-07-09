@@ -1,12 +1,16 @@
 import { Navigate } from 'react-router-dom'
 
 import { SessionStorage } from '@/shared/session/storage'
+import { resolvePostAuthPath } from '@/shared/utils/subscription-access'
 
 import { AuthLayout } from '../auth-ui'
 import { OtpVerificationForm } from '../components/OtpVerificationForm'
 
 export function OtpVerificationPage() {
-  const postAuthPath = SessionStorage.isBusinessDetailsCompleted() ? '/dashboard' : '/business'
+  const postAuthPath = resolvePostAuthPath(
+    SessionStorage.isBusinessDetailsCompleted(),
+    SessionStorage.getStoredSubscription(),
+  )
 
   if (SessionStorage.isAuthenticated()) {
     return <Navigate to={postAuthPath} replace />
