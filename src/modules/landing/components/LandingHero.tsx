@@ -180,6 +180,15 @@ function HeroVisual() {
   )
 }
 
+function MetaVerifiedBadge() {
+  return (
+    <div className="mb-5 inline-flex items-center gap-2 rounded-[var(--radius-pill)] border border-[#0081FB]/20 bg-white/90 px-3 py-1.5 shadow-soft backdrop-blur-sm sm:mb-6">
+      <img src="/meta.png" alt="" className="h-4 w-4 shrink-0 object-contain" aria-hidden />
+      <span className="text-[11px] font-semibold tracking-wide text-[#0081FB]">Meta Verified</span>
+    </div>
+  )
+}
+
 export function LandingHero() {
   return (
     <>
@@ -187,6 +196,7 @@ export function LandingHero() {
         <LandingNavbar variant="light" />
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
           <Reveal>
+            <MetaVerifiedBadge />
             <h1 className="text-3xl font-semibold tracking-tight text-ink sm:text-5xl lg:text-6xl">
               One inbox, <span className="text-accent-gradient">every conversation.</span>
             </h1>
