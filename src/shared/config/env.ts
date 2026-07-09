@@ -40,6 +40,23 @@ export function getInstagramAppId(): string {
   return import.meta.env.VITE_INSTAGRAM_APP_ID?.trim() ?? ''
 }
 
+export function getAppOrigin(): string | null {
+  const configured = import.meta.env.VITE_APP_URL?.trim() ?? ''
+  if (configured.length > 0) {
+    try {
+      return new URL(configured).origin
+    } catch {
+      return null
+    }
+  }
+
+  if (typeof window !== 'undefined') {
+    return window.location.origin
+  }
+
+  return null
+}
+
 function apiBaseOrigin(): string | null {
   const apiUrl = import.meta.env.VITE_API_URL?.trim() ?? ''
   if (apiUrl.length === 0) {
@@ -63,6 +80,11 @@ export function getInstagramRedirectUri(): string {
     return configured
   }
 
+  const appOrigin = getAppOrigin()
+  if (appOrigin !== null) {
+    return `${appOrigin}/oauth/instagram/callback`
+  }
+
   const apiOrigin = apiBaseOrigin()
   if (apiOrigin !== null) {
     return `${apiOrigin}/auth/instagram/callback`
@@ -73,11 +95,27 @@ export function getInstagramRedirectUri(): string {
 
 export function getInstagramOAuthAllowedOrigins(): string[] {
   const origins = new Set<string>()
-  origins.add(window.location.origin)
+
+  if (typeof window !== 'undefined') {
+    origins.add(window.location.origin)
+  }
+
+  const appOrigin = getAppOrigin()
+  if (appOrigin !== null) {
+    origins.add(appOrigin)
+  }
 
   const apiOrigin = apiBaseOrigin()
   if (apiOrigin !== null) {
     origins.add(apiOrigin)
+  }
+
+  const extraOrigins = import.meta.env.VITE_INSTAGRAM_OAUTH_ALLOWED_ORIGINS?.split(',') ?? []
+  for (const origin of extraOrigins) {
+    const trimmed = origin.trim()
+    if (trimmed.length > 0) {
+      origins.add(trimmed)
+    }
   }
 
   return [...origins]

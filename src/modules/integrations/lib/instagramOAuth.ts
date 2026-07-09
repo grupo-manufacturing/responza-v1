@@ -5,11 +5,23 @@ import {
   isInstagramOAuthConfigured,
 } from '@/shared/config/env'
 
+let oauthListenerBound = false
 let oauthPopup: Window | null = null
 let oauthResolve: ((result: { code: string }) => void) | null = null
 let oauthReject: ((error: Error) => void) | null = null
 
+function resetInstagramOAuthState(): void {
+  oauthResolve = null
+  oauthReject = null
+  oauthPopup = null
+}
+
 function bindInstagramOAuthListener(): void {
+  if (oauthListenerBound) {
+    return
+  }
+
+  oauthListenerBound = true
   const allowedOrigins = getInstagramOAuthAllowedOrigins()
 
   window.addEventListener('message', (event) => {
@@ -19,17 +31,15 @@ function bindInstagramOAuthListener(): void {
 
     try {
       const payload = typeof event.data === 'object' ? event.data : null
-      if (payload?.type === 'INSTAGRAM_OAUTH_SUCCESS') {
+      if (payload?.type === 'INSTAGRAM_OAUTH_SUCCESS' && typeof payload.code === 'string') {
         if (oauthResolve) {
           oauthResolve({ code: payload.code })
-          oauthResolve = null
-          oauthReject = null
+          resetInstagramOAuthState()
         }
       } else if (payload?.type === 'INSTAGRAM_OAUTH_ERROR') {
         if (oauthReject) {
           oauthReject(new Error(payload.error || 'Instagram OAuth failed'))
-          oauthResolve = null
-          oauthReject = null
+          resetInstagramOAuthState()
         }
       }
     } catch {
@@ -72,42 +82,45 @@ export async function startInstagramOAuth(): Promise<{ code: string }> {
         clearInterval(checkClosed)
         if (oauthReject) {
           oauthReject(new Error('Instagram OAuth was canceled'))
-          oauthResolve = null
-          oauthReject = null
+          resetInstagramOAuthState()
         }
       }
     }, 1000)
   })
 }
 
+function postInstagramOAuthResult(payload: Record<string, unknown>): void {
+  const targetOrigin = window.location.origin
+  window.opener?.postMessage(payload, targetOrigin)
+  setTimeout(() => {
+    window.close()
+  }, 150)
+}
+
 export function handleInstagramOAuthCallback(): void {
   const urlParams = new URLSearchParams(window.location.search)
-  const code = urlParams.get('code')
+  const code = urlParams.get('code')?.replace(/#_$/, '').trim() ?? ''
   const error = urlParams.get('error')
   const errorDescription = urlParams.get('error_description')
 
   if (error) {
-    window.opener?.postMessage({
+    postInstagramOAuthResult({
       type: 'INSTAGRAM_OAUTH_ERROR',
-      error: errorDescription || error || 'Instagram OAuth failed'
-    }, window.location.origin)
-    window.close()
+      error: errorDescription || error || 'Instagram OAuth failed',
+    })
     return
   }
 
-  if (!code) {
-    window.opener?.postMessage({
+  if (code.length === 0) {
+    postInstagramOAuthResult({
       type: 'INSTAGRAM_OAUTH_ERROR',
-      error: 'No authorization code received'
-    }, window.location.origin)
-    window.close()
+      error: 'No authorization code received',
+    })
     return
   }
 
-  window.opener?.postMessage({
+  postInstagramOAuthResult({
     type: 'INSTAGRAM_OAUTH_SUCCESS',
-    code
-  }, window.location.origin)
-  
-  window.close()
+    code,
+  })
 }
