@@ -242,7 +242,11 @@ export function LandingHero() {
                       src={logo}
                       alt={label}
                       className={landingPlatformLogoClass(platform)}
-                      style={platform === 'indiamart' ? { maxHeight: 44 } : { height: 44, width: 44 }}
+                      style={
+                        platform === 'indiamart' || platform === 'tally' || platform === 'shopify'
+                          ? { maxHeight: 44 }
+                          : { height: 44, width: 44 }
+                      }
                     />
                   </div>
                 </Reveal>

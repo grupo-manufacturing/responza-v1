@@ -1,7 +1,9 @@
 import { SubscriptionRequired } from '@/components/common/SubscriptionRequired'
 import { Alert } from '@/components/ui/Alert'
 import { SpinnerSection } from '@/components/ui/Spinner'
+import { ComingSoonIntegrationRow } from '@/modules/integrations/components/ComingSoonIntegrationRow'
 import { IntegrationRow } from '@/modules/integrations/components/IntegrationRow'
+import { COMING_SOON_INTEGRATIONS } from '@/modules/integrations/integrations.constants'
 import { useIntegrations } from '@/modules/integrations/hooks/useIntegrations'
 import { AppCard, AppPage, AppPageHeader } from '@/shared/ui/app-ui'
 
@@ -74,6 +76,9 @@ export function IntegrationsPage() {
                 onConnect={handleConnect}
                 onDisconnect={handleDisconnect}
               />
+            ))}
+            {COMING_SOON_INTEGRATIONS.map((integration) => (
+              <ComingSoonIntegrationRow key={integration.platform} {...integration} />
             ))}
           </div>
         </AppCard>

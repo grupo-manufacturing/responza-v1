@@ -1,10 +1,20 @@
-export type LandingPlatform = 'whatsapp' | 'instagram' | 'indiamart' | 'gmail'
+export type LandingPlatform =
+  | 'whatsapp'
+  | 'instagram'
+  | 'indiamart'
+  | 'gmail'
+  | 'tally'
+  | 'tiktok'
+  | 'shopify'
 
 const LANDING_INTEGRATION_PLATFORMS: readonly LandingPlatform[] = [
   'whatsapp',
   'instagram',
   'indiamart',
   'gmail',
+  'tally',
+  'tiktok',
+  'shopify',
 ]
 
 const LANDING_PLATFORM_LABELS: Record<LandingPlatform, string> = {
@@ -12,6 +22,9 @@ const LANDING_PLATFORM_LABELS: Record<LandingPlatform, string> = {
   instagram: 'Instagram',
   indiamart: 'IndiaMART',
   gmail: 'Gmail',
+  tally: 'Tally',
+  tiktok: 'TikTok',
+  shopify: 'Shopify',
 }
 
 const LANDING_PLATFORM_LOGOS: Record<LandingPlatform, string> = {
@@ -19,6 +32,9 @@ const LANDING_PLATFORM_LOGOS: Record<LandingPlatform, string> = {
   instagram: '/instagram.png',
   indiamart: '/indiamart.png',
   gmail: '/gmail.png',
+  tally: '/tally.png',
+  tiktok: '/tiktok.png',
+  shopify: '/shopify.png',
 }
 
 export const LANDING_PLATFORMS = LANDING_INTEGRATION_PLATFORMS.map((platform) => ({
@@ -32,6 +48,9 @@ export const PLATFORM_GLOW: Record<LandingPlatform, string> = {
   instagram: 'shadow-[0_8px_24px_rgb(225_48_108/0.16)]',
   indiamart: 'shadow-[0_8px_24px_rgb(245_158_11/0.16)]',
   gmail: 'shadow-[0_8px_24px_rgb(234_67_53/0.18)]',
+  tally: 'shadow-[0_8px_24px_rgb(220_38_38/0.16)]',
+  tiktok: 'shadow-[0_8px_24px_rgb(236_72_153/0.16)]',
+  shopify: 'shadow-[0_8px_24px_rgb(34_197_94/0.18)]',
 }
 
 export const PLATFORM_RING: Record<LandingPlatform, string> = {
@@ -39,10 +58,13 @@ export const PLATFORM_RING: Record<LandingPlatform, string> = {
   instagram: 'ring-pink-500/15',
   indiamart: 'ring-amber-500/20',
   gmail: 'ring-red-500/20',
+  tally: 'ring-red-500/20',
+  tiktok: 'ring-pink-500/15',
+  shopify: 'ring-emerald-500/20',
 }
 
 export function landingPlatformLogoClass(platform: LandingPlatform): string {
-  if (platform === 'indiamart') {
+  if (platform === 'indiamart' || platform === 'tally' || platform === 'shopify') {
     return 'h-8 w-auto max-w-full object-contain'
   }
 
