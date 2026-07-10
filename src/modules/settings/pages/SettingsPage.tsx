@@ -1,5 +1,6 @@
 import { useSearchParams } from 'react-router-dom'
 
+import { AgentSettingsPanel } from '@/modules/settings/components/AgentSettingsPanel'
 import { BusinessProfilePanel } from '@/modules/settings/components/BusinessProfilePanel'
 import { GeneralSettingsPanel } from '@/modules/settings/components/GeneralSettingsPanel'
 import { SubscriptionPanel } from '@/modules/settings/components/SubscriptionPanel'
@@ -7,6 +8,7 @@ import { AppPage, AppPageHeader } from '@/shared/ui/app-ui'
 
 const TABS = [
   { id: 'general', label: 'General' },
+  { id: 'agent', label: 'Agent' },
   { id: 'profile', label: 'Profile' },
   { id: 'subscription', label: 'Subscription' },
 ] as const
@@ -14,7 +16,7 @@ const TABS = [
 type SettingsTab = (typeof TABS)[number]['id']
 
 function isSettingsTab(value: string | null): value is SettingsTab {
-  return value === 'general' || value === 'profile' || value === 'subscription'
+  return value === 'general' || value === 'agent' || value === 'profile' || value === 'subscription'
 }
 
 export function SettingsPage() {
@@ -30,7 +32,7 @@ export function SettingsPage() {
     <AppPage className="max-w-4xl">
       <AppPageHeader
         title="Settings"
-        description="Manage your account, business profile, translation preferences, and subscription."
+        description="Manage your account, AI agent, business profile, translation preferences, and subscription."
       />
 
       <nav
@@ -55,6 +57,8 @@ export function SettingsPage() {
       </nav>
 
       {activeTab === 'general' && <GeneralSettingsPanel />}
+
+      {activeTab === 'agent' && <AgentSettingsPanel />}
 
       {activeTab === 'profile' && <BusinessProfilePanel />}
 
