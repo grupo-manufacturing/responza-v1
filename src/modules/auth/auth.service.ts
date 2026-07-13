@@ -78,6 +78,7 @@ export class AuthService {
         headers: {
           Authorization: `Bearer ${tokens.accessToken}`,
         },
+        timeout: 30000,
       },
     )
     return response.data

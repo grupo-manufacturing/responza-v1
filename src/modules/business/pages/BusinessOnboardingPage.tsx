@@ -71,7 +71,9 @@ export function BusinessOnboardingPage() {
       const result = await BusinessService.uploadCatalogue(file)
       setCatalogueFiles(result.profile.catalogueFiles)
     } catch (err: unknown) {
-      throw new Error(getApiErrorMessage(err, 'Could not upload catalogue file. Please try again.'))
+      throw new Error(
+        getApiErrorMessage(err, 'We could not upload this file right now. Please try again in a moment.'),
+      )
     } finally {
       setUploadingCatalogue(false)
     }
@@ -85,7 +87,7 @@ export function BusinessOnboardingPage() {
       const result = await BusinessService.deleteCatalogue(fileId)
       setCatalogueFiles(result.profile.catalogueFiles)
     } catch (err: unknown) {
-      setError(getApiErrorMessage(err, 'Could not remove catalogue file. Please try again.'))
+      setError(getApiErrorMessage(err, 'We could not remove this file right now. Please try again in a moment.'))
     } finally {
       setRemovingCatalogueId(null)
     }
@@ -115,7 +117,12 @@ export function BusinessOnboardingPage() {
         setStepIndex(findFirstOnboardingStepWithErrors(mappedErrors))
         setError(null)
       } else {
-        setError(getApiErrorMessage(err, 'Something went wrong. Please try again.'))
+        setError(
+          getApiErrorMessage(
+            err,
+            'We could not finish setting up your profile right now. Please try again in a moment — your answers are still here.',
+          ),
+        )
       }
     } finally {
       setIsLoading(false)

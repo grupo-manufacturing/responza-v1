@@ -1,6 +1,7 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios'
 
 import { AuthService } from '@/modules/auth/auth.service'
+import { clearGoogleOAuthStorage } from '@/shared/auth/googleOAuthStorage'
 import { getApiBaseUrl } from '@/shared/config/env'
 import { clearSessionCache } from '@/shared/hooks/useSession'
 import { resetRealtimeSupabaseClient } from '@/shared/realtime/supabase'
@@ -40,6 +41,7 @@ function shouldSkipTokenRefresh(requestUrl: string | undefined): boolean {
 function clearAuthSession(): void {
   clearSessionCache()
   SessionStorage.clearTokens()
+  clearGoogleOAuthStorage()
   resetRealtimeSupabaseClient()
 }
 
@@ -72,6 +74,10 @@ async function refreshSessionTokens(): Promise<boolean> {
 }
 
 api.interceptors.request.use((config) => {
+  if (config.headers.Authorization) {
+    return config
+  }
+
   const token = localStorage.getItem('accessToken')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`

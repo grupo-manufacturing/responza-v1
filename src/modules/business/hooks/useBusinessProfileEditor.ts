@@ -70,7 +70,9 @@ export function useBusinessProfileEditor() {
         text: 'Catalogue file uploaded.',
       })
     } catch (err: unknown) {
-      throw new Error(getApiErrorMessage(err, 'Could not upload catalogue file. Please try again.'))
+      throw new Error(
+        getApiErrorMessage(err, 'We could not upload this file right now. Please try again in a moment.'),
+      )
     } finally {
       setUploadingCatalogue(false)
     }
@@ -90,7 +92,7 @@ export function useBusinessProfileEditor() {
     } catch (err: unknown) {
       setSaveMessage({
         variant: 'error',
-        text: getApiErrorMessage(err, 'Could not remove catalogue file. Please try again.'),
+        text: getApiErrorMessage(err, 'We could not remove this file right now. Please try again in a moment.'),
       })
     } finally {
       setRemovingCatalogueId(null)
@@ -131,7 +133,7 @@ export function useBusinessProfileEditor() {
       } else {
         setSaveMessage({
           variant: 'error',
-          text: getApiErrorMessage(err, 'Could not save business profile. Please try again.'),
+          text: getApiErrorMessage(err, 'We could not save your changes right now. Please try again in a moment.'),
         })
       }
     } finally {

@@ -1,29 +1,42 @@
 import { getAuthSupabaseClient, isAuthSupabaseConfigured } from '@/shared/auth/supabase'
+import { clearGoogleOAuthStorage } from '@/shared/auth/googleOAuthStorage'
+import { getAppOrigin } from '@/shared/config/env'
+import { SessionStorage } from '@/shared/session/storage'
+
+import { AuthService } from '@/modules/auth/auth.service'
+import type { AuthSession } from '@/modules/auth/auth.types'
+
+const CALLBACK_PATH = '/auth/google/callback'
 
 export function isGoogleAuthConfigured(): boolean {
   return isAuthSupabaseConfigured()
 }
 
-export function getGoogleOAuthRedirectUri(nextPath?: string): string {
-  const redirectTo = new URL('/auth/google/callback', window.location.origin)
-
-  if (nextPath !== undefined && nextPath.startsWith('/')) {
-    redirectTo.searchParams.set('next', nextPath)
-  }
-
-  return redirectTo.toString()
+function oauthOrigin(): string {
+  return getAppOrigin() ?? window.location.origin
 }
 
+function buildRedirectUri(nextPath?: string): string {
+  const url = new URL(CALLBACK_PATH, oauthOrigin())
+  if (nextPath !== undefined && nextPath.startsWith('/')) {
+    url.searchParams.set('next', nextPath)
+  }
+  return url.toString()
+}
+
+/**
+ * Google OAuth is one flow for both new and returning users.
+ * Supabase + the backend create an account on first sign-in, or sign in if one exists.
+ */
 export async function startGoogleOAuth(nextPath = '/inbox'): Promise<void> {
-  const supabase = getAuthSupabaseClient()
-  const { error } = await supabase.auth.signInWithOAuth({
+  SessionStorage.clearTokens()
+  clearGoogleOAuthStorage()
+
+  const { error } = await getAuthSupabaseClient().auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: getGoogleOAuthRedirectUri(nextPath),
-      queryParams: {
-        access_type: 'offline',
-        prompt: 'select_account',
-      },
+      redirectTo: buildRedirectUri(nextPath),
+      queryParams: { prompt: 'select_account' },
     },
   })
 
@@ -32,56 +45,68 @@ export async function startGoogleOAuth(nextPath = '/inbox'): Promise<void> {
   }
 }
 
-export type GoogleOAuthTokens = {
-  accessToken: string
-  refreshToken: string
-  expiresIn: number
+export type GoogleOAuthCallbackResult =
+  | { kind: 'waiting' }
+  | { kind: 'redirect'; nextPath: string }
+  | { kind: 'session'; session: AuthSession; nextPath: string }
+
+function readCallbackParams(): URLSearchParams {
+  return new URLSearchParams(window.location.search)
 }
 
-export async function exchangeGoogleOAuthCode(code: string): Promise<GoogleOAuthTokens> {
-  const supabase = getAuthSupabaseClient()
-  const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+export async function handleGoogleOAuthCallback(): Promise<GoogleOAuthCallbackResult> {
+  const params = readCallbackParams()
 
-  if (error !== null) {
-    throw new Error(error.message)
+  const oauthError = params.get('error_description') ?? params.get('error')
+  if (oauthError !== null && oauthError.length > 0) {
+    throw new Error(oauthError)
   }
 
-  if (data.session === null) {
-    throw new Error('Google sign-in did not return a session')
+  const code = params.get('code')
+  if (code === null || code.length === 0) {
+    throw new Error('Google sign-in was canceled or did not return an authorization code.')
   }
 
-  return {
-    accessToken: data.session.access_token,
-    refreshToken: data.session.refresh_token,
-    expiresIn: data.session.expires_in ?? 3600,
-  }
-}
+  const nextPath =
+    params.get('next')?.startsWith('/') === true ? (params.get('next') as string) : '/inbox'
 
-export function readGoogleOAuthCallbackError(): string | null {
-  const params = new URLSearchParams(window.location.search)
-  const errorDescription = params.get('error_description')
-  const error = params.get('error')
+  const codeKey = `responza-google-oauth:${code}`
+  const codeState = sessionStorage.getItem(codeKey)
 
-  if (errorDescription !== null && errorDescription.length > 0) {
-    return errorDescription
+  if (codeState === 'pending') {
+    return { kind: 'waiting' }
   }
 
-  if (error !== null && error.length > 0) {
-    return error
+  if (codeState === 'done') {
+    if (SessionStorage.isAuthenticated()) {
+      return { kind: 'redirect', nextPath }
+    }
+    sessionStorage.removeItem(codeKey)
   }
 
-  return null
-}
+  sessionStorage.setItem(codeKey, 'pending')
 
-export function readGoogleOAuthCallbackCode(): string | null {
-  return new URLSearchParams(window.location.search).get('code')
-}
+  try {
+    const { data, error } = await getAuthSupabaseClient().auth.exchangeCodeForSession(code)
+    if (error !== null) {
+      throw new Error(error.message)
+    }
+    if (data.session === null) {
+      throw new Error('Google sign-in did not return a session.')
+    }
 
-export function readGoogleOAuthNextPath(): string {
-  const next = new URLSearchParams(window.location.search).get('next')
-  if (next !== null && next.startsWith('/')) {
-    return next
+    const session = await AuthService.completeOAuth({
+      accessToken: data.session.access_token,
+      refreshToken: data.session.refresh_token,
+      expiresIn: data.session.expires_in ?? 3600,
+    })
+
+    sessionStorage.setItem(codeKey, 'done')
+    window.history.replaceState({}, document.title, CALLBACK_PATH)
+
+    return { kind: 'session', session, nextPath }
+  } catch (error) {
+    sessionStorage.removeItem(codeKey)
+    throw error
   }
-
-  return '/inbox'
 }

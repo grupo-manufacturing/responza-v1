@@ -19,9 +19,37 @@ export const EMPTY_BUSINESS_ONBOARDING_FORM: BusinessOnboardingFormData = {
 export const CATALOGUE_ACCEPT =
   '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation,text/plain'
 
+export const CATALOGUE_MAX_FILES = 5
+export const CATALOGUE_MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024
+
+const CATALOGUE_ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt']
+
+/**
+ * Validates a catalogue file locally so users get instant feedback
+ * before any upload starts. Returns a user-facing message, or null if valid.
+ */
+export function validateCatalogueFileBeforeUpload(file: File): string | null {
+  const extension = file.name.includes('.') ? (file.name.split('.').pop()?.toLowerCase() ?? '') : ''
+
+  if (!CATALOGUE_ALLOWED_EXTENSIONS.includes(extension)) {
+    return `"${file.name}" is not a supported file type. Please upload a PDF, Word, Excel, PowerPoint, or text file.`
+  }
+
+  if (file.size === 0) {
+    return `"${file.name}" appears to be empty. Please choose a file with content.`
+  }
+
+  if (file.size > CATALOGUE_MAX_FILE_SIZE_BYTES) {
+    return `"${file.name}" is larger than 10 MB. Try compressing it or splitting it into smaller files.`
+  }
+
+  return null
+}
+
 export const BUSINESS_DESCRIPTION_MIN_LENGTH = 20
 
-export const INVALID_HTTP_URL_MESSAGE = 'Must be a valid http or https URL'
+export const INVALID_HTTP_URL_MESSAGE =
+  'Please enter a full link starting with https:// (e.g., https://yourshop.com)'
 
 function isValidOptionalUrl(value: string): boolean {
   const trimmed = value.trim()

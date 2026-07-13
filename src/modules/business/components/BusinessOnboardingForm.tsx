@@ -10,6 +10,8 @@ import type { CatalogueFile } from '@/modules/business/business.service'
 import {
   BUSINESS_DESCRIPTION_MIN_LENGTH,
   CATALOGUE_ACCEPT,
+  CATALOGUE_MAX_FILES,
+  validateCatalogueFileBeforeUpload,
   type BusinessOnboardingFieldErrors,
   type BusinessOnboardingFormData,
 } from '@/modules/business/business-onboarding'
@@ -111,12 +113,18 @@ export function BusinessOnboardingForm({
       return
     }
 
+    const validationError = validateCatalogueFileBeforeUpload(file)
+    if (validationError !== null) {
+      setCatalogueError(validationError)
+      return
+    }
+
     setCatalogueError(null)
     void onUploadCatalogue(file).catch((error: unknown) => {
       const message =
         error instanceof Error && error.message.length > 0
           ? error.message
-          : 'Could not upload this file. Please try a PDF, Word, Excel, PowerPoint, or text file under 10 MB.'
+          : 'We could not upload this file. Please try a PDF, Word, Excel, PowerPoint, or text file under 10 MB.'
       setCatalogueError(message)
     })
   }
@@ -177,7 +185,7 @@ export function BusinessOnboardingForm({
         <AppButton
           type="button"
           variant="secondary"
-          disabled={uploadingCatalogue || catalogueFiles.length >= 5}
+          disabled={uploadingCatalogue || catalogueFiles.length >= CATALOGUE_MAX_FILES}
           onClick={() => fileInputRef.current?.click()}
         >
           {uploadingCatalogue ? (

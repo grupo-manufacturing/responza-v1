@@ -40,21 +40,54 @@ export function getInstagramAppId(): string {
   return import.meta.env.VITE_INSTAGRAM_APP_ID?.trim() ?? ''
 }
 
-export function getAppOrigin(): string | null {
-  const configured = import.meta.env.VITE_APP_URL?.trim() ?? ''
-  if (configured.length > 0) {
+function parseConfiguredOrigins(value: string): string[] {
+  const origins: string[] = []
+
+  for (const part of value.split(',')) {
+    const trimmed = part.trim()
+    if (trimmed.length === 0) {
+      continue
+    }
+
     try {
-      return new URL(configured).origin
+      origins.push(new URL(trimmed).origin)
     } catch {
-      return null
+      continue
     }
   }
 
+  return origins
+}
+
+/** Allowed frontend origins from VITE_APP_URL (comma-separated in production). */
+export function getAppOrigins(): string[] {
+  const configured = import.meta.env.VITE_APP_URL?.trim() ?? ''
+  if (configured.length > 0) {
+    return parseConfiguredOrigins(configured)
+  }
+
   if (typeof window !== 'undefined') {
+    return [window.location.origin]
+  }
+
+  return []
+}
+
+/**
+ * Origin to use for OAuth redirects on this page load.
+ * Prefers the current browser origin when it is listed in VITE_APP_URL.
+ */
+export function getAppOrigin(): string | null {
+  const origins = getAppOrigins()
+  if (origins.length === 0) {
+    return typeof window !== 'undefined' ? window.location.origin : null
+  }
+
+  if (typeof window !== 'undefined' && origins.includes(window.location.origin)) {
     return window.location.origin
   }
 
-  return null
+  return origins[0] ?? null
 }
 
 function apiBaseOrigin(): string | null {
@@ -103,6 +136,10 @@ export function getInstagramOAuthAllowedOrigins(): string[] {
   const appOrigin = getAppOrigin()
   if (appOrigin !== null) {
     origins.add(appOrigin)
+  }
+
+  for (const origin of getAppOrigins()) {
+    origins.add(origin)
   }
 
   const apiOrigin = apiBaseOrigin()

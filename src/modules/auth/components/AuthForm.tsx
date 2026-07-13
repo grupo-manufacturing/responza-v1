@@ -171,6 +171,9 @@ export function AuthForm() {
                 </>
               )}
             </button>
+            <p className="mt-2 text-center text-[11px] text-ink-faint">
+              New or existing account — Google handles both the same way.
+            </p>
             <AuthDivider />
           </>
         )}

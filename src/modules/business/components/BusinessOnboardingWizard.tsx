@@ -11,8 +11,10 @@ import {
   BUSINESS_DESCRIPTION_MIN_LENGTH,
   BUSINESS_ONBOARDING_STEPS,
   CATALOGUE_ACCEPT,
+  CATALOGUE_MAX_FILES,
   canProceedFromOnboardingStep,
   validateBusinessOnboardingStep,
+  validateCatalogueFileBeforeUpload,
   type BusinessOnboardingFieldErrors,
   type BusinessOnboardingFormData,
   type BusinessOnboardingStepId,
@@ -225,12 +227,18 @@ export function BusinessOnboardingWizard({
       return
     }
 
+    const validationError = validateCatalogueFileBeforeUpload(file)
+    if (validationError !== null) {
+      setCatalogueError(validationError)
+      return
+    }
+
     setCatalogueError(null)
     void onUploadCatalogue(file).catch((error: unknown) => {
       const message =
         error instanceof Error && error.message.length > 0
           ? error.message
-          : 'Could not upload this file. Please try a PDF, Word, Excel, PowerPoint, or text file under 10 MB.'
+          : 'We could not upload this file. Please try a PDF, Word, Excel, PowerPoint, or text file under 10 MB.'
       setCatalogueError(message)
     })
   }
@@ -294,10 +302,10 @@ export function BusinessOnboardingWizard({
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              disabled={uploadingCatalogue || catalogueFiles.length >= 5}
+              disabled={uploadingCatalogue || catalogueFiles.length >= CATALOGUE_MAX_FILES}
               className={[
                 'flex w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-10 transition-colors',
-                uploadingCatalogue || catalogueFiles.length >= 5
+                uploadingCatalogue || catalogueFiles.length >= CATALOGUE_MAX_FILES
                   ? 'cursor-not-allowed border-border bg-surface-muted/50 opacity-70'
                   : 'border-accent/25 bg-accent/5 hover:border-accent/40 hover:bg-accent/8',
               ].join(' ')}
@@ -355,7 +363,7 @@ export function BusinessOnboardingWizard({
 
             {catalogueFiles.length > 0 && (
               <p className="mt-3 text-xs text-ink-faint">
-                {catalogueFiles.length} of 5 files uploaded
+                {catalogueFiles.length} of {CATALOGUE_MAX_FILES} files uploaded
               </p>
             )}
           </div>

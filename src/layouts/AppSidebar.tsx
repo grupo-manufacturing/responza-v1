@@ -2,6 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 
 import { BrandMark } from '@/shared/ui/brand-ui'
 import { clearSessionCache, useSession } from '@/shared/hooks/useSession'
+import { clearGoogleOAuthStorage } from '@/shared/auth/googleOAuthStorage'
 import { SessionStorage } from '@/shared/session/storage'
 
 import { SIDEBAR_NAVIGATION } from './sidebar.config'
@@ -65,6 +66,7 @@ export function AppSidebar({
 
   const handleLogout = () => {
     SessionStorage.clearTokens()
+    clearGoogleOAuthStorage()
     clearSessionCache()
     navigate('/auth?mode=login')
   }

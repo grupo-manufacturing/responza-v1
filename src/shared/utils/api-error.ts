@@ -82,7 +82,15 @@ export function getApiErrorCode(error: unknown): string | null {
 
 export function getApiErrorMessage(error: unknown, fallback: string): string {
   if (axios.isAxiosError(error)) {
-    const data = error.response?.data as ApiErrorBody | undefined
+    if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
+      return 'The request took too long to complete. Please check your internet connection and try again.'
+    }
+
+    if (error.response === undefined) {
+      return 'We could not reach the server. Please check your internet connection and try again.'
+    }
+
+    const data = error.response.data as ApiErrorBody | undefined
     const code = data?.error?.code
     const details = data?.error?.details
 
@@ -93,8 +101,19 @@ export function getApiErrorMessage(error: unknown, fallback: string): string {
       }
     }
 
-    if (typeof data?.error?.message === 'string' && data.error.message.length > 0) {
-      return data.error.message
+    const message = data?.error?.message
+    if (typeof message === 'string' && message.length > 0) {
+      // The backend's catch-all 500 message carries no context;
+      // the caller's fallback describes what actually failed.
+      if (!(code === 'INTERNAL_ERROR' && message === 'An unexpected error occurred')) {
+        return message
+      }
+    }
+
+    // Proxies can reject oversized uploads before our API sees them,
+    // returning a 413 without a structured error body.
+    if (error.response.status === 413) {
+      return 'This file is too large to upload. Please choose a smaller file.'
     }
   }
 

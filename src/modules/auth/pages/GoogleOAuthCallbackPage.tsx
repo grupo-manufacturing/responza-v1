@@ -1,54 +1,54 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { Spinner } from '@/components/ui/Spinner'
-import { AuthService } from '@/modules/auth/auth.service'
 import { completeAuthSession } from '@/modules/auth/lib/completeAuthSession'
-import {
-  exchangeGoogleOAuthCode,
-  readGoogleOAuthCallbackCode,
-  readGoogleOAuthCallbackError,
-  readGoogleOAuthNextPath,
-} from '@/modules/auth/lib/googleOAuth'
+import { handleGoogleOAuthCallback } from '@/modules/auth/lib/googleOAuth'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
+import { sanitizePostAuthDestination } from '@/shared/utils/subscription-access'
+import { SessionStorage } from '@/shared/session/storage'
 
 import { AuthCard, AuthLayout, AuthPrimaryButton } from '../auth-ui'
 
 export function GoogleOAuthCallbackPage() {
   const navigate = useNavigate()
   const [error, setError] = useState<string | null>(null)
-  const hasHandledCallback = useRef(false)
 
   useEffect(() => {
-    if (hasHandledCallback.current) {
-      return
+    let cancelled = false
+
+    const run = async () => {
+      const result = await handleGoogleOAuthCallback()
+
+      if (cancelled) {
+        return
+      }
+
+      if (result.kind === 'waiting') {
+        return
+      }
+
+      if (result.kind === 'redirect') {
+        const destination = sanitizePostAuthDestination(
+          result.nextPath,
+          SessionStorage.getStoredSubscription(),
+        )
+        navigate(destination, { replace: true })
+        return
+      }
+
+      completeAuthSession(result.session, navigate, result.nextPath)
     }
-    hasHandledCallback.current = true
 
-    const oauthError = readGoogleOAuthCallbackError()
-    if (oauthError !== null) {
-      setError(oauthError)
-      return
-    }
-
-    const code = readGoogleOAuthCallbackCode()
-    if (code === null) {
-      setError('Google sign-in was canceled or did not return an authorization code.')
-      return
-    }
-
-    const nextPath = readGoogleOAuthNextPath()
-
-    void (async () => {
-      try {
-        const tokens = await exchangeGoogleOAuthCode(code)
-        const session = await AuthService.completeOAuth(tokens)
-        window.history.replaceState({}, document.title, '/auth/google/callback')
-        completeAuthSession(session, navigate, nextPath)
-      } catch (err: unknown) {
+    void run().catch((err: unknown) => {
+      if (!cancelled) {
         setError(getApiErrorMessage(err, 'Could not complete Google sign-in. Please try again.'))
       }
-    })()
+    })
+
+    return () => {
+      cancelled = true
+    }
   }, [navigate])
 
   if (error !== null) {
