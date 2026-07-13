@@ -8,6 +8,12 @@ import { AppLayout } from '@/layouts/AppLayout'
 const LandingPage = lazy(() =>
   import('@/modules/landing/pages/LandingPage').then((m) => ({ default: m.LandingPage })),
 )
+const PrivacyPolicyPage = lazy(() =>
+  import('@/modules/landing/pages/PrivacyPolicyPage').then((m) => ({ default: m.PrivacyPolicyPage })),
+)
+const TermsPage = lazy(() =>
+  import('@/modules/landing/pages/TermsPage').then((m) => ({ default: m.TermsPage })),
+)
 const AuthPage = lazy(() => import('@/modules/auth/pages/AuthPage').then((m) => ({ default: m.AuthPage })))
 const OtpVerificationPage = lazy(() =>
   import('@/modules/auth/pages/OtpVerificationPage').then((m) => ({ default: m.OtpVerificationPage })),
@@ -52,6 +58,10 @@ export const router = createBrowserRouter([
   { path: '/register', element: <Navigate to="/auth?mode=register" replace /> },
   { path: '/subscription', element: <Navigate to="/settings?tab=subscription" replace /> },
   { path: '/oauth/instagram/callback', element: suspense(<InstagramOAuthCallbackPage />) },
+  { path: '/privacy-policy', element: suspense(<PrivacyPolicyPage />) },
+  { path: '/terms-conditions', element: suspense(<TermsPage />) },
+  { path: '/privacy', element: <Navigate to="/privacy-policy" replace /> },
+  { path: '/terms', element: <Navigate to="/terms-conditions" replace /> },
 
   {
     element: <ProtectedRoute />,

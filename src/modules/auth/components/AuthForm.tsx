@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 import { Spinner } from '@/components/ui/Spinner'
 import { SectionBadge } from '@/modules/landing/landing-ui'
@@ -266,7 +266,14 @@ export function AuthForm() {
 
         {!isLogin && (
           <p className="mt-3 text-center text-[10px] leading-relaxed text-ink-faint">
-            By creating an account, you agree to our Terms & Privacy Policy
+            By creating an account, you agree to our{' '}
+            <Link to="/terms-conditions" className="underline-offset-2 hover:underline">
+              Terms & Conditions
+            </Link>{' '}
+            and{' '}
+            <Link to="/privacy-policy" className="underline-offset-2 hover:underline">
+              Privacy Policy
+            </Link>
           </p>
         )}
       </AuthCard>

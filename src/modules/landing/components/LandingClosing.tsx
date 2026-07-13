@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
+import { LEGAL_FOOTER_LINKS } from '../legal.constants'
 import { LANDING_FAQS } from '../landing.constants'
 import { LandingButton, LandingLogo, Reveal, SectionDivider } from '../landing-ui'
 
@@ -122,6 +123,18 @@ export function LandingClosing() {
                 <Link to="/auth?mode=register" className="block text-on-dark-muted transition-colors hover:text-accent-soft">
                   Get started
                 </Link>
+              </div>
+              <div className="space-y-2">
+                <p className="font-medium text-on-dark">Legal</p>
+                {LEGAL_FOOTER_LINKS.map((link) => (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    className="block text-on-dark-muted transition-colors hover:text-accent-soft"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
               </div>
             </div>
           </div>
