@@ -5,8 +5,12 @@ import {
   LegalSubsection,
   LegalSubsubsection,
 } from '@/modules/landing/components/LegalPageLayout'
+import { SEO_PAGES } from '@/shared/seo/seo.constants'
+import { usePageMeta } from '@/shared/seo/usePageMeta'
 
 export function PrivacyPolicyPage() {
+  usePageMeta(SEO_PAGES.privacy)
+
   return (
     <LegalPageLayout title="Privacy Policy" lastUpdated="May 22, 2026">
       <div className="space-y-3 text-sm leading-relaxed text-ink-muted">

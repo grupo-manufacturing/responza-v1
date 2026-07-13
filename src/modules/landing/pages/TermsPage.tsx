@@ -5,8 +5,12 @@ import {
   LegalSubsection,
   LegalSubsubsection,
 } from '@/modules/landing/components/LegalPageLayout'
+import { SEO_PAGES } from '@/shared/seo/seo.constants'
+import { usePageMeta } from '@/shared/seo/usePageMeta'
 
 export function TermsPage() {
+  usePageMeta(SEO_PAGES.terms)
+
   return (
     <LegalPageLayout title="Terms & Conditions" lastUpdated="May 22, 2026" dateLabel="Effective Date">
       <div className="space-y-3 text-sm leading-relaxed text-ink-muted">

@@ -62,6 +62,7 @@ export const router = createBrowserRouter([
   { path: '/terms-conditions', element: suspense(<TermsPage />) },
   { path: '/privacy', element: <Navigate to="/privacy-policy" replace /> },
   { path: '/terms', element: <Navigate to="/terms-conditions" replace /> },
+  { path: '/pricing', element: <Navigate to={{ pathname: '/', hash: 'pricing' }} replace /> },
 
   {
     element: <ProtectedRoute />,
