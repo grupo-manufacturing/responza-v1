@@ -44,6 +44,12 @@ const InstagramOAuthCallbackPage = lazy(() =>
 const SettingsPage = lazy(() =>
   import('@/modules/settings/pages/SettingsPage').then((m) => ({ default: m.SettingsPage })),
 )
+const AdminPage = lazy(() =>
+  import('@/modules/admin/pages/AdminPage').then((m) => ({ default: m.AdminPage })),
+)
+const AdminLoginPage = lazy(() =>
+  import('@/modules/admin/pages/AdminLoginPage').then((m) => ({ default: m.AdminLoginPage })),
+)
 
 function suspense(element: React.ReactNode) {
   return <PageSuspense>{element}</PageSuspense>
@@ -63,6 +69,8 @@ export const router = createBrowserRouter([
   { path: '/privacy', element: <Navigate to="/privacy-policy" replace /> },
   { path: '/terms', element: <Navigate to="/terms-conditions" replace /> },
   { path: '/pricing', element: <Navigate to={{ pathname: '/', hash: 'pricing' }} replace /> },
+  { path: '/admin/login', element: suspense(<AdminLoginPage />) },
+  { path: '/admin', element: suspense(<AdminPage />) },
 
   {
     element: <ProtectedRoute />,
