@@ -173,3 +173,7 @@ export function getSupabaseUrl(): string {
 export function getSupabaseAnonKey(): string {
   return import.meta.env.VITE_SUPABASE_ANON_KEY?.trim() ?? ''
 }
+
+export function getCloudflareAnalyticsToken(): string {
+  return import.meta.env.VITE_CLOUDFLARE_ANALYTICS_TOKEN?.trim() ?? ''
+}

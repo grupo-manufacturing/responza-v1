@@ -11,6 +11,7 @@ interface ImportMetaEnv {
   readonly VITE_INSTAGRAM_OAUTH_ALLOWED_ORIGINS?: string
   readonly VITE_SUPABASE_URL?: string
   readonly VITE_SUPABASE_ANON_KEY?: string
+  readonly VITE_CLOUDFLARE_ANALYTICS_TOKEN?: string
 }
 
 interface ImportMeta {
