@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 
 import { Spinner } from '@/components/ui/Spinner'
+import { AuthPasswordInput } from '@/modules/auth/auth-ui'
 import { AdminService } from '@/modules/admin/admin.service'
 import { AdminSessionStorage } from '@/modules/admin/adminSession'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
@@ -65,14 +66,12 @@ export function AdminLoginPage() {
             <label htmlFor="admin-password" className="mb-1.5 block text-xs font-medium text-ink-muted">
               Password
             </label>
-            <input
+            <AuthPasswordInput
               id="admin-password"
-              type="password"
-              autoComplete="current-password"
+              name="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              className="w-full rounded-xl border border-border bg-white px-3.5 py-2.5 text-sm text-ink outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
-              required
+              autoComplete="current-password"
             />
           </div>
 
