@@ -174,6 +174,10 @@ export function getSupabaseAnonKey(): string {
   return import.meta.env.VITE_SUPABASE_ANON_KEY?.trim() ?? ''
 }
 
-export function getCloudflareAnalyticsToken(): string {
-  return import.meta.env.VITE_CLOUDFLARE_ANALYTICS_TOKEN?.trim() ?? ''
+export function getVercelAnalyticsUrl(): string {
+  return import.meta.env.VITE_VERCEL_ANALYTICS_URL?.trim() ?? ''
+}
+
+export function getVercelSpeedInsightsUrl(): string {
+  return import.meta.env.VITE_VERCEL_SPEED_INSIGHTS_URL?.trim() ?? ''
 }

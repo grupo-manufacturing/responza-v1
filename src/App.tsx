@@ -4,7 +4,6 @@ import { SpeedInsights } from '@vercel/speed-insights/react'
 import { RouterProvider } from 'react-router-dom'
 
 import { router } from '@/app/router'
-import { CloudflareWebAnalytics } from '@/shared/analytics/CloudflareWebAnalytics'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,7 +19,6 @@ export function App() {
       <RouterProvider router={router} />
       <Analytics />
       <SpeedInsights />
-      <CloudflareWebAnalytics />
     </QueryClientProvider>
   )
 }

@@ -5,6 +5,7 @@ import { Alert } from '@/components/ui/Alert'
 import { SpinnerSection } from '@/components/ui/Spinner'
 import { AdminService, type AdminDashboardResponse } from '@/modules/admin/admin.service'
 import { AdminSessionStorage } from '@/modules/admin/adminSession'
+import { getVercelAnalyticsUrl, getVercelSpeedInsightsUrl } from '@/shared/config/env'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
 import { BrandMark } from '@/shared/ui/brand-ui'
 
@@ -52,6 +53,49 @@ function OverviewCard({ label, value }: { readonly label: string; readonly value
       <p className="text-xs font-medium text-ink-muted">{label}</p>
       <p className="mt-1 text-2xl font-semibold tracking-tight text-ink">{value}</p>
     </div>
+  )
+}
+
+function ExternalLinkButton({ href, children }: { readonly href: string; readonly children: React.ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center justify-center rounded-[var(--radius-pill)] border border-border bg-white px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-surface-muted"
+    >
+      {children}
+    </a>
+  )
+}
+
+function VercelLinksSection() {
+  const analyticsUrl = getVercelAnalyticsUrl()
+  const speedInsightsUrl = getVercelSpeedInsightsUrl()
+  const hasAnyLink = analyticsUrl.length > 0 || speedInsightsUrl.length > 0
+
+  return (
+    <section>
+      <h2 className="text-lg font-semibold tracking-tight text-ink">Website traffic</h2>
+      <p className="mt-1 text-sm text-ink-muted">
+        View pageviews and visitors in Vercel. Numbers stay in Vercel for now.
+      </p>
+      {hasAnyLink ? (
+        <div className="mt-4 flex flex-wrap gap-3">
+          {analyticsUrl.length > 0 && (
+            <ExternalLinkButton href={analyticsUrl}>Open Vercel Analytics</ExternalLinkButton>
+          )}
+          {speedInsightsUrl.length > 0 && (
+            <ExternalLinkButton href={speedInsightsUrl}>Open Speed Insights</ExternalLinkButton>
+          )}
+        </div>
+      ) : (
+        <p className="mt-4 rounded-[var(--radius-card)] border border-border bg-white px-4 py-3 text-sm text-ink-muted">
+          Set <code className="text-ink">VITE_VERCEL_ANALYTICS_URL</code> (and optionally{' '}
+          <code className="text-ink">VITE_VERCEL_SPEED_INSIGHTS_URL</code>) in the frontend env, then redeploy.
+        </p>
+      )}
+    </section>
   )
 }
 
@@ -135,6 +179,8 @@ export function AdminPage() {
 
         {!loading && error === null && data !== null && (
           <>
+            <VercelLinksSection />
+
             <section>
               <h1 className="text-xl font-semibold tracking-tight text-ink">Overview</h1>
               <p className="mt-1 text-sm text-ink-muted">Live counts across all organizations.</p>
