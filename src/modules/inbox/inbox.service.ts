@@ -76,12 +76,12 @@ export interface ConversationDetailResponse {
   hasMoreMessages: boolean
 }
 
-export interface SendTextMessagePayload {
+interface SendTextMessagePayload {
   content: string
   contentType?: 'text'
 }
 
-export interface SendMediaMessagePayload {
+interface SendMediaMessagePayload {
   content?: string
   contentType: Exclude<MessageContentType, 'text'>
   storagePath: string
@@ -90,7 +90,7 @@ export interface SendMediaMessagePayload {
   filename?: string
 }
 
-export type SendMessagePayload = SendTextMessagePayload | SendMediaMessagePayload
+type SendMessagePayload = SendTextMessagePayload | SendMediaMessagePayload
 
 export interface UploadOutboundMediaResponse {
   media: {

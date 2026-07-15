@@ -20,14 +20,10 @@ export const CATALOGUE_ACCEPT =
   '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation,text/plain'
 
 export const CATALOGUE_MAX_FILES = 5
-export const CATALOGUE_MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024
+const CATALOGUE_MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024
 
 const CATALOGUE_ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt']
 
-/**
- * Validates a catalogue file locally so users get instant feedback
- * before any upload starts. Returns a user-facing message, or null if valid.
- */
 export function validateCatalogueFileBeforeUpload(file: File): string | null {
   const extension = file.name.includes('.') ? (file.name.split('.').pop()?.toLowerCase() ?? '') : ''
 
@@ -48,7 +44,7 @@ export function validateCatalogueFileBeforeUpload(file: File): string | null {
 
 export const BUSINESS_DESCRIPTION_MIN_LENGTH = 20
 
-export const INVALID_HTTP_URL_MESSAGE =
+const INVALID_HTTP_URL_MESSAGE =
   'Please enter a full link starting with https:// (e.g., https://yourshop.com)'
 
 function isValidOptionalUrl(value: string): boolean {
@@ -107,7 +103,7 @@ export function hasBusinessOnboardingFieldErrors(errors: BusinessOnboardingField
   return Object.keys(errors).length > 0
 }
 
-export function optionalUrlForPayload(value: string): string | null {
+function optionalUrlForPayload(value: string): string | null {
   const trimmed = value.trim()
   return trimmed.length > 0 ? trimmed : null
 }

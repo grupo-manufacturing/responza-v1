@@ -19,7 +19,7 @@ import {
 import type { IntegrationPlatform } from '@/modules/integrations/integrations.constants'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
 
-export type OutboundComposerAttachment = {
+type OutboundComposerAttachment = {
   file: File
   contentType: MediaContentType
   previewUrl: string

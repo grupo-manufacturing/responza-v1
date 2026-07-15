@@ -34,7 +34,7 @@ declare global {
 
 let scriptPromise: Promise<void> | null = null
 
-export function loadRazorpayCheckoutScript(): Promise<void> {
+function loadRazorpayCheckoutScript(): Promise<void> {
   if (window.Razorpay !== undefined) {
     return Promise.resolve()
   }

@@ -1,4 +1,4 @@
-export const INTEGRATION_PLATFORMS = ['whatsapp', 'instagram'] as const
+const INTEGRATION_PLATFORMS = ['whatsapp', 'instagram'] as const
 
 export type IntegrationPlatform = (typeof INTEGRATION_PLATFORMS)[number]
 export type IntegrationStatus = 'connected' | 'disconnected'
@@ -30,7 +30,7 @@ export function integrationStatusLabel(status: IntegrationStatus): string {
   return status === 'connected' ? 'Connected' : 'Disconnected'
 }
 
-export const COMING_SOON_INTEGRATION_PLATFORMS = [
+const COMING_SOON_INTEGRATION_PLATFORMS = [
   'indiamart',
   'gmail',
   'tally',

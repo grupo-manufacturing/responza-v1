@@ -99,34 +99,6 @@ export function upsertThreadMessage(
   }))
 }
 
-export function appendThreadMessage(
-  queryClient: QueryClient,
-  conversationId: string,
-  message: Message,
-): void {
-  updateThreadCache(queryClient, conversationId, (current) => ({
-    ...current,
-    messages: [...current.messages, message],
-  }))
-}
-
-export function removeThreadMessagesById(
-  queryClient: QueryClient,
-  conversationId: string,
-  messageIds: string[],
-): void {
-  if (messageIds.length === 0) {
-    return
-  }
-
-  const ids = new Set(messageIds)
-
-  updateThreadCache(queryClient, conversationId, (current) => ({
-    ...current,
-    messages: current.messages.filter((message) => !ids.has(message.id)),
-  }))
-}
-
 export function replaceOptimisticThreadMessage(
   queryClient: QueryClient,
   conversationId: string,

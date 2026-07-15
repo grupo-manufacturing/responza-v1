@@ -1,7 +1,7 @@
 import type { MediaContentType } from '@/modules/inbox/inbox.preview'
 import { formatMessageListPreview } from '@/modules/inbox/inbox.preview'
 
-export const OUTBOUND_MEDIA_MAX_BYTES = 2 * 1024 * 1024
+const OUTBOUND_MEDIA_MAX_BYTES = 2 * 1024 * 1024
 
 const IMAGE_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
 const VIDEO_MIME_TYPES = new Set(['video/mp4', 'video/3gpp', 'video/quicktime'])
@@ -65,7 +65,7 @@ function inferContentTypeFromFilename(filename: string): MediaContentType | null
   return EXTENSION_TO_CONTENT_TYPE[extension] ?? null
 }
 
-export function inferOutboundMediaContentType(file: File): MediaContentType | null {
+function inferOutboundMediaContentType(file: File): MediaContentType | null {
   const mimeType = normalizeMimeType(file.type)
   if (IMAGE_MIME_TYPES.has(mimeType)) return 'image'
   if (VIDEO_MIME_TYPES.has(mimeType)) return 'video'

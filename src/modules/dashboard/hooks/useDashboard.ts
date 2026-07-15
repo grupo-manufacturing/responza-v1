@@ -6,7 +6,7 @@ import { useIntegrationsGate } from '@/shared/hooks/useIntegrationsGate'
 import { useSubscriptionGate } from '@/shared/hooks/useSubscriptionGate'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
 
-export const dashboardKeys = {
+const dashboardKeys = {
   all: ['dashboard'] as const,
 }
 

@@ -59,8 +59,7 @@ function parseConfiguredOrigins(value: string): string[] {
   return origins
 }
 
-/** Allowed frontend origins from VITE_APP_URL (comma-separated in production). */
-export function getAppOrigins(): string[] {
+function getAppOrigins(): string[] {
   const configured = import.meta.env.VITE_APP_URL?.trim() ?? ''
   if (configured.length > 0) {
     return parseConfiguredOrigins(configured)
@@ -73,10 +72,6 @@ export function getAppOrigins(): string[] {
   return []
 }
 
-/**
- * Origin to use for OAuth redirects on this page load.
- * Prefers the current browser origin when it is listed in VITE_APP_URL.
- */
 export function getAppOrigin(): string | null {
   const origins = getAppOrigins()
   if (origins.length === 0) {

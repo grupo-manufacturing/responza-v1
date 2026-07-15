@@ -1,5 +1,4 @@
 export {
-  BrandMark,
   LandingButton,
   LandingLogo,
   ProfilePhoto,

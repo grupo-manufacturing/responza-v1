@@ -1,4 +1,4 @@
-export type AdminOverview = {
+type AdminOverview = {
   organizationCount: number
   trialCount: number
   activeCount: number
@@ -7,7 +7,7 @@ export type AdminOverview = {
   conversationsThisWeek: number
 }
 
-export type AdminOrganization = {
+type AdminOrganization = {
   id: string
   email: string
   name: string

@@ -8,12 +8,6 @@ export function isTrialSubscription(
   return subscription?.isTrialing === true
 }
 
-export function canAccessDashboard(
-  subscription: SubscriptionLike | null | undefined,
-): boolean {
-  return !isTrialSubscription(subscription)
-}
-
 export function canAccessAiAnalytics(
   subscription: SubscriptionLike | null | undefined,
 ): boolean {

@@ -1,8 +1,4 @@
-export const SITE_NAME = 'Responza AI'
-
-export const SITE_URL = 'https://www.responza.in'
-
-export const SITE_DESCRIPTION =
+const SITE_DESCRIPTION =
   'One intelligent inbox for WhatsApp and Instagram. Respond faster with AI suggestions, translation, and analytics in one place.'
 
 export const SEO_PAGES = {

@@ -34,7 +34,7 @@ export type BillingPlansCatalog = {
   razorpayMode: 'test' | 'live' | 'unknown'
 }
 
-export type CheckoutSession = {
+type CheckoutSession = {
   keyId: string
   subscriptionId: string
   shortUrl: string | null

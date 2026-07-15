@@ -12,9 +12,6 @@ export const INBOX_ICON_BUTTON_CLASS =
 export const INBOX_COMPOSER_ACTION_CLASS =
   'inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-colors disabled:cursor-not-allowed'
 
-export const INBOX_POPOVER_CLASS =
-  'absolute z-30 rounded-xl border border-border bg-white p-2 shadow-card'
-
 export function inboxThreadBackgroundClass(platform: IntegrationPlatform | null | undefined): string {
   if (platform === 'whatsapp') {
     return "bg-[url('/chat-bg.jpg')] bg-repeat bg-auto"
@@ -51,7 +48,7 @@ export function outboundMetaClass(platform: IntegrationPlatform | null | undefin
   return 'text-on-dark-muted'
 }
 
-export function platformTabInactiveClass(): string {
+function platformTabInactiveClass(): string {
   return 'border border-transparent bg-white/70 text-ink-muted hover:border-border hover:bg-surface-muted hover:text-ink'
 }
 

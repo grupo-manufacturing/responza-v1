@@ -53,7 +53,7 @@ export function SubscriptionPanel() {
       try {
         subscriptionData = await SubscriptionService.syncFromRazorpay()
       } catch {
-        // No paid Razorpay subscription to sync yet.
+        // ignore
       }
     }
 
@@ -100,7 +100,7 @@ export function SubscriptionPanel() {
             try {
               await SubscriptionService.syncFromRazorpay()
             } catch {
-              // Webhook may still apply the update if sync fails.
+              // ignore
             }
             clearSessionCache()
             void loadSession()

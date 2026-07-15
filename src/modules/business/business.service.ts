@@ -8,7 +8,7 @@ export interface CatalogueFile {
   createdAt: string
 }
 
-export interface BusinessProfile {
+interface BusinessProfile {
   organizationId: string
   brandName: string | null
   websiteUrl: string | null

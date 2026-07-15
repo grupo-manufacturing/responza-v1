@@ -65,10 +65,6 @@ export function isSubscriptionRequiredError(error: unknown): boolean {
   return getApiErrorCode(error) === 'SUBSCRIPTION_REQUIRED'
 }
 
-export function isConversationLimitReachedError(error: unknown): boolean {
-  return getApiErrorCode(error) === 'CONVERSATION_LIMIT_REACHED'
-}
-
 export function getApiErrorCode(error: unknown): string | null {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data as ApiErrorBody | undefined
@@ -103,15 +99,11 @@ export function getApiErrorMessage(error: unknown, fallback: string): string {
 
     const message = data?.error?.message
     if (typeof message === 'string' && message.length > 0) {
-      // The backend's catch-all 500 message carries no context;
-      // the caller's fallback describes what actually failed.
       if (!(code === 'INTERNAL_ERROR' && message === 'An unexpected error occurred')) {
         return message
       }
     }
 
-    // Proxies can reject oversized uploads before our API sees them,
-    // returning a 413 without a structured error body.
     if (error.response.status === 413) {
       return 'This file is too large to upload. Please choose a smaller file.'
     }

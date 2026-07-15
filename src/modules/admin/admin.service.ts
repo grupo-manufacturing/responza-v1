@@ -5,7 +5,7 @@ import { AdminSessionStorage } from '@/modules/admin/adminSession'
 
 import type { AdminDashboardResponse } from './admin.types'
 
-export type { AdminDashboardResponse, AdminOrganization, AdminOverview } from './admin.types'
+export type { AdminDashboardResponse } from './admin.types'
 
 const adminApi = axios.create({
   baseURL: getApiBaseUrl(),

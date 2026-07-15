@@ -15,7 +15,6 @@ export function isChunkLoadError(error: unknown): boolean {
   )
 }
 
-/** Reloads once per deploy cycle. Returns true if a reload was triggered. */
 export function reloadOnceForChunkError(): boolean {
   try {
     if (sessionStorage.getItem(CHUNK_RELOAD_KEY) === '1') {
@@ -24,7 +23,7 @@ export function reloadOnceForChunkError(): boolean {
     }
     sessionStorage.setItem(CHUNK_RELOAD_KEY, '1')
   } catch {
-    // sessionStorage unavailable — still try a single reload
+    // ignore
   }
 
   window.location.reload()
@@ -39,10 +38,6 @@ function clearChunkReloadFlag() {
   }
 }
 
-/**
- * Like React.lazy, but recovers from stale chunks after a deploy by
- * reloading the page once so the browser picks up the new index.html.
- */
 export function lazyWithRetry<T extends ComponentType<unknown>>(
   factory: () => Promise<{ default: T }>,
 ): LazyExoticComponent<T> {
@@ -53,7 +48,6 @@ export function lazyWithRetry<T extends ComponentType<unknown>>(
       return module
     } catch (error) {
       if (isChunkLoadError(error) && reloadOnceForChunkError()) {
-        // Keep Suspense pending while the page reloads.
         return new Promise(() => {})
       }
       throw error

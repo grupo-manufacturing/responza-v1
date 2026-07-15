@@ -95,28 +95,6 @@ export function AppCard({
   )
 }
 
-export function AppStatCard({
-  label,
-  value,
-  children,
-  hideValue = false,
-}: {
-  readonly label: string
-  readonly value?: string
-  readonly children?: ReactNode
-  readonly hideValue?: boolean
-}) {
-  return (
-    <AppCard padding="compact" className="hover-lift">
-      <p className="text-sm font-medium text-ink-muted">{label}</p>
-      {!hideValue && value !== undefined && (
-        <p className="mt-2 text-3xl font-semibold tracking-tight text-ink">{value}</p>
-      )}
-      {children !== undefined && <div className="mt-3">{children}</div>}
-    </AppCard>
-  )
-}
-
 export function AppPage({ children, className = '' }: { readonly children: ReactNode; readonly className?: string }) {
   return <div className={['mx-auto w-full max-w-6xl', className].join(' ')}>{children}</div>
 }

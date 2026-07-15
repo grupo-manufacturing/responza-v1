@@ -2,7 +2,7 @@ import { useEffect, useId, useRef, useState } from 'react'
 
 import { APP_INPUT_CLASS } from '@/shared/ui/app-ui'
 
-export type SelectOption<T extends string = string> = {
+type SelectOption<T extends string = string> = {
   readonly value: T
   readonly label: string
 }

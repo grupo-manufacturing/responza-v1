@@ -24,10 +24,6 @@ function buildRedirectUri(nextPath?: string): string {
   return url.toString()
 }
 
-/**
- * Google OAuth is one flow for both new and returning users.
- * Supabase + the backend create an account on first sign-in, or sign in if one exists.
- */
 export async function startGoogleOAuth(nextPath = '/inbox'): Promise<void> {
   SessionStorage.clearTokens()
   clearGoogleOAuthStorage()
