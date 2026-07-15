@@ -2,55 +2,55 @@ import { Navigate, createBrowserRouter } from 'react-router-dom'
 
 import { ProtectedRoute } from '@/app/guards/ProtectedRoute'
 import { RouteErrorElement } from '@/app/router/RouteErrorElement'
-import { PageSuspense } from '@/components/ui/Spinner'
+import { PageSuspense } from '@/shared/ui/primitives/Spinner'
 import { AppLayout } from '@/layouts/AppLayout'
 import { lazyWithRetry } from '@/shared/utils/lazyWithRetry'
 
 const LandingPage = lazyWithRetry(() =>
-  import('@/modules/landing/pages/LandingPage').then((m) => ({ default: m.LandingPage })),
+  import('@/features/landing/pages/LandingPage').then((m) => ({ default: m.LandingPage })),
 )
 const PrivacyPolicyPage = lazyWithRetry(() =>
-  import('@/modules/landing/pages/PrivacyPolicyPage').then((m) => ({ default: m.PrivacyPolicyPage })),
+  import('@/features/landing/pages/PrivacyPolicyPage').then((m) => ({ default: m.PrivacyPolicyPage })),
 )
 const TermsPage = lazyWithRetry(() =>
-  import('@/modules/landing/pages/TermsPage').then((m) => ({ default: m.TermsPage })),
+  import('@/features/landing/pages/TermsPage').then((m) => ({ default: m.TermsPage })),
 )
 const AuthPage = lazyWithRetry(() =>
-  import('@/modules/auth/pages/AuthPage').then((m) => ({ default: m.AuthPage })),
+  import('@/features/auth/pages/AuthPage').then((m) => ({ default: m.AuthPage })),
 )
 const OtpVerificationPage = lazyWithRetry(() =>
-  import('@/modules/auth/pages/OtpVerificationPage').then((m) => ({ default: m.OtpVerificationPage })),
+  import('@/features/auth/pages/OtpVerificationPage').then((m) => ({ default: m.OtpVerificationPage })),
 )
 const GoogleOAuthCallbackPage = lazyWithRetry(() =>
-  import('@/modules/auth/pages/GoogleOAuthCallbackPage').then((m) => ({ default: m.GoogleOAuthCallbackPage })),
+  import('@/features/auth/pages/GoogleOAuthCallbackPage').then((m) => ({ default: m.GoogleOAuthCallbackPage })),
 )
 const BusinessOnboardingPage = lazyWithRetry(() =>
-  import('@/modules/business/pages/BusinessOnboardingPage').then((m) => ({
+  import('@/features/business/pages/BusinessOnboardingPage').then((m) => ({
     default: m.BusinessOnboardingPage,
   })),
 )
 const DashboardPage = lazyWithRetry(() =>
-  import('@/modules/dashboard/pages/DashboardPage').then((m) => ({ default: m.DashboardPage })),
+  import('@/features/dashboard/pages/DashboardPage').then((m) => ({ default: m.DashboardPage })),
 )
 const InboxPage = lazyWithRetry(() =>
-  import('@/modules/inbox/pages/InboxPage').then((m) => ({ default: m.InboxPage })),
+  import('@/features/inbox/pages/InboxPage').then((m) => ({ default: m.InboxPage })),
 )
 const IntegrationsPage = lazyWithRetry(() =>
-  import('@/modules/integrations/pages/IntegrationsPage').then((m) => ({ default: m.IntegrationsPage })),
+  import('@/features/integrations/pages/IntegrationsPage').then((m) => ({ default: m.IntegrationsPage })),
 )
 const InstagramOAuthCallbackPage = lazyWithRetry(() =>
-  import('@/modules/integrations/pages/InstagramOAuthCallbackPage').then((m) => ({
+  import('@/features/integrations/pages/InstagramOAuthCallbackPage').then((m) => ({
     default: m.InstagramOAuthCallbackPage,
   })),
 )
 const SettingsPage = lazyWithRetry(() =>
-  import('@/modules/settings/pages/SettingsPage').then((m) => ({ default: m.SettingsPage })),
+  import('@/features/settings/pages/SettingsPage').then((m) => ({ default: m.SettingsPage })),
 )
 const AdminPage = lazyWithRetry(() =>
-  import('@/modules/admin/pages/AdminPage').then((m) => ({ default: m.AdminPage })),
+  import('@/features/admin/pages/AdminPage').then((m) => ({ default: m.AdminPage })),
 )
 const AdminLoginPage = lazyWithRetry(() =>
-  import('@/modules/admin/pages/AdminLoginPage').then((m) => ({ default: m.AdminLoginPage })),
+  import('@/features/admin/pages/AdminLoginPage').then((m) => ({ default: m.AdminLoginPage })),
 )
 
 function suspense(element: React.ReactNode) {

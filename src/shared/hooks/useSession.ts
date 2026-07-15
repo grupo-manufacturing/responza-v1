@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
-import { AuthService } from '@/modules/auth/auth.service'
-import type { MeResponse } from '@/modules/auth/auth.types'
+import { AuthService } from '@/features/auth/api/auth.service'
+import type { MeResponse } from '@/features/auth/api/auth.types'
 import { SessionStorage } from '@/shared/session/storage'
 
 let cachedMe: MeResponse | null = null

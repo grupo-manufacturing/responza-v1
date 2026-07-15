@@ -1,4 +1,4 @@
-import { Spinner } from '@/components/ui/Spinner'
+import { Spinner } from '@/shared/ui/primitives/Spinner'
 import { subscriptionStatusLabel } from '@/shared/utils/subscription-display'
 
 function SignOutIconButton({ onClick }: { readonly onClick: () => void }) {

@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { isRouteErrorResponse, useRouteError } from 'react-router-dom'
 
-import { Spinner } from '@/components/ui/Spinner'
+import { Spinner } from '@/shared/ui/primitives/Spinner'
 import { AppButton } from '@/shared/ui/app-ui'
 import { isChunkLoadError, reloadOnceForChunkError } from '@/shared/utils/lazyWithRetry'
 

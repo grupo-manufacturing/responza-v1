@@ -1,0 +1,84 @@
+import type { DashboardResponse } from '@/features/dashboard/api/dashboard.service'
+
+const previewTimestamp = (minutesAgo: number): string =>
+  new Date(Date.now() - minutesAgo * 60_000).toISOString()
+
+export const DASHBOARD_PREVIEW_DATA: DashboardResponse = {
+  stats: {
+    totalConversations: 48,
+    conversationsByPlatform: {
+      whatsapp: 31,
+      instagram: 17,
+    },
+    avgResponseTimeSeconds: 14 * 60 + 20,
+  },
+  needsReply: [
+    {
+      id: 'preview-needs-reply-1',
+      organizationId: 'preview',
+      channelId: 'preview-channel-1',
+      platform: 'whatsapp',
+      channelDisplayName: 'WhatsApp',
+      externalId: 'preview-wa-1',
+      displayName: 'Priya Sharma',
+      avatarUrl: null,
+      lastMessage: 'Is this still available? I can pick up today.',
+      lastMessageAt: previewTimestamp(12),
+      createdAt: previewTimestamp(60 * 24),
+    },
+    {
+      id: 'preview-needs-reply-2',
+      organizationId: 'preview',
+      channelId: 'preview-channel-2',
+      platform: 'instagram',
+      channelDisplayName: 'Instagram',
+      externalId: 'preview-ig-1',
+      displayName: '@studio.nova',
+      avatarUrl: null,
+      lastMessage: 'Can you share pricing for the premium plan?',
+      lastMessageAt: previewTimestamp(34),
+      createdAt: previewTimestamp(60 * 48),
+    },
+    {
+      id: 'preview-needs-reply-3',
+      organizationId: 'preview',
+      channelId: 'preview-channel-1',
+      platform: 'whatsapp',
+      channelDisplayName: 'WhatsApp',
+      externalId: 'preview-wa-2',
+      displayName: 'Rahul Mehta',
+      avatarUrl: null,
+      lastMessage: 'Need delivery by Friday — possible?',
+      lastMessageAt: previewTimestamp(58),
+      createdAt: previewTimestamp(60 * 72),
+    },
+  ],
+  toNudge: [
+    {
+      id: 'preview-nudge-1',
+      organizationId: 'preview',
+      channelId: 'preview-channel-2',
+      platform: 'instagram',
+      channelDisplayName: 'Instagram',
+      externalId: 'preview-ig-2',
+      displayName: '@hey.arjun',
+      avatarUrl: null,
+      lastMessage: 'Thanks, I will think about it.',
+      lastMessageAt: previewTimestamp(60 * 26),
+      createdAt: previewTimestamp(60 * 96),
+    },
+    {
+      id: 'preview-nudge-2',
+      organizationId: 'preview',
+      channelId: 'preview-channel-1',
+      platform: 'whatsapp',
+      channelDisplayName: 'WhatsApp',
+      externalId: 'preview-wa-3',
+      displayName: 'Ananya Kapoor',
+      avatarUrl: null,
+      lastMessage: 'Got it. Will confirm tomorrow.',
+      lastMessageAt: previewTimestamp(60 * 30),
+      createdAt: previewTimestamp(60 * 120),
+    },
+  ],
+}

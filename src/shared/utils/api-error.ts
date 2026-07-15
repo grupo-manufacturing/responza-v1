@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { BUSINESS_ONBOARDING_FIELD_LABELS } from '@/modules/business/business-onboarding'
+import { BUSINESS_ONBOARDING_FIELD_LABELS } from '@/features/business/lib/business-onboarding'
 
 type ApiErrorBody = {
   error?: {

@@ -1,4 +1,4 @@
-import type { SubscriptionDetails } from '@/modules/settings/subscription.service'
+import type { SubscriptionDetails } from '@/features/settings/api/subscription.service'
 
 export type SubscriptionLike = Pick<SubscriptionDetails, 'isTrialing' | 'hasAccess'>
 

@@ -1,6 +1,6 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios'
 
-import { AuthService } from '@/modules/auth/auth.service'
+import { AuthService } from '@/features/auth/api/auth.service'
 import { clearGoogleOAuthStorage } from '@/shared/auth/googleOAuthStorage'
 import { getApiBaseUrl } from '@/shared/config/env'
 import { clearSessionCache } from '@/shared/hooks/useSession'

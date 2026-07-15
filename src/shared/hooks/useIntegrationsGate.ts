@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { IntegrationsService } from '@/modules/integrations/integrations.service'
+import { IntegrationsService } from '@/features/integrations/api/integrations.service'
 
 export const integrationsGateKeys = {
   all: ['integrations', 'gate'] as const,

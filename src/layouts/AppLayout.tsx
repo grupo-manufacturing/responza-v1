@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
 
-import { SubscriptionRequired } from '@/components/common/SubscriptionRequired'
-import { PageSuspense, SpinnerOverlay } from '@/components/ui/Spinner'
-import { BusinessService } from '@/modules/business/business.service'
+import { SubscriptionRequired } from '@/shared/ui/gates/SubscriptionRequired'
+import { PageSuspense, SpinnerOverlay } from '@/shared/ui/primitives/Spinner'
+import { BusinessService } from '@/features/business/api/business.service'
 import { AppSidebar } from '@/layouts/AppSidebar'
 import { AppTopbar } from '@/layouts/AppTopbar'
 import { SIDEBAR_COLLAPSED_STORAGE_KEY } from '@/layouts/sidebar.config'

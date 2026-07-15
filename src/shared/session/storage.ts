@@ -1,4 +1,4 @@
-import type { SubscriptionDetails } from '@/modules/settings/subscription.service'
+import type { SubscriptionDetails } from '@/features/settings/api/subscription.service'
 
 const ORGANIZATION_STORAGE_KEY = 'organization'
 const SUBSCRIPTION_STORAGE_KEY = 'subscription'
