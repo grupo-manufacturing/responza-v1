@@ -6,7 +6,6 @@ import { ConversationQueueList } from '@/modules/dashboard/components/Conversati
 import { DashboardActionPanel } from '@/modules/dashboard/components/DashboardActionPanel'
 import { DashboardStatsRow } from '@/modules/dashboard/components/DashboardStatsRow'
 import { DashboardTrialPreview } from '@/modules/dashboard/components/DashboardTrialPreview'
-import { LeadQueueList } from '@/modules/dashboard/components/LeadQueueList'
 import { useDashboard } from '@/modules/dashboard/hooks/useDashboard'
 import { useSession } from '@/shared/hooks/useSession'
 import { SessionStorage } from '@/shared/session/storage'
@@ -52,7 +51,6 @@ function DashboardPageContent() {
             stats={data.stats}
             needsReplyCount={data.needsReply.length}
             toNudgeCount={data.toNudge.length}
-            leadsCount={data.leadsToFollowUp.length}
           />
 
           {data.stats.totalConversations === 0 && (
@@ -79,31 +77,17 @@ function DashboardPageContent() {
             </DashboardActionPanel>
 
             <DashboardActionPanel
-              title="Leads to follow up on"
-              description="Active leads that may need your attention."
-              viewAllHref="/leads"
-              viewAllLabel="Open leads"
+              title="Conversations to nudge"
+              description="You replied, but the customer has gone quiet."
+              viewAllHref="/inbox"
+              viewAllLabel="Open inbox"
             >
-              <LeadQueueList
-                leads={data.leadsToFollowUp}
-                emptyMessage="No leads need follow-up right now."
+              <ConversationQueueList
+                conversations={data.toNudge}
+                emptyMessage="No conversations need a follow-up nudge."
+                actionLabel="Nudge"
               />
             </DashboardActionPanel>
-
-            <div className="lg:col-span-2">
-              <DashboardActionPanel
-                title="Conversations to nudge"
-                description="You replied, but the customer has gone quiet."
-                viewAllHref="/inbox"
-                viewAllLabel="Open inbox"
-              >
-                <ConversationQueueList
-                  conversations={data.toNudge}
-                  emptyMessage="No conversations need a follow-up nudge."
-                  actionLabel="Nudge"
-                />
-              </DashboardActionPanel>
-            </div>
           </div>
         </div>
       )}

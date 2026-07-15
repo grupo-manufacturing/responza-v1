@@ -8,7 +8,6 @@ type DashboardStatsRowProps = {
   readonly stats: DashboardStats
   readonly needsReplyCount: number
   readonly toNudgeCount: number
-  readonly leadsCount: number
 }
 
 type SummaryCardProps = {
@@ -43,7 +42,6 @@ export function DashboardStatsRow({
   stats,
   needsReplyCount,
   toNudgeCount,
-  leadsCount,
 }: DashboardStatsRowProps) {
   const avgResponse =
     stats.avgResponseTimeSeconds !== null
@@ -61,7 +59,7 @@ export function DashboardStatsRow({
     platformParts.length > 0 ? platformParts.join(' · ') : 'No platform breakdown yet'
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
       <SummaryCard
         label="Awaiting your reply"
         value={String(needsReplyCount)}
@@ -75,13 +73,6 @@ export function DashboardStatsRow({
         hint="Customers who may need a nudge"
         href="/inbox"
         accentClass="bg-accent-warm"
-      />
-      <SummaryCard
-        label="Leads to follow up"
-        value={String(leadsCount)}
-        hint="Active leads needing attention"
-        href="/leads"
-        accentClass="bg-accent-violet"
       />
       <AppCard padding="compact">
         <div className="flex items-start gap-3">

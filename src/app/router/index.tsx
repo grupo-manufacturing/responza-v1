@@ -32,9 +32,6 @@ const BusinessOnboardingPage = lazyWithRetry(() =>
 const DashboardPage = lazyWithRetry(() =>
   import('@/modules/dashboard/pages/DashboardPage').then((m) => ({ default: m.DashboardPage })),
 )
-const LeadsPage = lazyWithRetry(() =>
-  import('@/modules/leads/pages/LeadsPage').then((m) => ({ default: m.LeadsPage })),
-)
 const InboxPage = lazyWithRetry(() =>
   import('@/modules/inbox/pages/InboxPage').then((m) => ({ default: m.InboxPage })),
 )
@@ -95,8 +92,8 @@ export const router = createBrowserRouter([
             element: <AppLayout />,
             children: [
               { path: '/dashboard', element: <DashboardPage /> },
-              { path: '/leads', element: <LeadsPage /> },
               { path: '/inbox', element: <InboxPage /> },
+              { path: '/leads', element: <Navigate to="/inbox" replace /> },
               { path: '/integrations', element: <IntegrationsPage /> },
               { path: '/settings', element: <SettingsPage /> },
             ],

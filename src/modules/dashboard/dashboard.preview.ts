@@ -81,28 +81,4 @@ export const DASHBOARD_PREVIEW_DATA: DashboardResponse = {
       createdAt: previewTimestamp(60 * 120),
     },
   ],
-  leadsToFollowUp: [
-    {
-      id: 'preview-lead-1',
-      organizationId: 'preview',
-      name: 'GreenLeaf Organics',
-      email: 'hello@greenleaf.example',
-      phone: '+91 98765 43210',
-      notes: 'Interested in bulk order for Q3.',
-      status: 'contacted',
-      createdAt: previewTimestamp(60 * 24 * 3),
-      updatedAt: previewTimestamp(90),
-    },
-    {
-      id: 'preview-lead-2',
-      organizationId: 'preview',
-      name: 'Metro Fitness Club',
-      email: null,
-      phone: '+91 99887 76655',
-      notes: 'Asked for a demo last week.',
-      status: 'new',
-      createdAt: previewTimestamp(60 * 24 * 5),
-      updatedAt: previewTimestamp(60 * 5),
-    },
-  ],
 }

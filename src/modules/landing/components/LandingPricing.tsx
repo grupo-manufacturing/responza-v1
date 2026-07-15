@@ -120,7 +120,7 @@ export function LandingPricing() {
           </h2>
           <p className="mt-4 text-base text-ink-muted">
             Start with a 3-day free trial, then choose Basic monthly or Responza Annual. Same powerful
-            inbox, AI tools, and lead management — only conversation volume changes.
+            inbox and AI tools — only conversation volume changes.
           </p>
         </Reveal>
 

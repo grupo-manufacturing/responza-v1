@@ -94,33 +94,6 @@ function AiFeaturesVisual() {
   )
 }
 
-function LeadsVisual() {
-  return (
-    <MockupShellDark>
-      {[
-        { name: 'Rahul Mehta', status: 'Hot lead', tone: 'bg-emerald-500/15 text-emerald-300/90' },
-        { name: 'Sneha Kapoor', status: 'Follow up', tone: 'bg-accent-warm/15 text-accent-warm' },
-      ].map((lead) => (
-        <div
-          key={lead.name}
-          className="flex items-center justify-between gap-3 border-b border-border-dark py-3 last:border-0"
-        >
-          <div className="flex min-w-0 items-center gap-2">
-            <img src={INTEGRATION_PLATFORM_LOGOS.whatsapp} alt="" className="h-4 w-4 shrink-0 object-contain" />
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-on-dark">{lead.name}</p>
-              <p className="text-xs text-on-dark-muted">2h ago</p>
-            </div>
-          </div>
-          <span className={`shrink-0 rounded-[var(--radius-pill)] px-2.5 py-0.5 text-[10px] font-medium ${lead.tone}`}>
-            {lead.status}
-          </span>
-        </div>
-      ))}
-    </MockupShellDark>
-  )
-}
-
 function FeatureBlock({
   variant,
   badge,
@@ -243,25 +216,6 @@ export function LandingFeatures() {
           </div>
         </div>
       </section>
-
-      <FeatureBlock
-        variant="dark"
-        badge="Lead management"
-        badgeTone="teal"
-        title={
-          <>
-            Track every prospect from <span className="text-accent-gradient-dark">first message</span> to close.
-          </>
-        }
-        description={
-          <p>
-            Add notes, update status, and follow up without losing context. Leads stay linked to the
-            conversations that created them.
-          </p>
-        }
-        visual={<LeadsVisual />}
-        reverse
-      />
     </>
   )
 }

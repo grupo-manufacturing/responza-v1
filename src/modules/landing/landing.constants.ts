@@ -104,8 +104,8 @@ export const PRICING_PLANS = [
 export const PLAN_FEATURES = [
   'Unified WhatsApp + Instagram inbox',
   'AI replies & translation',
-  'Lead management',
   'Conversation analytics',
+  'Dashboard attention queues',
 ] as const
 
 export const AI_FEATURES = [
@@ -135,7 +135,7 @@ export const AI_FEATURES = [
 export const LANDING_FAQS = [
   {
     q: 'How is Responza AI different from using WhatsApp and Instagram separately?',
-    a: 'Responza AI unifies both channels in one inbox with shared history, AI suggestions, lead tracking, and analytics — so your team never context-switches between apps.',
+    a: 'Responza AI unifies both channels in one inbox with shared history, AI suggestions, and analytics — so your team never context-switches between apps.',
   },
   {
     q: 'How do AI reply suggestions work?',

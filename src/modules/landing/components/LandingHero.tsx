@@ -202,7 +202,7 @@ export function LandingHero() {
             </h1>
             <p className="mt-5 max-w-lg text-base leading-relaxed text-ink-muted sm:mt-6 sm:text-lg">
               Responza AI brings WhatsApp and Instagram into a single workspace with AI that suggests replies,
-              translates messages, and helps you close leads faster.
+              translates messages, and helps you respond faster.
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap sm:items-center">
               <LandingButton to="/auth?mode=register" variant="primary" showChevron className="w-full sm:w-auto">
