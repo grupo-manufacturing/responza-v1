@@ -25,40 +25,52 @@ export function LandingClosing() {
               Everything you need to know about Responza AI from setup to billing.
             </p>
           </Reveal>
-          <div className="mt-10 space-y-3 sm:mt-12">
+          <div className="mt-10 divide-y divide-border-dark border-y border-border-dark sm:mt-12">
             {LANDING_FAQS.map((faq, index) => {
               const isOpen = openIndex === index
+              const panelId = `faq-panel-${index}`
+              const buttonId = `faq-button-${index}`
+
               return (
                 <Reveal key={faq.q} delay={index * 60}>
-                  <div
-                    className={[
-                      'glass-dark transition-colors duration-200',
-                      isOpen ? 'border-accent/20 bg-accent/5' : '',
-                      'rounded-2xl px-4 py-4 sm:rounded-[var(--radius-pill)] sm:px-5',
-                    ].join(' ')}
-                  >
+                  <div>
                     <button
+                      id={buttonId}
                       type="button"
+                      aria-expanded={isOpen}
+                      aria-controls={panelId}
                       onClick={() => setOpenIndex(isOpen ? null : index)}
-                      className="flex w-full items-start justify-between gap-4 text-left sm:items-center"
+                      className="flex w-full items-center justify-between gap-4 py-4 text-left transition-colors hover:text-accent-soft sm:py-5"
                     >
-                      <span className="text-sm font-medium text-on-dark">{faq.q}</span>
-                      <span
+                      <span className="text-sm font-medium text-on-dark sm:text-base">{faq.q}</span>
+                      <svg
                         className={[
-                          'flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-xs transition-colors',
-                          isOpen
-                            ? 'border-accent/40 bg-accent/15 text-accent-soft'
-                            : 'border-border-dark text-on-dark-muted',
+                          'h-4 w-4 shrink-0 text-on-dark-muted transition-transform duration-200',
+                          isOpen ? 'rotate-180 text-accent-soft' : '',
                         ].join(' ')}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden
                       >
-                        {isOpen ? '−' : '+'}
-                      </span>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
                     </button>
-                    {isOpen && (
-                      <p className="mt-3 pr-2 text-sm leading-relaxed text-on-dark-muted animate-step-in sm:pr-10">
-                        {faq.a}
-                      </p>
-                    )}
+                    <div
+                      id={panelId}
+                      role="region"
+                      aria-labelledby={buttonId}
+                      className={[
+                        'grid transition-[grid-template-rows] duration-200 ease-out',
+                        isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
+                      ].join(' ')}
+                    >
+                      <div className="overflow-hidden">
+                        <p className="pb-4 text-sm leading-relaxed text-on-dark-muted sm:pb-5 sm:pr-10">
+                          {faq.a}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </Reveal>
               )

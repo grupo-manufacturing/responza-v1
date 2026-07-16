@@ -108,25 +108,40 @@ export const PLAN_FEATURES = [
   'Dashboard attention queues',
 ] as const
 
-export const AI_FEATURES = [
+export const LANDING_FEATURES = [
   {
+    id: 'inbox',
+    label: 'Unified inbox',
+    tone: 'teal' as const,
+    title: 'All your messages',
+    titleAccent: 'in one place.',
+    description:
+      'WhatsApp and Instagram conversations arrive in a single inbox sorted by latest activity, with platform context always visible.',
+  },
+  {
+    id: 'replies',
     label: 'AI replies',
     tone: 'violet' as const,
-    title: 'Respond faster with smart suggestions',
+    title: 'Respond faster with',
+    titleAccent: 'smart suggestions.',
     description:
-      'Responza AI reads conversation context and drafts replies that match your tone. Edit, send, or ignore you stay in control.',
+      'Responza AI reads conversation context and drafts replies that match your tone. Edit, send, or ignore — you stay in control.',
   },
   {
+    id: 'translation',
     label: 'Translation',
     tone: 'warm' as const,
-    title: "Speak your customer's language",
+    title: "Speak your",
+    titleAccent: "customer's language.",
     description:
-      'Incoming messages are translated instantly so your team can reply confidently no copy-pasting into external tools.',
+      'Incoming messages are translated instantly so your team can reply confidently — no copy-pasting into external tools.',
   },
   {
+    id: 'analytics',
     label: 'Analytics',
     tone: 'teal' as const,
-    title: 'Understand what customers really want',
+    title: 'Understand what customers',
+    titleAccent: 'really want.',
     description:
       'AI-generated summaries and topic labels help you spot patterns, prioritize urgent threads, and prepare before you reply.',
   },
