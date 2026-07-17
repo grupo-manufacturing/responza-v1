@@ -41,7 +41,6 @@ export function AdminAffiliatesSection() {
   const [error, setError] = useState<string | null>(null)
   const [name, setName] = useState('')
   const [code, setCode] = useState('')
-  const [notes, setNotes] = useState('')
   const [creating, setCreating] = useState(false)
   const [createError, setCreateError] = useState<string | null>(null)
   const [expandedId, setExpandedId] = useState<string | null>(null)
@@ -74,11 +73,9 @@ export function AdminAffiliatesSection() {
       await AdminService.createAffiliate({
         name: name.trim(),
         code: code.trim().toUpperCase(),
-        notes: notes.trim().length > 0 ? notes.trim() : undefined,
       })
       setName('')
       setCode('')
-      setNotes('')
       await loadAffiliates()
     } catch (err) {
       setCreateError(getApiErrorMessage(err, 'Failed to create affiliate'))
@@ -137,7 +134,7 @@ export function AdminAffiliatesSection() {
 
       <form
         onSubmit={handleCreate}
-        className="mt-4 grid gap-3 rounded-[var(--radius-card)] border border-border bg-white p-4 sm:grid-cols-2 lg:grid-cols-4"
+        className="mt-4 grid gap-3 rounded-[var(--radius-card)] border border-border bg-white p-4 sm:grid-cols-3"
       >
         <div>
           <label htmlFor="affiliate-name" className="mb-1 block text-xs font-medium text-ink-muted">
@@ -168,18 +165,6 @@ export function AdminAffiliatesSection() {
             placeholder="PRIYA50"
           />
         </div>
-        <div>
-          <label htmlFor="affiliate-notes" className="mb-1 block text-xs font-medium text-ink-muted">
-            Notes
-          </label>
-          <input
-            id="affiliate-notes"
-            value={notes}
-            onChange={(event) => setNotes(event.target.value)}
-            className="w-full rounded-xl border border-border bg-white px-3 py-2 text-sm text-ink outline-none focus:border-ink/30"
-            placeholder="Optional"
-          />
-        </div>
         <div className="flex items-end">
           <button
             type="submit"
@@ -190,7 +175,7 @@ export function AdminAffiliatesSection() {
           </button>
         </div>
         {createError !== null && (
-          <div className="sm:col-span-2 lg:col-span-4">
+          <div className="sm:col-span-3">
             <Alert variant="error">{createError}</Alert>
           </div>
         )}
@@ -238,9 +223,6 @@ export function AdminAffiliatesSection() {
                     <tr className="border-b border-border">
                       <td className="px-4 py-3">
                         <p className="font-medium text-ink">{affiliate.name}</p>
-                        {affiliate.notes !== null && affiliate.notes.length > 0 && (
-                          <p className="mt-0.5 text-xs text-ink-muted">{affiliate.notes}</p>
-                        )}
                       </td>
                       <td className="px-4 py-3 font-mono text-ink">{affiliate.code}</td>
                       <td className="px-4 py-3 text-ink">{affiliate.referralCount}</td>

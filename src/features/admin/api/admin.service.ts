@@ -74,7 +74,6 @@ export class AdminService {
   static async createAffiliate(input: {
     name: string
     code: string
-    notes?: string
   }): Promise<{ affiliate: AdminAffiliate }> {
     const response = await adminApi.post<{ affiliate: AdminAffiliate }>('/admin/affiliates', input)
     return response.data
@@ -82,7 +81,7 @@ export class AdminService {
 
   static async updateAffiliate(
     id: string,
-    input: { name?: string; notes?: string | null; isActive?: boolean },
+    input: { name?: string; isActive?: boolean },
   ): Promise<{ affiliate: AdminAffiliate }> {
     const response = await adminApi.patch<{ affiliate: AdminAffiliate }>(`/admin/affiliates/${id}`, input)
     return response.data

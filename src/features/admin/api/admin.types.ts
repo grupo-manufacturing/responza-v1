@@ -34,7 +34,6 @@ export type AdminAffiliate = {
   id: string
   name: string
   code: string
-  notes: string | null
   isActive: boolean
   referralCount: number
   activePaidReferralCount: number
