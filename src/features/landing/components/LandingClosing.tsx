@@ -126,6 +126,9 @@ export function LandingClosing() {
                 <a href="#pricing" className="block text-on-dark-muted transition-colors hover:text-accent-soft">
                   Pricing
                 </a>
+                <a href="#affiliate" className="block text-on-dark-muted transition-colors hover:text-accent-soft">
+                  Affiliate
+                </a>
               </div>
               <div className="space-y-2">
                 <p className="font-medium text-on-dark">Account</p>

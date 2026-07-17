@@ -176,11 +176,16 @@ export const LANDING_FAQS = [
     q: 'Is there a free trial?',
     a: 'Yes. Every new account gets a 3-day free trial with full access to core features. No credit card required to start.',
   },
+  {
+    q: 'Do you have an affiliate program?',
+    a: 'Yes. Creators and influencers can get a unique referral code. You earn ₹50 per month for each referred business that keeps an active paid subscription. Trials don’t count. Apply via contact@responza.in.',
+  },
 ] as const
 
 const NAV_LINKS = [
   { href: '#features', label: 'Features' },
   { href: '#pricing', label: 'Pricing' },
+  { href: '#affiliate', label: 'Affiliate' },
   { href: '#faqs', label: 'FAQs' },
 ] as const
 
