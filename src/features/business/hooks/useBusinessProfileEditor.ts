@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 import {
   businessProfileToFormData,
   canSubmitBusinessOnboarding,
-  formDataToBusinessPayload,
+  formDataToBusinessUpdatePayload,
   hasBusinessOnboardingFieldErrors,
   isSameBusinessFormData,
   mapApiFieldErrorsToBusinessForm,
@@ -115,7 +115,7 @@ export function useBusinessProfileEditor() {
     setSaveMessage(null)
 
     try {
-      const result = await BusinessService.updateBusiness(formDataToBusinessPayload(formData))
+      const result = await BusinessService.updateBusiness(formDataToBusinessUpdatePayload(formData))
       const nextFormData = businessProfileToFormData(result.profile)
       setFormData(nextFormData)
       setSavedFormData(nextFormData)

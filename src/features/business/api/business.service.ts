@@ -28,6 +28,7 @@ export interface CompleteBusinessPayload {
   facebookPageUrl?: string | null
   instagramPageUrl?: string | null
   businessDescription: string
+  referralCode?: string | null
 }
 
 export interface BusinessResponse {

@@ -3,6 +3,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom'
 
 import { Alert } from '@/shared/ui/primitives/Alert'
 import { SpinnerSection } from '@/shared/ui/primitives/Spinner'
+import { AdminAffiliatesSection } from '@/features/admin/components/AdminAffiliatesSection'
 import { AdminService, type AdminDashboardResponse } from '@/features/admin/api/admin.service'
 import { AdminSessionStorage } from '@/features/admin/lib/adminSession'
 import { getVercelAnalyticsUrl, getVercelSpeedInsightsUrl } from '@/shared/config/env'
@@ -180,6 +181,8 @@ export function AdminPage() {
         {!loading && error === null && data !== null && (
           <>
             <VercelLinksSection />
+
+            <AdminAffiliatesSection />
 
             <section>
               <h1 className="text-xl font-semibold tracking-tight text-ink">Overview</h1>

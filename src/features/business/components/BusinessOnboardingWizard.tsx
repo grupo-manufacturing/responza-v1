@@ -411,39 +411,61 @@ export function BusinessOnboardingWizard({
 
       case 'businessDescription':
         return (
-          <div>
-            <textarea
-              ref={inputRef as React.RefObject<HTMLTextAreaElement>}
-              value={formData.businessDescription}
-              onChange={(event) => updateField('businessDescription', event.target.value)}
-              placeholder="Describe your products, services, target customers, tone, policies, and common questions you receive..."
-              className={fieldTextareaClass(mergedErrors.businessDescription !== undefined)}
-            />
-            <div className="mt-2 flex items-center justify-between gap-3">
-              <p className="text-xs text-ink-faint">
-                Minimum {BUSINESS_DESCRIPTION_MIN_LENGTH} characters
-              </p>
-              <p
-                className={[
-                  'text-xs font-medium tabular-nums',
-                  descriptionReady ? 'text-emerald-600' : 'text-ink-faint',
-                ].join(' ')}
-              >
-                {descriptionLength} / {BUSINESS_DESCRIPTION_MIN_LENGTH}
-              </p>
-            </div>
-            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-muted">
-              <div
-                className={[
-                  'h-full rounded-full transition-all duration-300',
-                  descriptionReady
-                    ? 'bg-gradient-to-r from-emerald-400 to-emerald-500'
-                    : 'bg-gradient-to-r from-accent-soft to-accent',
-                ].join(' ')}
-                style={{
-                  width: `${Math.min(100, (descriptionLength / BUSINESS_DESCRIPTION_MIN_LENGTH) * 100)}%`,
-                }}
+          <div className="space-y-5">
+            <div>
+              <textarea
+                ref={inputRef as React.RefObject<HTMLTextAreaElement>}
+                value={formData.businessDescription}
+                onChange={(event) => updateField('businessDescription', event.target.value)}
+                placeholder="Describe your products, services, target customers, tone, policies, and common questions you receive..."
+                className={fieldTextareaClass(mergedErrors.businessDescription !== undefined)}
               />
+              <div className="mt-2 flex items-center justify-between gap-3">
+                <p className="text-xs text-ink-faint">
+                  Minimum {BUSINESS_DESCRIPTION_MIN_LENGTH} characters
+                </p>
+                <p
+                  className={[
+                    'text-xs font-medium tabular-nums',
+                    descriptionReady ? 'text-emerald-600' : 'text-ink-faint',
+                  ].join(' ')}
+                >
+                  {descriptionLength} / {BUSINESS_DESCRIPTION_MIN_LENGTH}
+                </p>
+              </div>
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-muted">
+                <div
+                  className={[
+                    'h-full rounded-full transition-all duration-300',
+                    descriptionReady
+                      ? 'bg-gradient-to-r from-emerald-400 to-emerald-500'
+                      : 'bg-gradient-to-r from-accent-soft to-accent',
+                  ].join(' ')}
+                  style={{
+                    width: `${Math.min(100, (descriptionLength / BUSINESS_DESCRIPTION_MIN_LENGTH) * 100)}%`,
+                  }}
+                />
+              </div>
+              <FieldError message={mergedErrors.businessDescription} />
+            </div>
+
+            <div>
+              <label htmlFor="referral-code" className="mb-1.5 block text-sm font-medium text-ink">
+                Referral code <span className="font-normal text-ink-faint">(optional)</span>
+              </label>
+              <input
+                id="referral-code"
+                type="text"
+                value={formData.referralCode}
+                onChange={(event) => updateField('referralCode', event.target.value.toUpperCase())}
+                placeholder="e.g. PRIYA50"
+                autoComplete="off"
+                className={fieldInputClass(mergedErrors.referralCode !== undefined, true)}
+              />
+              <p className="mt-1.5 text-xs text-ink-faint">
+                If an influencer referred you, enter their code here.
+              </p>
+              <FieldError message={mergedErrors.referralCode} />
             </div>
           </div>
         )
@@ -472,7 +494,7 @@ export function BusinessOnboardingWizard({
         />
 
         {renderStepContent(currentStep.id)}
-        <FieldError message={stepFieldError} />
+        {currentStep.id !== 'businessDescription' && <FieldError message={stepFieldError} />}
       </StepShell>
 
       <div className="mt-8 flex items-center justify-between gap-3 border-t border-border pt-5">

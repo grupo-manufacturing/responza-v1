@@ -40,7 +40,9 @@ function formatValidationErrorMessage(details: ZodFlattenedError): string | null
 }
 
 export function getApiValidationFieldErrors(error: unknown): Record<string, string> | null {
-  const details = getApiErrorDetails<ZodFlattenedError>(error)
+  const details = getApiErrorDetails<ZodFlattenedError & { fieldErrors?: Record<string, string | string[]> }>(
+    error,
+  )
   if (details?.fieldErrors === undefined) {
     return null
   }
@@ -48,7 +50,12 @@ export function getApiValidationFieldErrors(error: unknown): Record<string, stri
   const mapped: Record<string, string> = {}
 
   for (const [field, messages] of Object.entries(details.fieldErrors)) {
-    const message = messages?.[0]
+    if (typeof messages === 'string' && messages.length > 0) {
+      mapped[field] = messages
+      continue
+    }
+
+    const message = Array.isArray(messages) ? messages[0] : undefined
     if (typeof message === 'string' && message.length > 0) {
       mapped[field] = message
     }

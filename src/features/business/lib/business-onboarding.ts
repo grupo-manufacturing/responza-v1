@@ -4,6 +4,7 @@ export type BusinessOnboardingFormData = {
   facebookPageUrl: string
   instagramPageUrl: string
   businessDescription: string
+  referralCode: string
 }
 
 export type BusinessOnboardingFieldErrors = Partial<Record<keyof BusinessOnboardingFormData, string>>
@@ -14,6 +15,7 @@ export const EMPTY_BUSINESS_ONBOARDING_FORM: BusinessOnboardingFormData = {
   facebookPageUrl: '',
   instagramPageUrl: '',
   businessDescription: '',
+  referralCode: '',
 }
 
 export const CATALOGUE_ACCEPT =
@@ -121,10 +123,32 @@ export function businessProfileToFormData(profile: {
     facebookPageUrl: profile.facebookPageUrl ?? '',
     instagramPageUrl: profile.instagramPageUrl ?? '',
     businessDescription: profile.businessDescription ?? '',
+    referralCode: '',
   }
 }
 
 export function formDataToBusinessPayload(
+  formData: BusinessOnboardingFormData,
+): {
+  brandName: string
+  websiteUrl: string | null
+  facebookPageUrl: string | null
+  instagramPageUrl: string | null
+  businessDescription: string
+  referralCode?: string | null
+} {
+  const referralCode = formData.referralCode.trim()
+  return {
+    brandName: formData.brandName.trim(),
+    websiteUrl: optionalUrlForPayload(formData.websiteUrl),
+    facebookPageUrl: optionalUrlForPayload(formData.facebookPageUrl),
+    instagramPageUrl: optionalUrlForPayload(formData.instagramPageUrl),
+    businessDescription: formData.businessDescription.trim(),
+    referralCode: referralCode.length > 0 ? referralCode : null,
+  }
+}
+
+export function formDataToBusinessUpdatePayload(
   formData: BusinessOnboardingFormData,
 ): {
   brandName: string
@@ -151,7 +175,8 @@ export function isSameBusinessFormData(
     left.websiteUrl === right.websiteUrl &&
     left.facebookPageUrl === right.facebookPageUrl &&
     left.instagramPageUrl === right.instagramPageUrl &&
-    left.businessDescription === right.businessDescription
+    left.businessDescription === right.businessDescription &&
+    left.referralCode === right.referralCode
   )
 }
 
@@ -161,6 +186,7 @@ export const BUSINESS_ONBOARDING_FIELD_LABELS: Record<keyof BusinessOnboardingFo
   facebookPageUrl: 'Facebook page link',
   instagramPageUrl: 'Instagram page link',
   businessDescription: 'Business description',
+  referralCode: 'Referral code',
 }
 
 export function mapApiFieldErrorsToBusinessForm(
