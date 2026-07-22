@@ -5,6 +5,8 @@ import { clearSessionCache, useSession } from '@/shared/hooks/useSession'
 import { clearGoogleOAuthStorage } from '@/shared/auth/googleOAuthStorage'
 import { SessionStorage } from '@/shared/session/storage'
 
+import { isGmailFeatureEnabled } from '@/shared/config/features'
+
 import { SIDEBAR_NAVIGATION } from './sidebar.config'
 import { SidebarAccountFooter } from './SidebarAccountFooter'
 
@@ -121,7 +123,9 @@ export function AppSidebar({
             <SidebarCollapseButton collapsed={collapsed} onToggle={onToggleCollapse} variant="nav" />
           </div>
         )}
-        {SIDEBAR_NAVIGATION.map((item) => (
+        {SIDEBAR_NAVIGATION.filter(
+          (item) => item.href !== '/gmail' || isGmailFeatureEnabled(),
+        ).map((item) => (
           <NavLink
             key={item.name}
             to={item.href}

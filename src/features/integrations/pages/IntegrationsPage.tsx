@@ -5,6 +5,7 @@ import { ComingSoonIntegrationRow } from '@/features/integrations/components/Com
 import { IntegrationRow } from '@/features/integrations/components/IntegrationRow'
 import { COMING_SOON_INTEGRATIONS } from '@/features/integrations/constants'
 import { useIntegrations } from '@/features/integrations/hooks/useIntegrations'
+import { isGmailFeatureEnabled } from '@/shared/config/features'
 import { AppCard, AppPage, AppPageHeader } from '@/shared/ui/app-ui'
 
 export function IntegrationsPage() {
@@ -50,7 +51,7 @@ export function IntegrationsPage() {
         </Alert>
       )}
 
-      {!gmailConfigured && (
+      {!gmailConfigured && isGmailFeatureEnabled() && (
         <Alert variant="warning" className="mb-4">
           Gmail OAuth env vars are missing. Add `VITE_GOOGLE_CLIENT_ID` and
           `VITE_GMAIL_REDIRECT_URI` to enable Gmail connect.
@@ -74,7 +75,9 @@ export function IntegrationsPage() {
       {!loading && (
         <AppCard padding="none" className="overflow-hidden">
           <div className="divide-y divide-border">
-            {integrations.map((integration) => (
+            {integrations
+              .filter((integration) => integration.platform !== 'gmail' || isGmailFeatureEnabled())
+              .map((integration) => (
               <IntegrationRow
                 key={integration.platform}
                 platform={integration.platform}

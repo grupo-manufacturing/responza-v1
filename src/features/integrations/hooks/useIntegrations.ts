@@ -21,6 +21,7 @@ import {
 } from '@/shared/config/env'
 import { useSubscriptionGate } from '@/shared/hooks/useSubscriptionGate'
 import { integrationsGateKeys } from '@/shared/hooks/useIntegrationsGate'
+import { isGmailFeatureEnabled } from '@/shared/config/features'
 import { mergeByKey } from '@/shared/utils/upsert'
 import { getApiErrorCode, getApiErrorMessage } from '@/shared/utils/api-error'
 import { integrationPlatformLabel } from '@/features/integrations/constants'
@@ -56,6 +57,11 @@ export function useIntegrations() {
   }, [])
 
   const loadGmailStatus = useCallback(async () => {
+    if (!isGmailFeatureEnabled()) {
+      setGmailDetails(null)
+      return
+    }
+
     try {
       const status = await IntegrationsService.getGmailStatus()
       setGmailDetails(status.connected ? status.gmail : null)

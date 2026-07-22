@@ -4,6 +4,7 @@ import { ProtectedRoute } from '@/app/guards/ProtectedRoute'
 import { RouteErrorElement } from '@/app/router/RouteErrorElement'
 import { PageSuspense } from '@/shared/ui/primitives/Spinner'
 import { AppLayout } from '@/layouts/AppLayout'
+import { isGmailFeatureEnabled } from '@/shared/config/features'
 import { lazyWithRetry } from '@/shared/utils/lazyWithRetry'
 
 const LandingPage = lazyWithRetry(() =>
@@ -102,7 +103,7 @@ export const router = createBrowserRouter([
             children: [
               { path: '/dashboard', element: <DashboardPage /> },
               { path: '/inbox', element: <InboxPage /> },
-              { path: '/gmail', element: <GmailPage /> },
+              { path: '/gmail', element: isGmailFeatureEnabled() ? <GmailPage /> : <Navigate to="/dashboard" replace /> },
               { path: '/leads', element: <Navigate to="/inbox" replace /> },
               { path: '/integrations', element: <IntegrationsPage /> },
               { path: '/settings', element: <SettingsPage /> },
