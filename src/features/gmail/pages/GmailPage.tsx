@@ -1,13 +1,16 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 
 import { GmailComposeModal } from '@/features/gmail/components/GmailComposeModal'
 import { GmailMessageList } from '@/features/gmail/components/GmailMessageList'
 import { GmailMessageView } from '@/features/gmail/components/GmailMessageView'
 import { GmailNotConnected } from '@/features/gmail/components/GmailNotConnected'
+import { gmailKeys } from '@/features/gmail/constants'
 import { useGmailConnection } from '@/features/gmail/hooks/useGmailConnection'
 import { useGmailMessage } from '@/features/gmail/hooks/useGmailMessage'
 import { flattenGmailMessages, useGmailMessages } from '@/features/gmail/hooks/useGmailMessages'
 import { useGmailSend } from '@/features/gmail/hooks/useGmailSend'
+import { isGmailRevokedError } from '@/features/gmail/lib/gmail-errors'
 import {
   buildReplyDefaults,
   type GmailComposeMode,
@@ -22,6 +25,7 @@ import { AppButton } from '@/shared/ui/app-ui'
 import { Alert } from '@/shared/ui/primitives/Alert'
 import { SpinnerSection } from '@/shared/ui/primitives/Spinner'
 import { useSubscriptionGate } from '@/shared/hooks/useSubscriptionGate'
+import { integrationsGateKeys } from '@/shared/hooks/useIntegrationsGate'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
 
 const EMPTY_COMPOSE_STATE: GmailComposeState = {
@@ -32,6 +36,7 @@ const EMPTY_COMPOSE_STATE: GmailComposeState = {
 }
 
 export function GmailPage() {
+  const queryClient = useQueryClient()
   const { subscriptionRequired } = useSubscriptionGate()
   const connectionQuery = useGmailConnection(!subscriptionRequired)
   const connected = connectionQuery.data?.connected === true
@@ -51,6 +56,20 @@ export function GmailPage() {
     selectedMessageId,
     !subscriptionRequired && connected && selectedMessageId !== null,
   )
+
+  const gmailRevoked =
+    isGmailRevokedError(messagesQuery.error) ||
+    isGmailRevokedError(messageQuery.error)
+
+  useEffect(() => {
+    if (!gmailRevoked) {
+      return
+    }
+
+    void connectionQuery.refetch()
+    void queryClient.invalidateQueries({ queryKey: gmailKeys.messages })
+    void queryClient.invalidateQueries({ queryKey: integrationsGateKeys.all })
+  }, [connectionQuery, gmailRevoked, queryClient])
 
   const handleSelectMessage = useCallback((messageId: string) => {
     setSelectedMessageId(messageId)
@@ -109,10 +128,25 @@ export function GmailPage() {
         setComposeState(EMPTY_COMPOSE_STATE)
         await messagesQuery.refetch()
       } catch (error) {
+        if (isGmailRevokedError(error)) {
+          setComposeOpen(false)
+          void connectionQuery.refetch()
+          void queryClient.invalidateQueries({ queryKey: integrationsGateKeys.all })
+          return
+        }
+
         setComposeError(getApiErrorMessage(error, 'Could not send email. Please try again.'))
       }
     },
-    [composeState.mode, composeState.replyMessageId, messagesQuery, replyMutation, sendMutation],
+    [
+      composeState.mode,
+      composeState.replyMessageId,
+      connectionQuery,
+      messagesQuery,
+      queryClient,
+      replyMutation,
+      sendMutation,
+    ],
   )
 
   if (subscriptionRequired) {
@@ -123,7 +157,7 @@ export function GmailPage() {
     return <SpinnerSection minHeightClassName="min-h-[50vh]" />
   }
 
-  if (!connected) {
+  if (!connected || gmailRevoked) {
     return (
       <div className="mx-auto w-full max-w-4xl">
         <header className="mb-6">
