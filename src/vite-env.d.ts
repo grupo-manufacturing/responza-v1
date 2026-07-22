@@ -7,6 +7,9 @@ interface ImportMetaEnv {
   readonly VITE_GRAPH_API_VERSION?: string
   readonly VITE_INSTAGRAM_APP_ID?: string
   readonly VITE_INSTAGRAM_REDIRECT_URI?: string
+  readonly VITE_GOOGLE_CLIENT_ID?: string
+  readonly VITE_GMAIL_REDIRECT_URI?: string
+  readonly VITE_GMAIL_OAUTH_ALLOWED_ORIGINS?: string
   readonly VITE_APP_URL?: string
   readonly VITE_INSTAGRAM_OAUTH_ALLOWED_ORIGINS?: string
   readonly VITE_SUPABASE_URL?: string

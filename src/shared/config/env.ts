@@ -161,6 +161,65 @@ export function isInstagramOAuthConfigured(): boolean {
   return getInstagramAppId().length > 0 && getInstagramRedirectUri().length > 0
 }
 
+export function getGoogleClientId(): string {
+  return import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim() ?? ''
+}
+
+export function getGmailRedirectUri(): string {
+  const configured = import.meta.env.VITE_GMAIL_REDIRECT_URI?.trim() ?? ''
+  if (configured.length > 0) {
+    return configured
+  }
+
+  const appOrigin = getAppOrigin()
+  if (appOrigin !== null) {
+    return `${appOrigin}/oauth/gmail/callback`
+  }
+
+  const apiOrigin = apiBaseOrigin()
+  if (apiOrigin !== null) {
+    return `${apiOrigin}/auth/gmail/callback`
+  }
+
+  return ''
+}
+
+export function getGmailOAuthAllowedOrigins(): string[] {
+  const origins = new Set<string>()
+
+  if (typeof window !== 'undefined') {
+    origins.add(window.location.origin)
+  }
+
+  const appOrigin = getAppOrigin()
+  if (appOrigin !== null) {
+    origins.add(appOrigin)
+  }
+
+  for (const origin of getAppOrigins()) {
+    origins.add(origin)
+  }
+
+  const apiOrigin = apiBaseOrigin()
+  if (apiOrigin !== null) {
+    origins.add(apiOrigin)
+  }
+
+  const extraOrigins = import.meta.env.VITE_GMAIL_OAUTH_ALLOWED_ORIGINS?.split(',') ?? []
+  for (const origin of extraOrigins) {
+    const trimmed = origin.trim()
+    if (trimmed.length > 0) {
+      origins.add(trimmed)
+    }
+  }
+
+  return [...origins]
+}
+
+export function isGmailOAuthConfigured(): boolean {
+  return getGoogleClientId().length > 0 && getGmailRedirectUri().length > 0
+}
+
 export function getSupabaseUrl(): string {
   return import.meta.env.VITE_SUPABASE_URL?.trim() ?? ''
 }

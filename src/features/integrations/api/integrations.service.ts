@@ -20,6 +20,12 @@ export interface InstagramConnectSummary {
   profile_picture_url: string | null
 }
 
+export interface GmailConnectSummary {
+  email: string
+  display_name: string | null
+  profile_picture_url: string | null
+}
+
 export interface ConnectWhatsAppPayload {
   code: string
   session_info: {
@@ -39,6 +45,11 @@ export interface ConnectInstagramPayload {
   }
 }
 
+export interface ConnectGmailPayload {
+  code: string
+  redirect_uri?: string
+}
+
 export interface ListIntegrationsResponse {
   integrations: Integration[]
 }
@@ -47,6 +58,7 @@ export interface ConnectIntegrationResponse {
   integration: Integration & { id: string }
   whatsapp?: WhatsAppConnectSummary
   instagram?: InstagramConnectSummary
+  gmail?: GmailConnectSummary
 }
 
 export interface DisconnectIntegrationResponse {
@@ -63,6 +75,11 @@ export interface InstagramStatusResponse {
   instagram: InstagramConnectSummary | null
 }
 
+export interface GmailStatusResponse {
+  connected: boolean
+  gmail: GmailConnectSummary | null
+}
+
 export class IntegrationsService {
   static async listIntegrations(): Promise<ListIntegrationsResponse> {
     const response = await api.get<ListIntegrationsResponse>('/integrations')
@@ -71,7 +88,11 @@ export class IntegrationsService {
 
   static async connectIntegration(
     platform: IntegrationPlatform,
-    payload: ConnectWhatsAppPayload | ConnectInstagramPayload | Record<string, never> = {},
+    payload:
+      | ConnectWhatsAppPayload
+      | ConnectInstagramPayload
+      | ConnectGmailPayload
+      | Record<string, never> = {},
   ): Promise<ConnectIntegrationResponse> {
     const response = await api.post<ConnectIntegrationResponse>(
       `/integrations/${platform}/connect`,
@@ -94,6 +115,11 @@ export class IntegrationsService {
 
   static async getInstagramStatus(): Promise<InstagramStatusResponse> {
     const response = await api.get<InstagramStatusResponse>('/integrations/instagram/status')
+    return response.data
+  }
+
+  static async getGmailStatus(): Promise<GmailStatusResponse> {
+    const response = await api.get<GmailStatusResponse>('/integrations/gmail/status')
     return response.data
   }
 }

@@ -43,6 +43,11 @@ const InstagramOAuthCallbackPage = lazyWithRetry(() =>
     default: m.InstagramOAuthCallbackPage,
   })),
 )
+const GmailOAuthCallbackPage = lazyWithRetry(() =>
+  import('@/features/integrations/pages/GmailOAuthCallbackPage').then((m) => ({
+    default: m.GmailOAuthCallbackPage,
+  })),
+)
 const SettingsPage = lazyWithRetry(() =>
   import('@/features/settings/pages/SettingsPage').then((m) => ({ default: m.SettingsPage })),
 )
@@ -69,6 +74,7 @@ export const router = createBrowserRouter([
       { path: '/register', element: <Navigate to="/auth?mode=register" replace /> },
       { path: '/subscription', element: <Navigate to="/settings?tab=subscription" replace /> },
       { path: '/oauth/instagram/callback', element: suspense(<InstagramOAuthCallbackPage />) },
+      { path: '/oauth/gmail/callback', element: suspense(<GmailOAuthCallbackPage />) },
       { path: '/privacy-policy', element: suspense(<PrivacyPolicyPage />) },
       { path: '/terms-conditions', element: suspense(<TermsPage />) },
       { path: '/privacy', element: <Navigate to="/privacy-policy" replace /> },

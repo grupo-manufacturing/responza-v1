@@ -10,6 +10,7 @@ import {
   type IntegrationStatus,
 } from '@/features/integrations/constants'
 import type {
+  GmailConnectSummary,
   InstagramConnectSummary,
   WhatsAppConnectSummary,
 } from '@/features/integrations/api/integrations.service'
@@ -20,6 +21,7 @@ type IntegrationRowProps = {
   busy: boolean
   whatsappDetails: WhatsAppConnectSummary | null
   instagramDetails: InstagramConnectSummary | null
+  gmailDetails: GmailConnectSummary | null
   onConnect: (platform: IntegrationPlatform) => void
   onDisconnect: (platform: IntegrationPlatform) => void
 }
@@ -39,6 +41,7 @@ function StatusIndicator({ connected }: { connected: boolean }) {
 const CONNECT_BUTTON_CLASS: Partial<Record<IntegrationPlatform, string>> = {
   whatsapp: '!bg-brand-whatsapp hover:!bg-brand-whatsapp/90',
   instagram: '!bg-gradient-to-r !from-[#405DE6] !to-brand-instagram hover:opacity-90',
+  gmail: '!bg-[#C5221F] hover:!bg-[#A91B1B]',
 }
 
 export function IntegrationRow({
@@ -47,6 +50,7 @@ export function IntegrationRow({
   busy,
   whatsappDetails,
   instagramDetails,
+  gmailDetails,
   onConnect,
   onDisconnect,
 }: IntegrationRowProps) {
@@ -56,7 +60,9 @@ export function IntegrationRow({
       ? 'Opening signup…'
       : platform === 'instagram' && busy && !isConnected
         ? 'Opening OAuth…'
-        : busy && !isConnected
+        : platform === 'gmail' && busy && !isConnected
+          ? 'Opening OAuth…'
+          : busy && !isConnected
           ? 'Connecting…'
           : isConnected
             ? 'Reconnect'
@@ -98,6 +104,15 @@ export function IntegrationRow({
                   profilePictureUrl={instagramDetails.profile_picture_url}
                   fallbackInitial={instagramDetails.username ?? 'I'}
                   avatarClassName="bg-gradient-to-br from-[#405DE6] to-brand-instagram text-white"
+                />
+              </div>
+            ) : platform === 'gmail' && isConnected && gmailDetails !== null ? (
+              <div className="mt-3">
+                <ConnectedAccountProfile
+                  displayName={gmailDetails.display_name ?? gmailDetails.email}
+                  profilePictureUrl={gmailDetails.profile_picture_url}
+                  fallbackInitial={gmailDetails.email}
+                  avatarClassName="bg-[#C5221F]/15 text-[#C5221F]"
                 />
               </div>
             ) : (

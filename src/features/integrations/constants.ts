@@ -1,4 +1,4 @@
-const INTEGRATION_PLATFORMS = ['whatsapp', 'instagram'] as const
+const INTEGRATION_PLATFORMS = ['whatsapp', 'instagram', 'gmail'] as const
 
 export type IntegrationPlatform = (typeof INTEGRATION_PLATFORMS)[number]
 export type IntegrationStatus = 'connected' | 'disconnected'
@@ -6,11 +6,13 @@ export type IntegrationStatus = 'connected' | 'disconnected'
 export const INTEGRATION_PLATFORM_LABELS: Record<IntegrationPlatform, string> = {
   whatsapp: 'WhatsApp',
   instagram: 'Instagram',
+  gmail: 'Gmail',
 }
 
 export const INTEGRATION_PLATFORM_LOGOS: Record<IntegrationPlatform, string> = {
   whatsapp: '/whatsapp.png',
   instagram: '/instagram.png',
+  gmail: '/gmail.png',
 }
 
 export function integrationPlatformLogoClass(_platform: IntegrationPlatform): string {
@@ -20,6 +22,7 @@ export function integrationPlatformLogoClass(_platform: IntegrationPlatform): st
 export const INTEGRATION_PLATFORM_DESCRIPTIONS: Record<IntegrationPlatform, string> = {
   whatsapp: 'Use Meta Embedded Signup to connect your WhatsApp Business number for inbox messaging.',
   instagram: 'Connect Instagram Direct to manage conversations in one place.',
+  gmail: 'Connect Gmail to manage your email from Responza.',
 }
 
 export function integrationPlatformLabel(platform: IntegrationPlatform): string {
@@ -32,7 +35,6 @@ export function integrationStatusLabel(status: IntegrationStatus): string {
 
 const COMING_SOON_INTEGRATION_PLATFORMS = [
   'indiamart',
-  'gmail',
   'tally',
   'tiktok',
   'shopify',
@@ -53,12 +55,6 @@ export const COMING_SOON_INTEGRATIONS: ComingSoonIntegration[] = [
     label: 'IndiaMART',
     logo: '/indiamart.png',
     description: 'Connect IndiaMART leads and inquiries directly in your inbox.',
-  },
-  {
-    platform: 'gmail',
-    label: 'Gmail',
-    logo: '/gmail.png',
-    description: 'Manage customer email conversations alongside your messaging channels.',
   },
   {
     platform: 'tally',

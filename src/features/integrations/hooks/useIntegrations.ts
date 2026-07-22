@@ -1,17 +1,21 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 
+import { startGmailOAuth } from '@/features/integrations/lib/gmailOAuth'
 import { startInstagramOAuth } from '@/features/integrations/lib/instagramOAuth'
 import { startWhatsAppEmbeddedSignup } from '@/features/integrations/lib/whatsappEmbeddedSignup'
 import type { IntegrationPlatform } from '@/features/integrations/constants'
 import {
   IntegrationsService,
   type InstagramConnectSummary,
+  type GmailConnectSummary,
   type Integration,
   type WhatsAppConnectSummary,
 } from '@/features/integrations/api/integrations.service'
 import {
+  getGmailRedirectUri,
   getInstagramRedirectUri,
+  isGmailOAuthConfigured,
   isInstagramOAuthConfigured,
   isWhatsAppEmbeddedSignupConfigured,
 } from '@/shared/config/env'
@@ -26,6 +30,7 @@ export function useIntegrations() {
   const [integrations, setIntegrations] = useState<Integration[]>([])
   const [whatsappDetails, setWhatsappDetails] = useState<WhatsAppConnectSummary | null>(null)
   const [instagramDetails, setInstagramDetails] = useState<InstagramConnectSummary | null>(null)
+  const [gmailDetails, setGmailDetails] = useState<GmailConnectSummary | null>(null)
   const [loading, setLoading] = useState(true)
   const [busyPlatform, setBusyPlatform] = useState<IntegrationPlatform | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -50,6 +55,15 @@ export function useIntegrations() {
     }
   }, [])
 
+  const loadGmailStatus = useCallback(async () => {
+    try {
+      const status = await IntegrationsService.getGmailStatus()
+      setGmailDetails(status.connected ? status.gmail : null)
+    } catch {
+      setGmailDetails(null)
+    }
+  }, [])
+
   const refreshIntegrationsGate = useCallback(() => {
     void queryClient.invalidateQueries({ queryKey: integrationsGateKeys.all })
   }, [queryClient])
@@ -64,12 +78,14 @@ export function useIntegrations() {
       setIntegrations(result.integrations)
       await loadWhatsAppStatus()
       await loadInstagramStatus()
+      await loadGmailStatus()
       refreshIntegrationsGate()
     } catch (err) {
       if (handleError(err)) {
         setIntegrations([])
         setWhatsappDetails(null)
         setInstagramDetails(null)
+        setGmailDetails(null)
         return
       }
 
@@ -77,10 +93,11 @@ export function useIntegrations() {
       setIntegrations([])
       setWhatsappDetails(null)
       setInstagramDetails(null)
+      setGmailDetails(null)
     } finally {
       setLoading(false)
     }
-  }, [handleError, loadInstagramStatus, loadWhatsAppStatus, refreshIntegrationsGate, reset])
+  }, [handleError, loadGmailStatus, loadInstagramStatus, loadWhatsAppStatus, refreshIntegrationsGate, reset])
 
   useEffect(() => {
     void loadIntegrations()
@@ -131,6 +148,26 @@ export function useIntegrations() {
         return
       }
 
+      if (platform === 'gmail') {
+        if (!isGmailOAuthConfigured()) {
+          throw new Error(
+            'Gmail OAuth is not configured. Set VITE_GOOGLE_CLIENT_ID and VITE_GMAIL_REDIRECT_URI.',
+          )
+        }
+
+        const oauth = await startGmailOAuth()
+        const redirectUri = getGmailRedirectUri()
+        const result = await IntegrationsService.connectIntegration(platform, {
+          code: oauth.code,
+          redirect_uri: redirectUri,
+        })
+        setIntegrations((current) => mergeByKey(current, result.integration, 'platform'))
+        setGmailDetails(result.gmail ?? null)
+        setSuccess('Gmail connected successfully. Open Gmail to manage your email.')
+        refreshIntegrationsGate()
+        return
+      }
+
       return
     } catch (err) {
       if (getApiErrorCode(err) === 'NOT_IMPLEMENTED') {
@@ -157,6 +194,9 @@ export function useIntegrations() {
       if (platform === 'instagram') {
         setInstagramDetails(null)
       }
+      if (platform === 'gmail') {
+        setGmailDetails(null)
+      }
       setSuccess(`${integrationPlatformLabel(platform)} disconnected.`)
       refreshIntegrationsGate()
     } catch (err) {
@@ -170,6 +210,7 @@ export function useIntegrations() {
     integrations,
     whatsappDetails,
     instagramDetails,
+    gmailDetails,
     loading,
     busyPlatform,
     error,
@@ -177,6 +218,7 @@ export function useIntegrations() {
     subscriptionRequired,
     whatsappConfigured: isWhatsAppEmbeddedSignupConfigured(),
     instagramConfigured: isInstagramOAuthConfigured(),
+    gmailConfigured: isGmailOAuthConfigured(),
     handleConnect,
     handleDisconnect,
   }

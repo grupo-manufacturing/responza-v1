@@ -12,6 +12,7 @@ export function IntegrationsPage() {
     integrations,
     whatsappDetails,
     instagramDetails,
+    gmailDetails,
     loading,
     busyPlatform,
     error,
@@ -19,6 +20,7 @@ export function IntegrationsPage() {
     subscriptionRequired,
     whatsappConfigured,
     instagramConfigured,
+    gmailConfigured,
     handleConnect,
     handleDisconnect,
   } = useIntegrations()
@@ -48,6 +50,13 @@ export function IntegrationsPage() {
         </Alert>
       )}
 
+      {!gmailConfigured && (
+        <Alert variant="warning" className="mb-4">
+          Gmail OAuth env vars are missing. Add `VITE_GOOGLE_CLIENT_ID` and
+          `VITE_GMAIL_REDIRECT_URI` to enable Gmail connect.
+        </Alert>
+      )}
+
       {loading && <SpinnerSection minHeightClassName="min-h-[40vh]" />}
 
       {!loading && success !== null && (
@@ -73,6 +82,7 @@ export function IntegrationsPage() {
                 busy={busyPlatform === integration.platform}
                 whatsappDetails={integration.platform === 'whatsapp' ? whatsappDetails : null}
                 instagramDetails={integration.platform === 'instagram' ? instagramDetails : null}
+                gmailDetails={integration.platform === 'gmail' ? gmailDetails : null}
                 onConnect={handleConnect}
                 onDisconnect={handleDisconnect}
               />
