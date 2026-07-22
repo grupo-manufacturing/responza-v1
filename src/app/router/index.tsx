@@ -38,6 +38,9 @@ const InboxPage = lazyWithRetry(() =>
 const IntegrationsPage = lazyWithRetry(() =>
   import('@/features/integrations/pages/IntegrationsPage').then((m) => ({ default: m.IntegrationsPage })),
 )
+const GmailPage = lazyWithRetry(() =>
+  import('@/features/gmail/pages/GmailPage').then((m) => ({ default: m.GmailPage })),
+)
 const InstagramOAuthCallbackPage = lazyWithRetry(() =>
   import('@/features/integrations/pages/InstagramOAuthCallbackPage').then((m) => ({
     default: m.InstagramOAuthCallbackPage,
@@ -99,6 +102,7 @@ export const router = createBrowserRouter([
             children: [
               { path: '/dashboard', element: <DashboardPage /> },
               { path: '/inbox', element: <InboxPage /> },
+              { path: '/gmail', element: <GmailPage /> },
               { path: '/leads', element: <Navigate to="/inbox" replace /> },
               { path: '/integrations', element: <IntegrationsPage /> },
               { path: '/settings', element: <SettingsPage /> },

@@ -36,6 +36,13 @@ export const SIDEBAR_NAVIGATION: SidebarNavItem[] = [
     ),
   },
   {
+    name: 'Gmail',
+    href: '/gmail',
+    icon: (
+      <img src="/gmail.png" alt="" className="h-5 w-5 object-contain" />
+    ),
+  },
+  {
     name: 'Integrations',
     href: '/integrations',
     icon: (
