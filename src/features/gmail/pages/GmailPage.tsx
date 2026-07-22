@@ -15,7 +15,6 @@ import {
 } from '@/features/gmail/constants'
 import {
   GMAIL_LIST_COLUMN_CLASS,
-  GMAIL_PANEL_HEADER_CLASS,
   GMAIL_SHELL_CLASS,
 } from '@/features/gmail/lib/gmail-ui'
 import { SubscriptionRequired } from '@/shared/ui/gates/SubscriptionRequired'
@@ -184,9 +183,6 @@ export function GmailPage() {
               mobileShowMessage ? 'hidden lg:flex' : 'flex',
             ].join(' ')}
           >
-            <div className={GMAIL_PANEL_HEADER_CLASS}>
-              <h2 className="text-sm font-semibold text-ink">Inbox</h2>
-            </div>
             <GmailMessageList
               messages={messages}
               selectedMessageId={selectedMessageId}

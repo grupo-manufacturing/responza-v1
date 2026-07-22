@@ -5,6 +5,9 @@ export const GMAIL_PANEL_HEADER_CLASS = 'shrink-0 border-b border-border px-3 py
 
 export const GMAIL_LIST_COLUMN_CLASS = 'w-full lg:w-[340px] lg:shrink-0'
 
+export const GMAIL_SCROLL_AREA_CLASS =
+  'overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
+
 export function gmailListItemSelectedClass(isSelected: boolean): string {
   if (!isSelected) {
     return 'hover:bg-surface-muted/70'

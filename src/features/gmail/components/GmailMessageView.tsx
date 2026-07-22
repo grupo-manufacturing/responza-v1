@@ -1,7 +1,15 @@
 import { GmailMessageHeader } from '@/features/gmail/components/GmailMessageHeader'
 import type { GmailMessageDetail } from '@/features/gmail/api/gmail.types'
+import { GMAIL_SCROLL_AREA_CLASS } from '@/features/gmail/lib/gmail-ui'
 import { AppButton } from '@/shared/ui/app-ui'
 import { Spinner } from '@/shared/ui/primitives/Spinner'
+
+function wrapEmailHtml(bodyHtml: string): string {
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+    html, body { margin: 0; padding: 0; overflow: auto; scrollbar-width: none; -ms-overflow-style: none; }
+    html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
+  </style></head><body>${bodyHtml}</body></html>`
+}
 
 type GmailMessageViewProps = {
   message: GmailMessageDetail | null
@@ -24,7 +32,7 @@ export function GmailMessageView({
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       <GmailMessageHeader message={message} onBack={onBack} />
 
-      <div className="min-h-0 flex-1 overflow-y-auto bg-white/70">
+      <div className={`min-h-0 flex-1 bg-white/70 ${GMAIL_SCROLL_AREA_CLASS}`}>
         {loading && (
           <div className="flex h-full items-center justify-center py-12">
             <Spinner />
@@ -64,7 +72,7 @@ export function GmailMessageView({
             <iframe
               title={message.subject}
               sandbox=""
-              srcDoc={message.bodyHtml}
+              srcDoc={wrapEmailHtml(message.bodyHtml)}
               className="min-h-[420px] w-full rounded-xl border border-border bg-white"
             />
           </div>

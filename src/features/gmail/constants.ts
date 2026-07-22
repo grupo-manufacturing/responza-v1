@@ -25,6 +25,21 @@ export function formatGmailTimestamp(value: string): string {
   return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 }
 
+export function formatGmailDetailTimestamp(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return ''
+  }
+
+  return date.toLocaleString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  })
+}
+
 export function formatGmailSender(from: string): string {
   const trimmed = from.trim()
   if (trimmed.length === 0) {
