@@ -9,6 +9,7 @@ type GmailMessageViewProps = {
   error: string | null
   onBack?: () => void
   onRetry?: () => void
+  onReply?: () => void
 }
 
 export function GmailMessageView({
@@ -17,6 +18,7 @@ export function GmailMessageView({
   error,
   onBack,
   onRetry,
+  onReply,
 }: GmailMessageViewProps) {
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
@@ -48,6 +50,17 @@ export function GmailMessageView({
 
         {!loading && error === null && message !== null && (
           <div className="p-4 sm:p-6">
+            {onReply !== undefined && (
+              <div className="mb-4">
+                <AppButton
+                  variant="secondary"
+                  onClick={onReply}
+                  className="!border-[#C5221F]/20 !text-[#C5221F] hover:!bg-[#C5221F]/5"
+                >
+                  Reply
+                </AppButton>
+              </div>
+            )}
             <iframe
               title={message.subject}
               sandbox=""

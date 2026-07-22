@@ -38,3 +38,31 @@ export function formatGmailSender(from: string): string {
 
   return trimmed
 }
+
+export function extractEmailAddress(value: string): string {
+  const trimmed = value.trim()
+  const angleMatch = trimmed.match(/<([^>]+)>/)
+  if (angleMatch !== null && angleMatch[1] !== undefined) {
+    return angleMatch[1].trim()
+  }
+
+  return trimmed
+}
+
+export function buildReplyDefaults(message: { from: string; subject: string }) {
+  const subject = message.subject.trim()
+  return {
+    to: extractEmailAddress(message.from),
+    subject: /^re:/i.test(subject) ? subject : `Re: ${subject}`,
+  }
+}
+
+export type GmailComposeMode = 'compose' | 'reply'
+
+export type GmailComposeState = {
+  mode: GmailComposeMode
+  replyMessageId?: string
+  to: string
+  subject: string
+  body: string
+}

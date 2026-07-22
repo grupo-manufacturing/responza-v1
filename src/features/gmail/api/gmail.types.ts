@@ -19,3 +19,20 @@ export interface ListGmailMessagesResponse {
 export interface GetGmailMessageResponse {
   message: GmailMessageDetail
 }
+
+export interface SendGmailMessagePayload {
+  to: string
+  subject: string
+  body: string
+}
+
+export interface ReplyGmailMessagePayload {
+  body: string
+}
+
+export interface SentGmailMessageResponse {
+  message: {
+    id: string
+    threadId: string
+  }
+}
