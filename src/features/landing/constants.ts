@@ -87,7 +87,7 @@ export const PRICING_PLANS = [
     interval: 'monthly' as const,
     highlight: false,
     freeTrial: true,
-    description: 'For teams getting started with a unified inbox.',
+    description: 'For teams getting started with WhatsApp and Instagram.',
   },
   {
     key: 'premium',
@@ -102,7 +102,7 @@ export const PRICING_PLANS = [
 ] as const
 
 export const PLAN_FEATURES = [
-  'Unified WhatsApp + Instagram inbox',
+  'WhatsApp & Instagram modules',
   'AI replies & translation',
   'Conversation analytics',
   'Dashboard attention queues',
@@ -111,12 +111,12 @@ export const PLAN_FEATURES = [
 export const LANDING_FEATURES = [
   {
     id: 'inbox',
-    label: 'Unified inbox',
+    label: 'Channel modules',
     tone: 'teal' as const,
-    title: 'All your messages',
-    titleAccent: 'in one place.',
+    title: 'Every channel',
+    titleAccent: 'in its own space.',
     description:
-      'WhatsApp and Instagram conversations arrive in a single inbox sorted by latest activity, with platform context always visible.',
+      'WhatsApp and Instagram each get a dedicated module with conversations sorted by latest activity — switch channels without losing context.',
   },
   {
     id: 'replies',
@@ -150,7 +150,7 @@ export const LANDING_FEATURES = [
 export const LANDING_FAQS = [
   {
     q: 'How is Responza AI different from using WhatsApp and Instagram separately?',
-    a: 'Responza AI unifies both channels in one inbox with shared history, AI suggestions, and analytics — so your team never context-switches between apps.',
+    a: 'Responza gives each channel its own module inside one workspace — with shared AI suggestions, translation, analytics, and a dashboard that shows what needs attention across channels.',
   },
   {
     q: 'How do AI reply suggestions work?',
@@ -158,7 +158,7 @@ export const LANDING_FAQS = [
   },
   {
     q: 'Can I still message customers outside of Responza AI?',
-    a: 'Yes. Messages sent from WhatsApp or Instagram directly still sync into your Responza AI inbox when channels are connected.',
+    a: 'Yes. Messages sent from WhatsApp or Instagram directly still sync into the matching Responza module when that channel is connected.',
   },
   {
     q: 'Is my data private and secure?',

@@ -16,10 +16,10 @@ import {
   outboundBubbleClass,
   platformTabActiveClass,
 } from '@/features/inbox/lib/inbox-ui'
-import type { IntegrationPlatform } from '@/features/integrations/constants'
+import type { MessagingPlatform } from '@/features/inbox/constants'
 import { LandingButton, LandingLogo, ProfilePhoto, Reveal, SectionBadge } from '@/shared/ui/brand-ui'
 
-type HeroPlatformFilter = IntegrationPlatform | 'all'
+type HeroMessagingModule = MessagingPlatform
 
 type HeroMockMessage = {
   readonly id: string
@@ -32,14 +32,14 @@ type HeroMockConversation = {
   readonly id: string
   readonly name: string
   readonly avatar: string
-  readonly platform: IntegrationPlatform
+  readonly platform: HeroMessagingModule
   readonly preview: string
   readonly messages: readonly HeroMockMessage[]
   readonly aiSuggestions: readonly string[]
   readonly draft: string
 }
 
-const HERO_PLATFORM_FILTERS: readonly HeroPlatformFilter[] = ['all', 'whatsapp', 'instagram']
+const HERO_MODULES: readonly HeroMessagingModule[] = ['whatsapp', 'instagram']
 
 const HERO_CONVERSATIONS: readonly HeroMockConversation[] = [
   {
@@ -118,7 +118,7 @@ const HERO_CONVERSATIONS: readonly HeroMockConversation[] = [
       {
         id: 'm2',
         direction: 'outbound',
-        content: 'Great — Responza unifies WhatsApp + Instagram in one inbox.',
+        content: 'Great — I can walk you through WhatsApp and Instagram in Responza.',
         time: '10:01',
       },
     ],
@@ -148,13 +148,12 @@ const HERO_CONVERSATIONS: readonly HeroMockConversation[] = [
   },
 ]
 
-function platformFilterLabel(filter: HeroPlatformFilter): string {
-  if (filter === 'all') return 'All'
-  if (filter === 'whatsapp') return 'WhatsApp'
+function moduleLabel(module: HeroMessagingModule): string {
+  if (module === 'whatsapp') return 'WhatsApp'
   return 'Instagram'
 }
 
-function PlatformGlyph({ platform }: { readonly platform: IntegrationPlatform }) {
+function PlatformGlyph({ platform }: { readonly platform: HeroMessagingModule }) {
   const src = platform === 'whatsapp' ? '/whatsapp.png' : '/instagram.png'
   const label = platform === 'whatsapp' ? 'WhatsApp' : 'Instagram'
   return <img src={src} alt={label} className="h-3.5 w-3.5 object-contain" />
@@ -298,15 +297,12 @@ function LandingNavbar({ variant = 'dark' }: { readonly variant?: 'light' | 'dar
 }
 
 function HeroVisual() {
-  const [platformFilter, setPlatformFilter] = useState<HeroPlatformFilter>('all')
+  const [activeModule, setActiveModule] = useState<HeroMessagingModule>('whatsapp')
   const [selectedId, setSelectedId] = useState(HERO_CONVERSATIONS[0].id)
 
   const visibleConversations = useMemo(
-    () =>
-      HERO_CONVERSATIONS.filter(
-        (conversation) => platformFilter === 'all' || conversation.platform === platformFilter,
-      ),
-    [platformFilter],
+    () => HERO_CONVERSATIONS.filter((conversation) => conversation.platform === activeModule),
+    [activeModule],
   )
 
   useEffect(() => {
@@ -318,6 +314,7 @@ function HeroVisual() {
   const selected =
     visibleConversations.find((conversation) => conversation.id === selectedId) ??
     visibleConversations[0] ??
+    HERO_CONVERSATIONS.find((conversation) => conversation.platform === activeModule) ??
     HERO_CONVERSATIONS[0]
 
   const threadMessages = selected.messages.slice(-2)
@@ -335,23 +332,32 @@ function HeroVisual() {
         aria-hidden
       >
         <div className="flex flex-col gap-3 px-3 pt-3 pb-2.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-4 sm:pt-4 sm:pb-3 lg:px-5">
-          <p className="shrink-0 text-sm font-semibold tracking-tight text-ink">Inbox</p>
+          <div className="flex min-w-0 items-center gap-2">
+            <img
+              src={activeModule === 'whatsapp' ? '/whatsapp.png' : '/instagram.png'}
+              alt=""
+              className="h-5 w-5 shrink-0 object-contain"
+            />
+            <p className="truncate text-sm font-semibold tracking-tight text-ink">
+              {moduleLabel(activeModule)}
+            </p>
+          </div>
           <div className="flex min-w-0 gap-1.5 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {HERO_PLATFORM_FILTERS.map((filter) => {
-              const isActive = platformFilter === filter
+            {HERO_MODULES.map((module) => {
+              const isActive = activeModule === module
               return (
                 <button
-                  key={filter}
+                  key={module}
                   type="button"
                   tabIndex={-1}
                   aria-pressed={isActive}
-                  onClick={() => setPlatformFilter(filter)}
+                  onClick={() => setActiveModule(module)}
                   className={[
                     'shrink-0 rounded-[var(--radius-pill)] px-2.5 py-1 text-[11px] font-medium whitespace-nowrap transition-all duration-200',
-                    platformTabActiveClass(filter, isActive),
+                    platformTabActiveClass(module, isActive),
                   ].join(' ')}
                 >
-                  {platformFilterLabel(filter)}
+                  {moduleLabel(module)}
                 </button>
               )
             })}
@@ -493,11 +499,11 @@ export function LandingHero() {
           <Reveal className="flex min-w-0 flex-col items-center text-center lg:items-start lg:text-left">
             <MetaVerifiedBadge />
             <h1 className="text-[1.75rem] leading-tight font-semibold tracking-tight text-ink sm:text-4xl md:text-5xl lg:text-6xl">
-              One inbox, <span className="text-accent-gradient">every conversation.</span>
+              One workspace, <span className="text-accent-gradient">every channel.</span>
             </h1>
             <p className="mt-4 max-w-lg text-sm leading-relaxed text-ink-muted sm:mt-5 sm:text-base md:mt-6 md:text-lg">
-              Responza AI brings WhatsApp and Instagram into a single workspace with AI that suggests replies,
-              translates messages, and helps you respond faster.
+              Manage WhatsApp and Instagram from dedicated modules in Responza — with AI reply
+              suggestions, instant translation, and a dashboard that shows what needs attention.
             </p>
             <div className="mt-6 flex w-full max-w-sm flex-col gap-3 sm:mt-8 sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:justify-center lg:justify-start">
               <LandingButton to="/auth?mode=register" variant="primary" showChevron className="w-full sm:w-auto">
@@ -535,7 +541,7 @@ export function LandingHero() {
               Connect the channels your customers already use.
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-ink-muted sm:text-base">
-              WhatsApp and Instagram are live today — more platforms are on the way.
+              WhatsApp and Instagram each have their own module — more channels are on the way.
             </p>
           </Reveal>
 

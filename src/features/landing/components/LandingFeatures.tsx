@@ -23,14 +23,17 @@ function InboxVisual() {
   return (
     <MockupShellDark>
       <div className="mb-3 flex items-center justify-between">
-        <p className="text-sm font-medium text-on-dark">Inbox</p>
+        <div className="flex items-center gap-2">
+          <img src="/whatsapp.png" alt="" className="h-4 w-4 object-contain" />
+          <p className="text-sm font-medium text-on-dark">WhatsApp</p>
+        </div>
         <div className="flex gap-1.5">
-          {(['All', 'WhatsApp', 'Instagram'] as const).map((tab, index) => (
+          {(['WhatsApp', 'Instagram'] as const).map((tab, index) => (
             <span
               key={tab}
               className={[
                 'rounded-[var(--radius-pill)] px-2.5 py-1 text-[10px] font-medium',
-                index === 0 ? 'bg-on-dark text-ink' : 'bg-white/5 text-on-dark-muted',
+                index === 0 ? 'bg-brand-whatsapp text-white' : 'bg-white/5 text-on-dark-muted',
               ].join(' ')}
             >
               {tab}
@@ -46,13 +49,6 @@ function InboxVisual() {
             preview: 'Thanks for the quote — can we discuss…',
             avatar: LANDING_AVATARS.priya,
             active: true,
-          },
-          {
-            name: 'Alex Chen',
-            platform: 'instagram' as const,
-            preview: 'Do you ship internationally?',
-            avatar: LANDING_AVATARS.alex,
-            active: false,
           },
           {
             name: 'Maya Patel',
@@ -272,8 +268,8 @@ export function LandingFeatures() {
             <span className="text-accent-gradient-dark">clarity and speed.</span>
           </h2>
           <p className="mt-6 text-base leading-relaxed text-on-dark-muted">
-            One inbox for WhatsApp and Instagram, plus AI that suggests replies, translates messages, and
-            surfaces what matters.
+            Dedicated WhatsApp and Instagram modules, plus AI that suggests replies, translates
+            messages, and surfaces what matters.
           </p>
         </Reveal>
       </div>

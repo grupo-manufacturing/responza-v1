@@ -114,7 +114,7 @@ export function LandingClosing() {
             <div>
               <LandingLogo variant="dark" />
               <p className="mt-3 max-w-xs text-sm leading-relaxed text-on-dark-muted">
-                One intelligent inbox for WhatsApp and Instagram conversations.
+                Dedicated modules for WhatsApp and Instagram conversations.
               </p>
             </div>
             <div className="flex gap-10 text-sm sm:gap-12">
