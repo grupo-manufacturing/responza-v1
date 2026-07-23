@@ -64,14 +64,14 @@ export function DashboardStatsRow({
         label="Awaiting your reply"
         value={String(needsReplyCount)}
         hint={needsReplyCount === 1 ? '1 conversation waiting' : `${needsReplyCount} conversations waiting`}
-        href="/inbox"
+        href="/whatsapp"
         accentClass="bg-accent"
       />
       <SummaryCard
         label="Quiet conversations"
         value={String(toNudgeCount)}
         hint="Customers who may need a nudge"
-        href="/inbox"
+        href="/whatsapp"
         accentClass="bg-accent-warm"
       />
       <AppCard padding="compact">

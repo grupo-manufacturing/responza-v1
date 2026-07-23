@@ -1,4 +1,3 @@
-import type { InboxPlatformFilter } from '@/features/inbox/constants'
 import type { IntegrationPlatform } from '@/features/integrations/constants'
 
 export const INBOX_SHELL_CLASS =
@@ -48,11 +47,13 @@ export function outboundMetaClass(platform: IntegrationPlatform | null | undefin
   return 'text-on-dark-muted'
 }
 
+type PlatformTabFilter = IntegrationPlatform | 'all'
+
 function platformTabInactiveClass(): string {
   return 'border border-transparent bg-white/70 text-ink-muted hover:border-border hover:bg-surface-muted hover:text-ink'
 }
 
-export function platformTabActiveClass(filter: InboxPlatformFilter, isActive: boolean): string {
+export function platformTabActiveClass(filter: PlatformTabFilter, isActive: boolean): string {
   if (!isActive) {
     return platformTabInactiveClass()
   }

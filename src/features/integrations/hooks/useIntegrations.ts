@@ -129,7 +129,7 @@ export function useIntegrations() {
         })
         setIntegrations((current) => mergeByKey(current, result.integration, 'platform'))
         setWhatsappDetails(result.whatsapp ?? null)
-        setSuccess('WhatsApp connected successfully. Open Inbox to view conversations.')
+        setSuccess('WhatsApp connected successfully. Open WhatsApp to view conversations.')
         refreshIntegrationsGate()
         return
       }
@@ -149,7 +149,7 @@ export function useIntegrations() {
         })
         setIntegrations((current) => mergeByKey(current, result.integration, 'platform'))
         setInstagramDetails(result.instagram ?? null)
-        setSuccess('Instagram connected successfully. Open Inbox to view conversations.')
+        setSuccess('Instagram connected successfully. Open Instagram to view conversations.')
         refreshIntegrationsGate()
         return
       }

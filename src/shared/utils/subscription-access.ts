@@ -16,8 +16,8 @@ export function canAccessAiAnalytics(
 
 export function resolveDefaultAppPath(
   subscription: SubscriptionLike | null | undefined,
-): '/inbox' | '/dashboard' {
-  return isTrialSubscription(subscription) ? '/inbox' : '/dashboard'
+): '/whatsapp' | '/dashboard' {
+  return isTrialSubscription(subscription) ? '/whatsapp' : '/dashboard'
 }
 
 export function resolvePostAuthPath(
@@ -36,7 +36,7 @@ export function sanitizePostAuthDestination(
   subscription: SubscriptionLike | null | undefined,
 ): string {
   if (path === '/dashboard' && isTrialSubscription(subscription)) {
-    return '/inbox'
+    return '/whatsapp'
   }
 
   return path

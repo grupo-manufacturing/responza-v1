@@ -1,9 +1,12 @@
 import {
   INTEGRATION_PLATFORM_LABELS,
+  INTEGRATION_PLATFORM_LOGOS,
   type IntegrationPlatform,
 } from '@/features/integrations/constants'
 
-export type InboxPlatformFilter = IntegrationPlatform | 'all'
+export type MessagingPlatform = Extract<IntegrationPlatform, 'whatsapp' | 'instagram'>
+
+export const MESSAGING_PLATFORMS: MessagingPlatform[] = ['whatsapp', 'instagram']
 
 export type MessageDirection = 'inbound' | 'outbound'
 
@@ -11,20 +14,29 @@ export type MessageStatus = 'pending' | 'sent' | 'failed' | 'read'
 
 export type MessageContentType = 'text' | 'image' | 'video' | 'audio' | 'document'
 
-export const INBOX_PLATFORM_FILTERS: InboxPlatformFilter[] = [
-  'all',
-  'whatsapp',
-  'instagram',
-]
-
 export const REPLY_SUGGESTION_CHIP_COUNT = 2
 
-export function inboxPlatformFilterLabel(filter: InboxPlatformFilter): string {
-  if (filter === 'all') {
-    return 'All'
-  }
+export function messagingPlatformPath(platform: MessagingPlatform): string {
+  return `/${platform}`
+}
 
-  return INTEGRATION_PLATFORM_LABELS[filter]
+export function messagingConversationPath(
+  platform: MessagingPlatform,
+  conversationId: string,
+): string {
+  return `${messagingPlatformPath(platform)}?conversation=${encodeURIComponent(conversationId)}`
+}
+
+export function messagingPlatformLabel(platform: MessagingPlatform): string {
+  return INTEGRATION_PLATFORM_LABELS[platform]
+}
+
+export function messagingPlatformLogo(platform: MessagingPlatform): string {
+  return INTEGRATION_PLATFORM_LOGOS[platform]
+}
+
+export function isMessagingPlatform(value: string): value is MessagingPlatform {
+  return value === 'whatsapp' || value === 'instagram'
 }
 
 export function formatInboxTimestamp(value: string): string {

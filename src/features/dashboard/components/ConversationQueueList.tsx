@@ -1,9 +1,8 @@
 import { Link } from 'react-router-dom'
 
 import { ContactAvatar } from '@/features/inbox/components/ContactAvatar'
-import { formatInboxTimestamp } from '@/features/inbox/constants'
+import { formatInboxTimestamp, isMessagingPlatform, messagingConversationPath } from '@/features/inbox/constants'
 import type { ConversationListItem } from '@/features/inbox/api/inbox.service'
-import type { IntegrationPlatform } from '@/features/integrations/constants'
 
 const MAX_VISIBLE_ITEMS = 5
 
@@ -16,8 +15,8 @@ type ConversationQueueListProps = {
   readonly actionLabel: string
 }
 
-function isIntegrationPlatform(value: string): value is IntegrationPlatform {
-  return value === 'whatsapp' || value === 'instagram'
+function isIntegrationPlatform(value: string): value is 'whatsapp' | 'instagram' {
+  return isMessagingPlatform(value)
 }
 
 export function ConversationQueueList({
@@ -61,7 +60,14 @@ export function ConversationQueueList({
                 <span className="text-xs leading-none whitespace-nowrap text-ink-faint">
                   {formatInboxTimestamp(conversation.lastMessageAt)}
                 </span>
-                <Link to={`/inbox?conversation=${conversation.id}`} className={QUEUE_ACTION_CLASS}>
+                <Link
+                  to={
+                    platform !== undefined
+                      ? messagingConversationPath(platform, conversation.id)
+                      : '/whatsapp'
+                  }
+                  className={QUEUE_ACTION_CLASS}
+                >
                   {actionLabel}
                 </Link>
               </div>

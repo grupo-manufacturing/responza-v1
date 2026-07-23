@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useQueryClient, type InfiniteData } from '@tanstack/react-query'
 
-import type { InboxPlatformFilter } from '@/features/inbox/constants'
+import type { MessagingPlatform } from '@/features/inbox/constants'
 import {
   InboxService,
   type ConversationDetailResponse,
@@ -9,7 +9,7 @@ import {
 import { getApiErrorCode } from '@/shared/utils/api-error'
 
 export const inboxKeys = {
-  conversations: (filter: InboxPlatformFilter) => ['inbox', 'conversations', filter] as const,
+  conversations: (platform: MessagingPlatform) => ['inbox', 'conversations', platform] as const,
   thread: (id: string) => ['inbox', 'thread', id] as const,
 }
 
@@ -17,7 +17,7 @@ export function isIntegrationsRequiredError(error: unknown): boolean {
   return getApiErrorCode(error) === 'INTEGRATIONS_REQUIRED'
 }
 
-export function useInboxConversations(filter: InboxPlatformFilter, enabled: boolean) {
+export function useInboxConversations(platform: MessagingPlatform, enabled: boolean) {
   return useInfiniteQuery<
     ListConversationsResponse,
     Error,
@@ -25,10 +25,10 @@ export function useInboxConversations(filter: InboxPlatformFilter, enabled: bool
     ReturnType<typeof inboxKeys.conversations>,
     string | undefined
   >({
-    queryKey: inboxKeys.conversations(filter),
+    queryKey: inboxKeys.conversations(platform),
     queryFn: ({ pageParam }) =>
       InboxService.listConversations({
-        platform: filter === 'all' ? undefined : filter,
+        platform,
         cursor: pageParam,
       }),
     initialPageParam: undefined as string | undefined,

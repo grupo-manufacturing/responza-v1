@@ -11,9 +11,11 @@ import { ConversationList } from '@/features/inbox/components/ConversationList'
 import { ConversationThread } from '@/features/inbox/components/ConversationThread'
 import { ConversationThreadHeader } from '@/features/inbox/components/ConversationThreadHeader'
 import { MessageComposer, type SendComposerInput } from '@/features/inbox/components/MessageComposer'
-import { PlatformTabs } from '@/features/inbox/components/PlatformTabs'
-import type { InboxPlatformFilter } from '@/features/inbox/constants'
-import type { IntegrationPlatform } from '@/features/integrations/constants'
+import {
+  messagingPlatformLabel,
+  messagingPlatformLogo,
+  type MessagingPlatform,
+} from '@/features/inbox/constants'
 import {
   inboxKeys,
   isIntegrationsRequiredError,
@@ -47,11 +49,14 @@ type SendMessageErrorDetails = {
   message?: Message
 }
 
-export function InboxPage() {
+type ChannelInboxViewProps = {
+  platform: MessagingPlatform
+}
+
+export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
   const [searchParams] = useSearchParams()
   const initialConversationId = searchParams.get('conversation')
 
-  const [platformFilter, setPlatformFilter] = useState<InboxPlatformFilter>('all')
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(initialConversationId)
   const [sending, setSending] = useState(false)
   const { subscriptionRequired, handleError } = useSubscriptionGate()
@@ -69,7 +74,7 @@ export function InboxPage() {
   const queriesEnabled =
     !subscriptionRequired && !integrationsRequired && !integrationsLoading
 
-  const conversationsQuery = useInboxConversations(platformFilter, queriesEnabled)
+  const conversationsQuery = useInboxConversations(platform, queriesEnabled)
   const threadQuery = useInboxThread(selectedConversationId, queriesEnabled)
 
   const organizationId = me?.organization.id ?? SessionStorage.getStoredOrganization()?.id ?? null
@@ -80,6 +85,11 @@ export function InboxPage() {
     selectedConversationId,
     enabled: queriesEnabled,
   })
+
+  useEffect(() => {
+    setSelectedConversationId(initialConversationId)
+    setMobileShowThread(initialConversationId !== null)
+  }, [initialConversationId, platform])
 
   useEffect(() => {
     if (conversationsQuery.error) {
@@ -121,12 +131,6 @@ export function InboxPage() {
       : null
 
   const error = sendError ?? listError ?? threadError
-
-  const handlePlatformFilterChange = (filter: InboxPlatformFilter) => {
-    setPlatformFilter(filter)
-    setSelectedConversationId(null)
-    setMobileShowThread(false)
-  }
 
   const conversations = flattenConversations(conversationsQuery.data)
   const listLoading = conversationsQuery.isLoading
@@ -269,7 +273,7 @@ export function InboxPage() {
       }
 
       queryClient.setQueryData(
-        inboxKeys.conversations(platformFilter),
+        inboxKeys.conversations(platform),
         (current: ConversationsInfiniteData | undefined) => {
           if (current === undefined) {
             return current
@@ -325,7 +329,7 @@ export function InboxPage() {
       ? conversations.find((item) => item.id === selectedConversationId)
       : undefined
 
-  const activePlatform: IntegrationPlatform | null = selectedListItem?.platform ?? null
+  const activePlatform = selectedListItem?.platform ?? platform
   const conversationLimitReached =
     subscription?.conversationQuotaEnforced === true &&
     subscription.conversationsRemaining !== null &&
@@ -368,7 +372,14 @@ export function InboxPage() {
             ].join(' ')}
           >
             <div className={INBOX_PANEL_HEADER_CLASS}>
-              <PlatformTabs value={platformFilter} onChange={handlePlatformFilterChange} />
+              <div className="flex items-center gap-2.5">
+                <img
+                  src={messagingPlatformLogo(platform)}
+                  alt=""
+                  className="h-6 w-6 object-contain"
+                />
+                <h1 className="text-sm font-semibold text-ink">{messagingPlatformLabel(platform)}</h1>
+              </div>
             </div>
 
             {listLoading ? (
@@ -378,13 +389,13 @@ export function InboxPage() {
             ) : (
               <div className="flex min-h-0 flex-1 flex-col">
                 <ConversationList
-                conversations={conversations}
-                selectedId={selectedConversationId}
-                hasMore={conversationsQuery.hasNextPage ?? false}
-                loadingMore={listLoadingMore}
-                onLoadMore={handleLoadMoreConversations}
-                onSelect={(item) => handleSelectConversation(item.id)}
-              />
+                  conversations={conversations}
+                  selectedId={selectedConversationId}
+                  hasMore={conversationsQuery.hasNextPage ?? false}
+                  loadingMore={listLoadingMore}
+                  onLoadMore={handleLoadMoreConversations}
+                  onSelect={(item) => handleSelectConversation(item.id)}
+                />
               </div>
             )}
           </div>

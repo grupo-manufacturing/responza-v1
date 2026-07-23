@@ -33,8 +33,11 @@ const BusinessOnboardingPage = lazyWithRetry(() =>
 const DashboardPage = lazyWithRetry(() =>
   import('@/features/dashboard/pages/DashboardPage').then((m) => ({ default: m.DashboardPage })),
 )
-const InboxPage = lazyWithRetry(() =>
-  import('@/features/inbox/pages/InboxPage').then((m) => ({ default: m.InboxPage })),
+const WhatsAppPage = lazyWithRetry(() =>
+  import('@/features/whatsapp/pages/WhatsAppPage').then((m) => ({ default: m.WhatsAppPage })),
+)
+const InstagramPage = lazyWithRetry(() =>
+  import('@/features/instagram/pages/InstagramPage').then((m) => ({ default: m.InstagramPage })),
 )
 const IntegrationsPage = lazyWithRetry(() =>
   import('@/features/integrations/pages/IntegrationsPage').then((m) => ({ default: m.IntegrationsPage })),
@@ -102,9 +105,10 @@ export const router = createBrowserRouter([
             element: <AppLayout />,
             children: [
               { path: '/dashboard', element: <DashboardPage /> },
-              { path: '/inbox', element: <InboxPage /> },
+              { path: '/whatsapp', element: <WhatsAppPage /> },
+              { path: '/instagram', element: <InstagramPage /> },
               { path: '/gmail', element: isGmailFeatureEnabled() ? <GmailPage /> : <Navigate to="/dashboard" replace /> },
-              { path: '/leads', element: <Navigate to="/inbox" replace /> },
+              { path: '/leads', element: <Navigate to="/whatsapp" replace /> },
               { path: '/integrations', element: <IntegrationsPage /> },
               { path: '/settings', element: <SettingsPage /> },
             ],

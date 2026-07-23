@@ -24,7 +24,7 @@ function buildRedirectUri(nextPath?: string): string {
   return url.toString()
 }
 
-export async function startGoogleOAuth(nextPath = '/inbox'): Promise<void> {
+export async function startGoogleOAuth(nextPath = '/whatsapp'): Promise<void> {
   SessionStorage.clearTokens()
   clearGoogleOAuthStorage()
 
@@ -64,7 +64,7 @@ export async function handleGoogleOAuthCallback(): Promise<GoogleOAuthCallbackRe
   }
 
   const nextPath =
-    params.get('next')?.startsWith('/') === true ? (params.get('next') as string) : '/inbox'
+    params.get('next')?.startsWith('/') === true ? (params.get('next') as string) : '/whatsapp'
 
   const codeKey = `responza-google-oauth:${code}`
   const codeState = sessionStorage.getItem(codeKey)

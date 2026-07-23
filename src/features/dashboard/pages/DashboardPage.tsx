@@ -66,8 +66,8 @@ function DashboardPageContent() {
             <DashboardActionPanel
               title="Conversations that need your reply"
               description="Customers are waiting for a response."
-              viewAllHref="/inbox"
-              viewAllLabel="Open inbox"
+              viewAllHref="/whatsapp"
+              viewAllLabel="Open WhatsApp"
             >
               <ConversationQueueList
                 conversations={data.needsReply}
@@ -79,8 +79,8 @@ function DashboardPageContent() {
             <DashboardActionPanel
               title="Conversations to nudge"
               description="You replied, but the customer has gone quiet."
-              viewAllHref="/inbox"
-              viewAllLabel="Open inbox"
+              viewAllHref="/whatsapp"
+              viewAllLabel="Open WhatsApp"
             >
               <ConversationQueueList
                 conversations={data.toNudge}
