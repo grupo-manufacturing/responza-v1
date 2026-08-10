@@ -58,6 +58,9 @@ const GmailOAuthCallbackPage = lazyWithRetry(() =>
 const SettingsPage = lazyWithRetry(() =>
   import('@/features/settings/pages/SettingsPage').then((m) => ({ default: m.SettingsPage })),
 )
+const AgentPage = lazyWithRetry(() =>
+  import('@/features/agent/pages/AgentPage').then((m) => ({ default: m.AgentPage })),
+)
 const AdminPage = lazyWithRetry(() =>
   import('@/features/admin/pages/AdminPage').then((m) => ({ default: m.AdminPage })),
 )
@@ -105,6 +108,7 @@ export const router = createBrowserRouter([
             element: <AppLayout />,
             children: [
               { path: '/dashboard', element: <DashboardPage /> },
+              { path: '/agent', element: <AgentPage /> },
               { path: '/whatsapp', element: <WhatsAppPage /> },
               { path: '/instagram', element: <InstagramPage /> },
               { path: '/gmail', element: isGmailFeatureEnabled() ? <GmailPage /> : <Navigate to="/dashboard" replace /> },
