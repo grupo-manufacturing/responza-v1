@@ -3,9 +3,14 @@ import { Spinner } from '@/shared/ui/primitives/Spinner'
 import { SpinnerSection } from '@/shared/ui/primitives/Spinner'
 import { BusinessOnboardingForm } from '@/features/business/components/BusinessOnboardingForm'
 import { useBusinessProfileEditor } from '@/features/business/hooks/useBusinessProfileEditor'
+import { useAgentStatus } from '@/features/knowledge/hooks/useAgentStatus'
+import { AgentStatusBanner } from '@/features/settings/components/AgentStatusBanner'
 import { AppButton, AppCard } from '@/shared/ui/app-ui'
 
 export function BusinessProfilePanel() {
+  const { status: agentStatus, isLoading: agentStatusLoading, loadError: agentStatusError, refetch: refetchAgentStatus } =
+    useAgentStatus()
+
   const {
     isLoading,
     loadError,
@@ -22,7 +27,11 @@ export function BusinessProfilePanel() {
     handleUploadCatalogue,
     handleRemoveCatalogue,
     handleSave,
-  } = useBusinessProfileEditor()
+  } = useBusinessProfileEditor({
+    onProfileMutated: () => {
+      void refetchAgentStatus()
+    },
+  })
 
   if (isLoading) {
     return <SpinnerSection minHeightClassName="min-h-[20rem]" />
@@ -34,6 +43,12 @@ export function BusinessProfilePanel() {
 
   return (
     <AppCard>
+      <AgentStatusBanner
+        status={agentStatus}
+        isLoading={agentStatusLoading}
+        loadError={agentStatusError}
+      />
+
       {saveMessage !== null && (
         <div className="mb-4">
           <Alert variant={saveMessage.variant}>{saveMessage.text}</Alert>

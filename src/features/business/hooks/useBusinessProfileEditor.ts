@@ -14,7 +14,8 @@ import {
 import { BusinessService, type CatalogueFile } from '@/features/business/api/business.service'
 import { getApiErrorMessage, getApiValidationFieldErrors } from '@/shared/utils/api-error'
 
-export function useBusinessProfileEditor() {
+export function useBusinessProfileEditor(options?: { onProfileMutated?: () => void }) {
+  const onProfileMutated = options?.onProfileMutated
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [formData, setFormData] = useState<BusinessOnboardingFormData | null>(null)
@@ -69,6 +70,7 @@ export function useBusinessProfileEditor() {
         variant: 'success',
         text: 'Catalogue file uploaded.',
       })
+      onProfileMutated?.()
     } catch (err: unknown) {
       throw new Error(
         getApiErrorMessage(err, 'We could not upload this file right now. Please try again in a moment.'),
@@ -89,6 +91,7 @@ export function useBusinessProfileEditor() {
         variant: 'success',
         text: 'Catalogue file removed.',
       })
+      onProfileMutated?.()
     } catch (err: unknown) {
       setSaveMessage({
         variant: 'error',
@@ -125,6 +128,7 @@ export function useBusinessProfileEditor() {
         variant: 'success',
         text: 'Business profile updated.',
       })
+      onProfileMutated?.()
     } catch (err: unknown) {
       const apiFieldErrors = getApiValidationFieldErrors(err)
       if (apiFieldErrors !== null) {
