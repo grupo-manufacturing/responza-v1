@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
 import { IntegrationsRequired } from '@/shared/ui/gates/IntegrationsRequired'
@@ -144,24 +144,6 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
   const messages = flattenThreadMessages(threadQuery.data)
   const hasMoreOlder = threadQuery.hasNextPage ?? false
 
-  const agentDraft = useMemo(() => {
-    for (let index = messages.length - 1; index >= 0; index -= 1) {
-      const message = messages[index]
-      if (
-        message.direction === 'inbound' &&
-        message.suggestedReply !== null &&
-        message.suggestedReply.trim().length > 0
-      ) {
-        return {
-          messageId: message.id,
-          reply: message.suggestedReply,
-        }
-      }
-    }
-
-    return null
-  }, [messages])
-
   const handleLoadMoreConversations = useCallback(() => {
     if (!conversationsQuery.hasNextPage || conversationsQuery.isFetchingNextPage) {
       return
@@ -240,7 +222,6 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
         mediaUrl: optimisticPreviewUrl,
         mimeType: input.attachment.file.type || null,
         status: 'pending',
-        suggestedReply: null,
         createdAt: new Date().toISOString(),
       }
 
@@ -462,7 +443,6 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
               disabled={selectedConversationId === null || threadLoading}
               sending={sending}
               platform={activePlatform}
-              agentDraft={agentDraft}
               onSend={handleSendMessage}
             />
             <ConversationAnalyticsPanel

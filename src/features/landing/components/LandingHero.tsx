@@ -35,8 +35,6 @@ type HeroMockConversation = {
   readonly platform: HeroMessagingModule
   readonly preview: string
   readonly messages: readonly HeroMockMessage[]
-  readonly aiSuggestions: readonly string[]
-  readonly draft: string
 }
 
 const HERO_MODULES: readonly HeroMessagingModule[] = ['whatsapp', 'instagram']
@@ -48,8 +46,6 @@ const HERO_CONVERSATIONS: readonly HeroMockConversation[] = [
     avatar: LANDING_AVATARS.priya,
     platform: 'whatsapp',
     preview: 'Thanks for the quote…',
-    draft: 'Happy to send the proposal today.',
-    aiSuggestions: ['Happy to send the quote today.'],
     messages: [
       {
         id: 'p1',
@@ -69,6 +65,12 @@ const HERO_CONVERSATIONS: readonly HeroMockConversation[] = [
         content: 'Thanks for the quote… that works for us.',
         time: '10:45',
       },
+      {
+        id: 'p4',
+        direction: 'outbound',
+        content: 'Happy to send the proposal today.',
+        time: '10:45',
+      },
     ],
   },
   {
@@ -77,8 +79,6 @@ const HERO_CONVERSATIONS: readonly HeroMockConversation[] = [
     avatar: LANDING_AVATARS.alex,
     platform: 'instagram',
     preview: 'Do you ship internationally?',
-    draft: 'Yes — we ship worldwide. Share your city?',
-    aiSuggestions: ['Yes, we ship worldwide!'],
     messages: [
       {
         id: 'a1',
@@ -98,6 +98,12 @@ const HERO_CONVERSATIONS: readonly HeroMockConversation[] = [
         content: 'Perfect — I’m in Singapore.',
         time: '10:28',
       },
+      {
+        id: 'a4',
+        direction: 'outbound',
+        content: 'Yes — we ship worldwide. Share your city?',
+        time: '10:28',
+      },
     ],
   },
   {
@@ -106,8 +112,6 @@ const HERO_CONVERSATIONS: readonly HeroMockConversation[] = [
     avatar: LANDING_AVATARS.maya,
     platform: 'whatsapp',
     preview: 'Interested in a demo…',
-    draft: 'Happy to walk you through a quick demo.',
-    aiSuggestions: ['Happy to schedule a quick demo.'],
     messages: [
       {
         id: 'm1',
@@ -121,6 +125,18 @@ const HERO_CONVERSATIONS: readonly HeroMockConversation[] = [
         content: 'Great — I can walk you through WhatsApp and Instagram in Responza.',
         time: '10:01',
       },
+      {
+        id: 'm3',
+        direction: 'inbound',
+        content: 'Interested in a demo for our team.',
+        time: '10:04',
+      },
+      {
+        id: 'm4',
+        direction: 'outbound',
+        content: 'Happy to walk you through a quick demo.',
+        time: '10:04',
+      },
     ],
   },
   {
@@ -129,8 +145,6 @@ const HERO_CONVERSATIONS: readonly HeroMockConversation[] = [
     avatar: LANDING_AVATARS.natasha,
     platform: 'instagram',
     preview: 'Can you help with pricing?',
-    draft: 'Sure — Basic starts at ₹499/month.',
-    aiSuggestions: ['Sure — happy to share pricing.'],
     messages: [
       {
         id: 'n1',
@@ -141,8 +155,8 @@ const HERO_CONVERSATIONS: readonly HeroMockConversation[] = [
       {
         id: 'n2',
         direction: 'outbound',
-        content: 'Absolutely — Basic is ₹499/month with a 3-day free trial.',
-        time: '9:42',
+        content: 'Sure — Basic starts at ₹499/month.',
+        time: '9:40',
       },
     ],
   },
@@ -317,8 +331,7 @@ function HeroVisual() {
     HERO_CONVERSATIONS.find((conversation) => conversation.platform === activeModule) ??
     HERO_CONVERSATIONS[0]
 
-  const threadMessages = selected.messages.slice(-2)
-  const aiSuggestion = selected.aiSuggestions[0]
+  const threadMessages = selected.messages.slice(-3)
 
   return (
     <div className="relative mx-auto w-full min-w-0 max-w-md sm:max-w-xl lg:max-w-none">
@@ -457,15 +470,9 @@ function HeroVisual() {
             </div>
 
             <div className="space-y-2 border-t border-border/70 bg-white/90 px-3 py-2.5 backdrop-blur-sm sm:space-y-2.5 sm:px-4 sm:py-3">
-              {aiSuggestion ? (
-                <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-accent-violet/20 bg-accent-violet/8 px-2.5 py-1.5 text-[10px] text-ink sm:px-3 sm:text-[11px]">
-                  <span className="shrink-0 font-medium text-accent-violet">AI</span>
-                  <span className="truncate text-ink-muted">{aiSuggestion}</span>
-                </div>
-              ) : null}
               <div className="flex items-center gap-2 sm:gap-2.5">
                 <div className="min-w-0 flex-1 rounded-full border border-border bg-surface-muted/40 px-3 py-2 sm:px-4 sm:py-2.5">
-                  <p className="truncate text-xs text-ink-muted sm:text-sm">{selected.draft}</p>
+                  <p className="truncate text-xs text-ink-faint sm:text-sm">Type a message…</p>
                 </div>
                 <div
                   className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full sm:h-10 sm:w-10 ${composerSendButtonClass(true, selected.platform)}`}
@@ -502,8 +509,9 @@ export function LandingHero() {
               One workspace, <span className="text-accent-gradient">every channel.</span>
             </h1>
             <p className="mt-4 max-w-lg text-sm leading-relaxed text-ink-muted sm:mt-5 sm:text-base md:mt-6 md:text-lg">
-              Manage WhatsApp and Instagram from dedicated modules in Responza — with AI reply
-              suggestions, instant translation, and a dashboard that shows what needs attention.
+              Manage WhatsApp and Instagram from dedicated modules in Responza — with AI auto-replies
+              from your business knowledge, instant translation, and a dashboard that shows what
+              needs attention.
             </p>
             <div className="mt-6 flex w-full max-w-sm flex-col gap-3 sm:mt-8 sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:justify-center lg:justify-start">
               <LandingButton to="/auth?mode=register" variant="primary" showChevron className="w-full sm:w-auto">
