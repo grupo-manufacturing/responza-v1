@@ -183,6 +183,8 @@ export function MessageComposer({
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const appliedAgentDraftMessageIdRef = useRef<string | null>(null)
+  const appliedAgentDraftReplyRef = useRef<string | null>(null)
+  const dismissedAgentDraftMessageIdsRef = useRef<Set<string>>(new Set())
   const aiBusy = suggesting
   const attachmentsSupported = true
   const canSend =
@@ -194,14 +196,38 @@ export function MessageComposer({
     !disabled && !sending && !aiBusy && conversationId !== null
   const canAttach = !disabled && !sending && !aiBusy && attachmentsSupported
 
+  const dismissAgentDraft = (messageId: string) => {
+    dismissedAgentDraftMessageIdsRef.current.add(messageId)
+    if (appliedAgentDraftMessageIdRef.current === messageId) {
+      appliedAgentDraftMessageIdRef.current = null
+      appliedAgentDraftReplyRef.current = null
+    }
+  }
+
   useEffect(() => {
+    setContent('')
     setSuggestions([])
     setSuggestError(null)
+    setAttachmentError(null)
+    setAttachment((current) => {
+      if (current !== null) {
+        URL.revokeObjectURL(current.previewUrl)
+      }
+      return null
+    })
+    if (fileInputRef.current !== null) {
+      fileInputRef.current.value = ''
+    }
     appliedAgentDraftMessageIdRef.current = null
+    appliedAgentDraftReplyRef.current = null
   }, [conversationId])
 
   useEffect(() => {
     if (disabled || agentDraft === null) {
+      return
+    }
+
+    if (dismissedAgentDraftMessageIdsRef.current.has(agentDraft.messageId)) {
       return
     }
 
@@ -215,6 +241,7 @@ export function MessageComposer({
 
     setContent(agentDraft.reply)
     appliedAgentDraftMessageIdRef.current = agentDraft.messageId
+    appliedAgentDraftReplyRef.current = agentDraft.reply
     requestAnimationFrame(() => {
       textareaRef.current?.focus()
     })
@@ -255,6 +282,10 @@ export function MessageComposer({
       content: trimmed,
       attachment: attachment ?? undefined,
     })
+
+    if (agentDraft !== null) {
+      dismissAgentDraft(agentDraft.messageId)
+    }
 
     setContent('')
     clearAttachment()
@@ -310,6 +341,10 @@ export function MessageComposer({
   const handleSuggestionSelect = (suggestion: string) => {
     if (disabled || sending || aiBusy) {
       return
+    }
+
+    if (appliedAgentDraftMessageIdRef.current !== null) {
+      dismissAgentDraft(appliedAgentDraftMessageIdRef.current)
     }
 
     setContent(suggestion)
@@ -387,7 +422,19 @@ export function MessageComposer({
             ref={textareaRef}
             value={content}
             onChange={(event) => {
-              setContent(event.target.value)
+              const next = event.target.value
+              const appliedMessageId = appliedAgentDraftMessageIdRef.current
+              const appliedReply = appliedAgentDraftReplyRef.current
+
+              if (
+                appliedMessageId !== null &&
+                appliedReply !== null &&
+                (next.trim().length === 0 || next !== appliedReply)
+              ) {
+                dismissAgentDraft(appliedMessageId)
+              }
+
+              setContent(next)
             }}
             placeholder={composerPlaceholder(disabled, attachment !== null)}
             disabled={composerDisabled}
