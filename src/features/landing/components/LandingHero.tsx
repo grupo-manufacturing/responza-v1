@@ -509,8 +509,8 @@ export function LandingHero() {
               One workspace, <span className="text-accent-gradient">every channel.</span>
             </h1>
             <p className="mt-4 max-w-lg text-sm leading-relaxed text-ink-muted sm:mt-5 sm:text-base md:mt-6 md:text-lg">
-              Manage WhatsApp and Instagram from dedicated modules in Responza — with AI auto-replies
-              from your business knowledge, instant translation, and a dashboard that shows what
+              Manage WhatsApp and Instagram from dedicated modules in Responza — with AI draft
+              replies in your composer, instant translation, and a dashboard that shows what
               needs attention.
             </p>
             <div className="mt-6 flex w-full max-w-sm flex-col gap-3 sm:mt-8 sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:justify-center lg:justify-start">

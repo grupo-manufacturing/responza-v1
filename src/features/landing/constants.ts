@@ -122,10 +122,10 @@ export const LANDING_FEATURES = [
     id: 'replies',
     label: 'AI replies',
     tone: 'violet' as const,
-    title: 'Answer customers with',
-    titleAccent: 'instant AI replies.',
+    title: 'Respond faster with',
+    titleAccent: 'AI draft replies.',
     description:
-      'Responza AI uses your business knowledge to reply on WhatsApp and Instagram automatically — only when it has a confident answer.',
+      'Responza AI drafts replies from your business knowledge in the composer. Review, edit, and send when you are ready.',
   },
   {
     id: 'translation',
@@ -150,11 +150,11 @@ export const LANDING_FEATURES = [
 export const LANDING_FAQS = [
   {
     q: 'How is Responza AI different from using WhatsApp and Instagram separately?',
-    a: 'Responza gives each channel its own module inside one workspace — with AI auto-replies, translation, analytics, and a dashboard that shows what needs attention across channels.',
+    a: 'Responza gives each channel its own module inside one workspace — with AI draft replies, translation, analytics, and a dashboard that shows what needs attention across channels.',
   },
   {
-    q: 'How do AI auto-replies work?',
-    a: 'After you connect WhatsApp or Instagram, Responza builds a knowledge base from your business profile. When a customer messages you, the agent replies automatically if it can answer from that knowledge — otherwise it stays silent so your team can step in.',
+    q: 'How do AI draft replies work?',
+    a: 'When a customer messages you on WhatsApp or Instagram, Responza drafts a reply in the composer from your business knowledge. You review and send it yourself — nothing goes out automatically.',
   },
   {
     q: 'Can I still message customers outside of Responza AI?',

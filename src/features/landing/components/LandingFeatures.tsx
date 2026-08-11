@@ -98,17 +98,25 @@ function RepliesVisual() {
           </p>
         </div>
       </div>
-      <div className="mt-4 flex justify-end">
-        <div className="max-w-[85%] rounded-2xl rounded-tr-md bg-accent-violet px-3.5 py-2.5 text-sm leading-relaxed text-white">
-          Of course — Premium is ₹4,999/year with 30k conversations.
-        </div>
-      </div>
-      <p className="mt-4 text-[10px] font-medium tracking-widest text-on-dark-muted uppercase">
-        Sent automatically by AI
+      <p className="mt-5 text-[10px] font-medium tracking-widest text-on-dark-muted uppercase">
+        AI draft in composer
       </p>
+      <div className="mt-2.5 space-y-2">
+        {[
+          'Of course — Premium is ₹4,999/year with 30k conversations.',
+          'Happy to send a detailed quote today. Want a call too?',
+        ].map((suggestion) => (
+          <div
+            key={suggestion}
+            className="rounded-2xl border border-accent-violet/25 bg-accent-violet/10 px-3.5 py-2.5 text-sm leading-relaxed text-on-dark"
+          >
+            {suggestion}
+          </div>
+        ))}
+      </div>
       <div className="mt-4 flex items-center gap-2 border-t border-border-dark pt-3">
         <div className="min-w-0 flex-1 rounded-full border border-border-dark bg-white/5 px-3.5 py-2">
-          <p className="truncate text-xs text-on-dark-muted">Type a message…</p>
+          <p className="truncate text-xs text-on-dark-muted">Of course — Premium is ₹4,999/year…</p>
         </div>
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-violet text-white">
           <svg className="h-4 w-4 rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
@@ -260,8 +268,8 @@ export function LandingFeatures() {
             <span className="text-accent-gradient-dark">clarity and speed.</span>
           </h2>
           <p className="mt-6 text-base leading-relaxed text-on-dark-muted">
-            Dedicated WhatsApp and Instagram modules, plus AI that auto-replies from your
-            knowledge base, translates messages, and surfaces what matters.
+            Dedicated WhatsApp and Instagram modules, plus AI that drafts replies in your
+            composer, translates messages, and surfaces what matters.
           </p>
         </Reveal>
       </div>

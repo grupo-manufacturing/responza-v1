@@ -35,6 +35,7 @@ type MessageComposerProps = {
   readonly disabled: boolean
   readonly sending: boolean
   readonly platform?: IntegrationPlatform | null
+  readonly agentDraft?: { messageId: string; reply: string } | null
   readonly onSend: (input: SendComposerInput) => Promise<void>
 }
 
@@ -170,6 +171,7 @@ export function MessageComposer({
   disabled,
   sending,
   platform = null,
+  agentDraft = null,
   onSend,
 }: MessageComposerProps) {
   const [content, setContent] = useState('')
@@ -180,6 +182,7 @@ export function MessageComposer({
   const [suggestions, setSuggestions] = useState<string[]>([])
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const appliedAgentDraftMessageIdRef = useRef<string | null>(null)
   const aiBusy = suggesting
   const attachmentsSupported = true
   const canSend =
@@ -194,7 +197,28 @@ export function MessageComposer({
   useEffect(() => {
     setSuggestions([])
     setSuggestError(null)
+    appliedAgentDraftMessageIdRef.current = null
   }, [conversationId])
+
+  useEffect(() => {
+    if (disabled || agentDraft === null) {
+      return
+    }
+
+    if (appliedAgentDraftMessageIdRef.current === agentDraft.messageId) {
+      return
+    }
+
+    if (content.trim().length > 0) {
+      return
+    }
+
+    setContent(agentDraft.reply)
+    appliedAgentDraftMessageIdRef.current = agentDraft.messageId
+    requestAnimationFrame(() => {
+      textareaRef.current?.focus()
+    })
+  }, [agentDraft, content, disabled])
 
   useEffect(() => {
     return () => {

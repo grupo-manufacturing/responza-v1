@@ -38,6 +38,7 @@ function mapRealtimeMessage(row: Record<string, unknown>): Message | null {
     mediaUrl: null,
     mimeType: typeof row.mime_type === 'string' ? row.mime_type : null,
     status: row.status as MessageStatus,
+    suggestedReply: typeof row.suggested_reply === 'string' ? row.suggested_reply : null,
     createdAt,
   }
 }
@@ -51,6 +52,7 @@ function mergeRealtimeMessage(existing: Message | undefined, incoming: Message):
     ...incoming,
     mediaUrl: incoming.mediaUrl ?? existing.mediaUrl,
     mimeType: incoming.mimeType ?? existing.mimeType,
+    suggestedReply: incoming.suggestedReply ?? existing.suggestedReply,
   }
 }
 

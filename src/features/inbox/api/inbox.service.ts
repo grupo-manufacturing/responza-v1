@@ -48,6 +48,7 @@ export interface Message {
   mediaUrl: string | null
   mimeType: string | null
   status: MessageStatus
+  suggestedReply: string | null
   createdAt: string
 }
 
