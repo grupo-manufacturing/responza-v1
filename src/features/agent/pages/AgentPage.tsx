@@ -1,34 +1,16 @@
 import axios from 'axios'
 import { useCallback, useEffect, useState } from 'react'
 
-import {
-  KnowledgeService,
-  type IngestionResult,
-  type KnowledgeBaseResult,
-  type KnowledgeJob,
-} from '@/features/agent/api/knowledge.service'
+import { KnowledgeService, type KnowledgeBaseResult } from '@/features/agent/api/knowledge.service'
 import { AgentChatPanel } from '@/features/agent/components/AgentChatPanel'
-import { AgentPipelineSection } from '@/features/agent/components/AgentPipelineSection'
 import { AgentProfileSummary } from '@/features/agent/components/AgentProfileSummary'
-import { pollKnowledgeJob } from '@/features/agent/lib/poll-job'
 import { BusinessService, type BusinessResponse } from '@/features/business/api/business.service'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
 import { Alert } from '@/shared/ui/primitives/Alert'
 import { SpinnerSection } from '@/shared/ui/primitives/Spinner'
 import { AppButtonLink, AppPage, AppPageHeader } from '@/shared/ui/app-ui'
 
-type PipelineStep = 'ingest' | 'index'
-
-async function loadIngestion(): Promise<IngestionResult | null> {
-  try {
-    return await KnowledgeService.getIngestion()
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 404) {
-      return null
-    }
-    throw error
-  }
-}
+const KNOWLEDGE_POLL_INTERVAL_MS = 5_000
 
 async function loadKnowledgeBase(): Promise<KnowledgeBaseResult | null> {
   try {
@@ -43,18 +25,14 @@ async function loadKnowledgeBase(): Promise<KnowledgeBaseResult | null> {
 
 export function AgentPage() {
   const [business, setBusiness] = useState<BusinessResponse | null>(null)
-  const [ingestion, setIngestion] = useState<IngestionResult | null>(null)
   const [knowledgeBase, setKnowledgeBase] = useState<KnowledgeBaseResult | null>(null)
   const [loading, setLoading] = useState(true)
   const [pageError, setPageError] = useState<string | null>(null)
-  const [activeStep, setActiveStep] = useState<PipelineStep | null>(null)
-  const [activeJob, setActiveJob] = useState<KnowledgeJob | null>(null)
-  const [stepError, setStepError] = useState<string | null>(null)
 
-  const refreshStatus = useCallback(async () => {
-    const [nextIngestion, nextKnowledgeBase] = await Promise.all([loadIngestion(), loadKnowledgeBase()])
-    setIngestion(nextIngestion)
+  const refreshKnowledgeBase = useCallback(async () => {
+    const nextKnowledgeBase = await loadKnowledgeBase()
     setKnowledgeBase(nextKnowledgeBase)
+    return nextKnowledgeBase
   }, [])
 
   useEffect(() => {
@@ -62,9 +40,8 @@ export function AgentPage() {
 
     void (async () => {
       try {
-        const [businessResponse, nextIngestion, nextKnowledgeBase] = await Promise.all([
+        const [businessResponse, nextKnowledgeBase] = await Promise.all([
           BusinessService.getBusiness(),
-          loadIngestion(),
           loadKnowledgeBase(),
         ])
 
@@ -73,7 +50,6 @@ export function AgentPage() {
         }
 
         setBusiness(businessResponse)
-        setIngestion(nextIngestion)
         setKnowledgeBase(nextKnowledgeBase)
       } catch (error) {
         if (!cancelled) {
@@ -91,37 +67,21 @@ export function AgentPage() {
     }
   }, [])
 
-  async function runPipelineStep(step: PipelineStep, start: () => Promise<{ job: KnowledgeJob }>) {
-    setStepError(null)
-    setActiveStep(step)
-    setActiveJob(null)
-
-    try {
-      const { job } = await start()
-      setActiveJob(job)
-
-      const finishedJob = await pollKnowledgeJob(job.id, setActiveJob)
-      if (finishedJob.status === 'failed') {
-        setStepError(finishedJob.error ?? 'Job failed.')
-        return
-      }
-
-      await refreshStatus()
-    } catch (error) {
-      setStepError(getApiErrorMessage(error, 'Job failed.'))
-    } finally {
-      setActiveStep(null)
-      setActiveJob(null)
+  useEffect(() => {
+    if (knowledgeBase !== null) {
+      return
     }
-  }
 
-  function handleIngest() {
-    void runPipelineStep('ingest', KnowledgeService.startIngest)
-  }
+    const intervalId = window.setInterval(() => {
+      void refreshKnowledgeBase().catch(() => {
+        // Ignore transient poll errors; the page already shows a building state.
+      })
+    }, KNOWLEDGE_POLL_INTERVAL_MS)
 
-  function handleIndex() {
-    void runPipelineStep('index', KnowledgeService.startIndex)
-  }
+    return () => {
+      window.clearInterval(intervalId)
+    }
+  }, [knowledgeBase, refreshKnowledgeBase])
 
   const businessName = business?.profile.brandName ?? 'your business'
   const chatReady = knowledgeBase !== null && knowledgeBase.chunks_created > 0
@@ -130,7 +90,7 @@ export function AgentPage() {
     <AppPage>
       <AppPageHeader
         title="Agent test"
-        description="Run ingest → index → ask against your live business profile. For internal testing of the knowledge agent."
+        description="Chat with your business agent. Knowledge is built automatically after onboarding."
         action={
           <AppButtonLink to="/business" variant="secondary">
             Edit profile
@@ -146,20 +106,21 @@ export function AgentPage() {
         <div className="space-y-6">
           <AgentProfileSummary business={business} />
 
-          <AgentPipelineSection
-            ingestion={ingestion}
-            knowledgeBase={knowledgeBase}
-            activeStep={activeStep}
-            activeJob={activeJob}
-            stepError={stepError}
-            onIngest={handleIngest}
-            onIndex={handleIndex}
-          />
+          {!chatReady && (
+            <Alert variant="warning">
+              Your agent is still building from your business profile. This usually takes a few
+              minutes. You can stay on this page or come back later.
+            </Alert>
+          )}
 
-          <div>
-            <h2 className="mb-3 text-sm font-medium text-ink">3. Ask the agent</h2>
-            <AgentChatPanel businessName={businessName} disabled={!chatReady} />
-          </div>
+          {chatReady && knowledgeBase !== null && (
+            <Alert variant="success">
+              Knowledge base ready · {knowledgeBase.chunks_created} chunks across{' '}
+              {knowledgeBase.sources_processed} source types.
+            </Alert>
+          )}
+
+          <AgentChatPanel businessName={businessName} disabled={!chatReady} />
         </div>
       )}
     </AppPage>

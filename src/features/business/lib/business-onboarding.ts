@@ -1,7 +1,6 @@
 export type BusinessOnboardingFormData = {
   brandName: string
   websiteUrl: string
-  facebookPageUrl: string
   instagramPageUrl: string
   businessDescription: string
   referralCode: string
@@ -12,7 +11,6 @@ export type BusinessOnboardingFieldErrors = Partial<Record<keyof BusinessOnboard
 export const EMPTY_BUSINESS_ONBOARDING_FORM: BusinessOnboardingFormData = {
   brandName: '',
   websiteUrl: '',
-  facebookPageUrl: '',
   instagramPageUrl: '',
   businessDescription: '',
   referralCode: '',
@@ -90,10 +88,6 @@ export function validateBusinessOnboardingForm(
     errors.websiteUrl = INVALID_HTTP_URL_MESSAGE
   }
 
-  if (!isValidOptionalUrl(formData.facebookPageUrl)) {
-    errors.facebookPageUrl = INVALID_HTTP_URL_MESSAGE
-  }
-
   if (!isValidOptionalUrl(formData.instagramPageUrl)) {
     errors.instagramPageUrl = INVALID_HTTP_URL_MESSAGE
   }
@@ -113,14 +107,12 @@ function optionalUrlForPayload(value: string): string | null {
 export function businessProfileToFormData(profile: {
   brandName: string | null
   websiteUrl: string | null
-  facebookPageUrl: string | null
   instagramPageUrl: string | null
   businessDescription: string | null
 }): BusinessOnboardingFormData {
   return {
     brandName: profile.brandName ?? '',
     websiteUrl: profile.websiteUrl ?? '',
-    facebookPageUrl: profile.facebookPageUrl ?? '',
     instagramPageUrl: profile.instagramPageUrl ?? '',
     businessDescription: profile.businessDescription ?? '',
     referralCode: '',
@@ -132,7 +124,6 @@ export function formDataToBusinessPayload(
 ): {
   brandName: string
   websiteUrl: string | null
-  facebookPageUrl: string | null
   instagramPageUrl: string | null
   businessDescription: string
   referralCode?: string | null
@@ -141,7 +132,6 @@ export function formDataToBusinessPayload(
   return {
     brandName: formData.brandName.trim(),
     websiteUrl: optionalUrlForPayload(formData.websiteUrl),
-    facebookPageUrl: optionalUrlForPayload(formData.facebookPageUrl),
     instagramPageUrl: optionalUrlForPayload(formData.instagramPageUrl),
     businessDescription: formData.businessDescription.trim(),
     referralCode: referralCode.length > 0 ? referralCode : null,
@@ -153,14 +143,12 @@ export function formDataToBusinessUpdatePayload(
 ): {
   brandName: string
   websiteUrl: string | null
-  facebookPageUrl: string | null
   instagramPageUrl: string | null
   businessDescription: string
 } {
   return {
     brandName: formData.brandName.trim(),
     websiteUrl: optionalUrlForPayload(formData.websiteUrl),
-    facebookPageUrl: optionalUrlForPayload(formData.facebookPageUrl),
     instagramPageUrl: optionalUrlForPayload(formData.instagramPageUrl),
     businessDescription: formData.businessDescription.trim(),
   }
@@ -173,7 +161,6 @@ export function isSameBusinessFormData(
   return (
     left.brandName === right.brandName &&
     left.websiteUrl === right.websiteUrl &&
-    left.facebookPageUrl === right.facebookPageUrl &&
     left.instagramPageUrl === right.instagramPageUrl &&
     left.businessDescription === right.businessDescription &&
     left.referralCode === right.referralCode
@@ -183,7 +170,6 @@ export function isSameBusinessFormData(
 export const BUSINESS_ONBOARDING_FIELD_LABELS: Record<keyof BusinessOnboardingFormData, string> = {
   brandName: 'Brand name',
   websiteUrl: 'Website URL',
-  facebookPageUrl: 'Facebook page link',
   instagramPageUrl: 'Instagram page link',
   businessDescription: 'Business description',
   referralCode: 'Referral code',
@@ -208,7 +194,6 @@ export type BusinessOnboardingStepId =
   | 'brandName'
   | 'websiteUrl'
   | 'catalogue'
-  | 'facebookPageUrl'
   | 'instagramPageUrl'
   | 'businessDescription'
 
@@ -240,13 +225,6 @@ export const BUSINESS_ONBOARDING_STEPS: readonly BusinessOnboardingStep[] = [
     title: 'Upload your catalogue',
     subtitle: 'Share brochures or product lists so the AI can answer with accurate details. Up to 5 files, 10 MB each.',
     required: false,
-  },
-  {
-    id: 'facebookPageUrl',
-    title: 'Facebook page link',
-    subtitle: 'Optional. Add your public Facebook page if you use it for customer conversations.',
-    required: false,
-    field: 'facebookPageUrl',
   },
   {
     id: 'instagramPageUrl',

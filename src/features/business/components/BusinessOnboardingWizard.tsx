@@ -369,26 +369,6 @@ export function BusinessOnboardingWizard({
           </div>
         )
 
-      case 'facebookPageUrl':
-        return (
-          <input
-            ref={inputRef as React.RefObject<HTMLInputElement>}
-            type="text"
-            inputMode="url"
-            autoComplete="url"
-            value={formData.facebookPageUrl}
-            onChange={(event) => updateField('facebookPageUrl', event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter') {
-                event.preventDefault()
-                handleNext()
-              }
-            }}
-            placeholder="https://facebook.com/yourpage"
-            className={fieldInputClass(mergedErrors.facebookPageUrl !== undefined, true)}
-          />
-        )
-
       case 'instagramPageUrl':
         return (
           <input

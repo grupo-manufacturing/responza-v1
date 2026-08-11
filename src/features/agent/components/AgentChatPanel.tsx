@@ -91,12 +91,12 @@ export function AgentChatPanel({ businessName, disabled = false }: AgentChatPane
     <AppCard className="flex min-h-[28rem] flex-col overflow-hidden !p-0">
       <div className="border-b border-border bg-surface-muted/60 px-5 py-4">
         <p className="text-sm font-medium text-ink">Chat with {businessName}</p>
-        <p className="mt-1 text-xs text-ink-muted">Answers are grounded only in your ingested business data.</p>
+        <p className="mt-1 text-xs text-ink-muted">Answers are grounded only in your business knowledge base.</p>
       </div>
 
       <div className="flex-1 space-y-4 overflow-y-auto bg-white/40 px-5 py-4">
         {disabled && (
-          <Alert variant="warning">Build the knowledge base before asking questions.</Alert>
+          <Alert variant="warning">Your agent is still building. Check back in a few minutes.</Alert>
         )}
 
         {!disabled && messages.length === 0 && (

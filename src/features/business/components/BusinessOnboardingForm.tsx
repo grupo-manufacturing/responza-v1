@@ -227,34 +227,18 @@ export function BusinessOnboardingForm({
         )}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <FieldLabel optional>Facebook page link</FieldLabel>
-          <input
-            type="text"
-            inputMode="url"
-            autoComplete="url"
-            value={formData.facebookPageUrl}
-            onChange={(event) => updateField('facebookPageUrl', event.target.value)}
-            placeholder="https://facebook.com/yourpage"
-            className={fieldInputClass(fieldErrors.facebookPageUrl !== undefined)}
-          />
-          <FieldError message={fieldErrors.facebookPageUrl} />
-        </div>
-
-        <div>
-          <FieldLabel optional>Instagram page link</FieldLabel>
-          <input
-            type="text"
-            inputMode="url"
-            autoComplete="url"
-            value={formData.instagramPageUrl}
-            onChange={(event) => updateField('instagramPageUrl', event.target.value)}
-            placeholder="https://instagram.com/yourpage"
-            className={fieldInputClass(fieldErrors.instagramPageUrl !== undefined)}
-          />
-          <FieldError message={fieldErrors.instagramPageUrl} />
-        </div>
+      <div>
+        <FieldLabel optional>Instagram page link</FieldLabel>
+        <input
+          type="text"
+          inputMode="url"
+          autoComplete="url"
+          value={formData.instagramPageUrl}
+          onChange={(event) => updateField('instagramPageUrl', event.target.value)}
+          placeholder="https://instagram.com/yourpage"
+          className={fieldInputClass(fieldErrors.instagramPageUrl !== undefined)}
+        />
+        <FieldError message={fieldErrors.instagramPageUrl} />
       </div>
 
       <div>

@@ -12,7 +12,6 @@ interface BusinessProfile {
   organizationId: string
   brandName: string | null
   websiteUrl: string | null
-  facebookPageUrl: string | null
   instagramPageUrl: string | null
   businessDescription: string | null
   catalogueFiles: CatalogueFile[]
@@ -25,7 +24,6 @@ interface BusinessProfile {
 export interface CompleteBusinessPayload {
   brandName: string
   websiteUrl?: string | null
-  facebookPageUrl?: string | null
   instagramPageUrl?: string | null
   businessDescription: string
   referralCode?: string | null
