@@ -6,10 +6,6 @@ export interface TranslateMessageResponse {
   original: string
 }
 
-export interface SuggestReplyResponse {
-  suggestions: string[]
-}
-
 export interface ConversationAnalyticsResponse {
   leadScore: number
   suggestedActions: string[]
@@ -69,10 +65,6 @@ async function runAiJob<T>(path: string, body: unknown): Promise<T> {
 export class AiService {
   static async translateMessage(messageId: string): Promise<TranslateMessageResponse> {
     return runAiJob<TranslateMessageResponse>('/ai/translate', { messageId })
-  }
-
-  static async suggestReply(conversationId: string): Promise<SuggestReplyResponse> {
-    return runAiJob<SuggestReplyResponse>('/ai/suggest-reply', { conversationId })
   }
 
   static async analyzeConversation(

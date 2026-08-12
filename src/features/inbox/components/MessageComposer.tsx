@@ -1,9 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { Spinner } from '@/shared/ui/primitives/Spinner'
-import { AiService } from '@/features/ai/api/ai.service'
-import { ReplySuggestionChips } from '@/features/inbox/components/ReplySuggestionChips'
-import { REPLY_SUGGESTION_CHIP_COUNT } from '@/features/inbox/constants'
 import {
   attachmentPreviewLabel,
   canPreviewAttachmentLocally,
@@ -17,7 +14,6 @@ import {
   composerSendButtonClass,
 } from '@/features/inbox/lib/inbox-ui'
 import type { IntegrationPlatform } from '@/features/integrations/constants'
-import { getApiErrorMessage } from '@/shared/utils/api-error'
 
 type OutboundComposerAttachment = {
   file: File
@@ -68,19 +64,6 @@ function AttachIcon() {
         strokeLinejoin="round"
         strokeWidth={1.75}
         d="m18.375 12.739-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.122 2.122l7.81-7.81"
-      />
-    </svg>
-  )
-}
-
-function SuggestReplyIcon() {
-  return (
-    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.75}
-        d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
       />
     </svg>
   )
@@ -177,24 +160,15 @@ export function MessageComposer({
   const [content, setContent] = useState('')
   const [attachment, setAttachment] = useState<SelectedAttachment | null>(null)
   const [attachmentError, setAttachmentError] = useState<string | null>(null)
-  const [suggesting, setSuggesting] = useState(false)
-  const [suggestError, setSuggestError] = useState<string | null>(null)
-  const [suggestions, setSuggestions] = useState<string[]>([])
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const appliedAgentDraftMessageIdRef = useRef<string | null>(null)
   const appliedAgentDraftReplyRef = useRef<string | null>(null)
   const dismissedAgentDraftMessageIdsRef = useRef<Set<string>>(new Set())
-  const aiBusy = suggesting
   const attachmentsSupported = true
   const canSend =
-    !disabled &&
-    !sending &&
-    !aiBusy &&
-    (attachment !== null || content.trim().length > 0)
-  const canSuggest =
-    !disabled && !sending && !aiBusy && conversationId !== null
-  const canAttach = !disabled && !sending && !aiBusy && attachmentsSupported
+    !disabled && !sending && (attachment !== null || content.trim().length > 0)
+  const canAttach = !disabled && !sending && attachmentsSupported
 
   const dismissAgentDraft = (messageId: string) => {
     dismissedAgentDraftMessageIdsRef.current.add(messageId)
@@ -206,8 +180,6 @@ export function MessageComposer({
 
   useEffect(() => {
     setContent('')
-    setSuggestions([])
-    setSuggestError(null)
     setAttachmentError(null)
     setAttachment((current) => {
       if (current !== null) {
@@ -269,7 +241,7 @@ export function MessageComposer({
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
 
-    if (disabled || sending || aiBusy) {
+    if (disabled || sending) {
       return
     }
 
@@ -289,7 +261,6 @@ export function MessageComposer({
 
     setContent('')
     clearAttachment()
-    setSuggestions([])
   }
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -319,61 +290,10 @@ export function MessageComposer({
     event.target.value = ''
   }
 
-  const handleSuggestReply = async () => {
-    if (conversationId === null || disabled || sending || aiBusy) {
-      return
-    }
-
-    setSuggesting(true)
-    setSuggestError(null)
-
-    try {
-      const { suggestions: nextSuggestions } = await AiService.suggestReply(conversationId)
-      setSuggestions(nextSuggestions.slice(0, REPLY_SUGGESTION_CHIP_COUNT))
-    } catch (err: unknown) {
-      setSuggestions([])
-      setSuggestError(getApiErrorMessage(err, 'Could not generate reply suggestions. Please try again.'))
-    } finally {
-      setSuggesting(false)
-    }
-  }
-
-  const handleSuggestionSelect = (suggestion: string) => {
-    if (disabled || sending || aiBusy) {
-      return
-    }
-
-    if (appliedAgentDraftMessageIdRef.current !== null) {
-      dismissAgentDraft(appliedAgentDraftMessageIdRef.current)
-    }
-
-    setContent(suggestion)
-    setSuggestError(null)
-    requestAnimationFrame(() => {
-      textareaRef.current?.focus()
-    })
-  }
-
-  const handleDismissSuggestions = () => {
-    setSuggestions([])
-    setSuggestError(null)
-  }
-
-  const composerDisabled = disabled || sending || aiBusy
+  const composerDisabled = disabled || sending
 
   return (
     <div className="relative shrink-0">
-      {suggestions.length > 0 && (
-        <div className="absolute bottom-full left-0 right-0 z-10 px-4 pb-2">
-          <ReplySuggestionChips
-            suggestions={suggestions}
-            disabled={composerDisabled}
-            onSelect={handleSuggestionSelect}
-            onDismiss={handleDismissSuggestions}
-          />
-        </div>
-      )}
-
       <form
         onSubmit={(event) => {
           void handleSubmit(event)
@@ -442,21 +362,6 @@ export function MessageComposer({
             className="min-h-[36px] max-h-28 flex-1 resize-none border-0 bg-transparent py-1.5 text-sm text-ink outline-none placeholder:text-ink-faint disabled:cursor-not-allowed"
           />
           <button
-            type="button"
-            onClick={() => {
-              void handleSuggestReply()
-            }}
-            disabled={!canSuggest}
-            aria-label={suggesting ? 'Generating reply suggestions' : 'Suggest reply'}
-            title="Suggest reply"
-            className={composerActionIconClass(
-              canSuggest,
-              'text-accent-violet hover:bg-accent-violet/10 hover:text-accent-violet',
-            )}
-          >
-            {suggesting ? <Spinner size="sm" variant="muted" /> : <SuggestReplyIcon />}
-          </button>
-          <button
             type="submit"
             disabled={!canSend}
             aria-label={sending ? 'Sending message' : 'Send message'}
@@ -468,11 +373,6 @@ export function MessageComposer({
         {attachmentError !== null && (
           <p className="mt-2 text-xs text-red-600" role="alert">
             {attachmentError}
-          </p>
-        )}
-        {suggestError !== null && (
-          <p className="mt-2 text-xs text-red-600" role="alert">
-            {suggestError}
           </p>
         )}
       </form>

@@ -14,8 +14,6 @@ export type MessageStatus = 'pending' | 'sent' | 'failed' | 'read'
 
 export type MessageContentType = 'text' | 'image' | 'video' | 'audio' | 'document'
 
-export const REPLY_SUGGESTION_CHIP_COUNT = 2
-
 export function messagingPlatformPath(platform: MessagingPlatform): string {
   return `/${platform}`
 }
