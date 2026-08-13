@@ -151,23 +151,20 @@ export function BusinessOnboardingPage() {
   }
 
   return (
-    <AppFlowLayout maxWidthClass="max-w-xl">
-      <div className="flex flex-col gap-5 sm:gap-6">
+    <AppFlowLayout maxWidthClass="max-w-xl" compact>
+      <div className="flex flex-col gap-3">
         <header className="shrink-0 text-center">
-          <div className="mb-4 flex justify-center">
+          <div className="mb-2.5 flex justify-center">
             <LandingLogo variant="light" />
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+          <h1 className="text-xl font-semibold tracking-tight text-ink sm:text-2xl">
             Set up your <span className="text-accent-gradient">business profile</span>
           </h1>
-          <p className="mt-2 text-sm text-ink-muted">
-            A quick guided setup so Responza AI understands your brand before you start replying.
-          </p>
         </header>
 
-        <AppCard padding="default" className="overflow-hidden sm:p-8">
+        <AppCard padding="compact" className="overflow-hidden">
           {error !== null && (
-            <div className="mb-4">
+            <div className="mb-3">
               <Alert variant="error">{error}</Alert>
             </div>
           )}

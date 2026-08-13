@@ -52,7 +52,7 @@ function FieldError({ message }: { readonly message?: string }) {
     return null
   }
 
-  return <p className="mt-2 text-sm text-red-600">{message}</p>
+  return <p className="mt-1.5 text-sm text-red-600">{message}</p>
 }
 
 function fieldInputClass(hasError: boolean, large = false): string {
@@ -66,7 +66,7 @@ function fieldInputClass(hasError: boolean, large = false): string {
 function fieldTextareaClass(hasError: boolean): string {
   return [
     APP_TEXTAREA_CLASS,
-    'min-h-[10rem] px-4 py-3.5 text-base leading-relaxed',
+    'min-h-[6.5rem] px-3.5 py-3 text-sm leading-relaxed',
     hasError ? 'border-red-300 focus:border-red-400 focus:ring-red-100' : '',
   ].join(' ')
 }
@@ -81,14 +81,14 @@ function OnboardingProgress({
   const percent = Math.round((currentStep / totalSteps) * 100)
 
   return (
-    <div className="mb-8">
-      <div className="mb-2 flex items-center justify-between text-xs font-medium tracking-wide text-ink-faint uppercase">
+    <div className="mb-4">
+      <div className="mb-1.5 flex items-center justify-between text-xs font-medium tracking-wide text-ink-faint uppercase">
         <span>
           Step {currentStep} of {totalSteps}
         </span>
         <span>{percent}%</span>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-surface-muted">
+      <div className="h-1.5 overflow-hidden rounded-full bg-surface-muted">
         <div
           className="h-full rounded-full bg-gradient-to-r from-accent-soft via-accent to-accent-violet transition-[width] duration-500 ease-out"
           style={{ width: `${percent}%` }}
@@ -112,13 +112,13 @@ function StepHeader({
   readonly required: boolean
 }) {
   return (
-    <div className="mb-6">
-      <h2 className="text-xl font-semibold tracking-tight text-ink sm:text-2xl">
+    <div className="mb-3">
+      <h2 className="text-lg font-semibold tracking-tight text-ink sm:text-xl">
         {title}
         {required && <span className="text-red-500"> *</span>}
         {!required && <span className="ml-2 text-sm font-normal text-ink-faint">(optional)</span>}
       </h2>
-      <p className="mt-2 text-sm leading-relaxed text-ink-muted">{subtitle}</p>
+      <p className="mt-1 text-sm leading-snug text-ink-muted">{subtitle}</p>
     </div>
   )
 }
@@ -304,7 +304,7 @@ export function BusinessOnboardingWizard({
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadingCatalogue || catalogueFiles.length >= CATALOGUE_MAX_FILES}
               className={[
-                'flex w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-10 transition-colors',
+                'flex w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed px-4 py-6 transition-colors',
                 uploadingCatalogue || catalogueFiles.length >= CATALOGUE_MAX_FILES
                   ? 'cursor-not-allowed border-border bg-surface-muted/50 opacity-70'
                   : 'border-accent/25 bg-accent/5 hover:border-accent/40 hover:bg-accent/8',
@@ -313,12 +313,12 @@ export function BusinessOnboardingWizard({
               {uploadingCatalogue ? (
                 <>
                   <Spinner size="sm" variant="muted" />
-                  <span className="mt-3 text-sm font-medium text-ink-muted">Uploading...</span>
+                  <span className="mt-2 text-sm font-medium text-ink-muted">Uploading...</span>
                 </>
               ) : (
                 <>
-                  <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-ink-muted shadow-soft">
-                    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-ink-muted shadow-soft">
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -327,8 +327,8 @@ export function BusinessOnboardingWizard({
                       />
                     </svg>
                   </span>
-                  <span className="mt-4 text-sm font-medium text-ink">Click to upload a document</span>
-                  <span className="mt-1 text-xs text-ink-faint">PDF, Word, Excel, PowerPoint, or text</span>
+                  <span className="mt-3 text-sm font-medium text-ink">Click to upload a document</span>
+                  <span className="mt-0.5 text-xs text-ink-faint">PDF, Word, Excel, PowerPoint, or text</span>
                 </>
               )}
             </button>
@@ -336,11 +336,11 @@ export function BusinessOnboardingWizard({
             <FieldError message={catalogueError ?? undefined} />
 
             {catalogueFiles.length > 0 && (
-              <ul className="mt-4 space-y-2">
+              <ul className="mt-3 max-h-28 space-y-1.5 overflow-y-auto">
                 {catalogueFiles.map((file) => (
                   <li
                     key={file.id}
-                    className="flex items-center justify-between gap-3 rounded-xl border border-border bg-white px-3 py-2.5 shadow-soft"
+                    className="flex items-center justify-between gap-3 rounded-xl border border-border bg-white px-3 py-2 shadow-soft"
                   >
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium text-ink">{file.filename}</p>
@@ -362,7 +362,7 @@ export function BusinessOnboardingWizard({
             )}
 
             {catalogueFiles.length > 0 && (
-              <p className="mt-3 text-xs text-ink-faint">
+              <p className="mt-2 text-xs text-ink-faint">
                 {catalogueFiles.length} of {CATALOGUE_MAX_FILES} files uploaded
               </p>
             )}
@@ -391,7 +391,7 @@ export function BusinessOnboardingWizard({
 
       case 'businessDescription':
         return (
-          <div className="space-y-5">
+          <div className="space-y-3">
             <div>
               <textarea
                 ref={inputRef as React.RefObject<HTMLTextAreaElement>}
@@ -400,7 +400,7 @@ export function BusinessOnboardingWizard({
                 placeholder="Describe your products, services, target customers, tone, policies, and common questions you receive..."
                 className={fieldTextareaClass(mergedErrors.businessDescription !== undefined)}
               />
-              <div className="mt-2 flex items-center justify-between gap-3">
+              <div className="mt-1.5 flex items-center justify-between gap-3">
                 <p className="text-xs text-ink-faint">
                   Minimum {BUSINESS_DESCRIPTION_MIN_LENGTH} characters
                 </p>
@@ -413,7 +413,7 @@ export function BusinessOnboardingWizard({
                   {descriptionLength} / {BUSINESS_DESCRIPTION_MIN_LENGTH}
                 </p>
               </div>
-              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-muted">
+              <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-surface-muted">
                 <div
                   className={[
                     'h-full rounded-full transition-all duration-300',
@@ -430,7 +430,7 @@ export function BusinessOnboardingWizard({
             </div>
 
             <div>
-              <label htmlFor="referral-code" className="mb-1.5 block text-sm font-medium text-ink">
+              <label htmlFor="referral-code" className="mb-1 block text-sm font-medium text-ink">
                 Referral code <span className="font-normal text-ink-faint">(optional)</span>
               </label>
               <input
@@ -442,7 +442,7 @@ export function BusinessOnboardingWizard({
                 autoComplete="off"
                 className={fieldInputClass(mergedErrors.referralCode !== undefined, true)}
               />
-              <p className="mt-1.5 text-xs text-ink-faint">
+              <p className="mt-1 text-xs text-ink-faint">
                 If an influencer referred you, enter their code here.
               </p>
               <FieldError message={mergedErrors.referralCode} />
@@ -477,7 +477,7 @@ export function BusinessOnboardingWizard({
         {currentStep.id !== 'businessDescription' && <FieldError message={stepFieldError} />}
       </StepShell>
 
-      <div className="mt-8 flex items-center justify-between gap-3 border-t border-border pt-5">
+      <div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-3">
         <div>
           {!isFirstStep && (
             <AppButton type="button" variant="ghost" onClick={handleBack} disabled={isSaving}>
@@ -513,7 +513,7 @@ export function BusinessOnboardingWizard({
       </div>
 
       {isLastStep && !descriptionReady && (
-        <p className="mt-3 text-right text-xs text-ink-faint">
+        <p className="mt-2 text-right text-xs text-ink-faint">
           Add at least {BUSINESS_DESCRIPTION_MIN_LENGTH} characters to finish setup.
         </p>
       )}
