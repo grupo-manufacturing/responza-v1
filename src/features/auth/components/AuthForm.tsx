@@ -16,7 +16,6 @@ import {
   AuthCard,
   AuthDivider,
   AuthHeader,
-  AuthBackChevron,
   AuthModeToggle,
   AuthPasswordInput,
   AuthPrimaryButton,
@@ -126,8 +125,6 @@ export function AuthForm() {
 
   return (
     <>
-      <AuthBackChevron to="/" label="Back to home" />
-
       <AuthHeader
         title={
           isLogin ? (

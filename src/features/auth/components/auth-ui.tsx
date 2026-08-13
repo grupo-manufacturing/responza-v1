@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import { useRef, useState } from 'react'
 
 import { APP_INPUT_CLASS, AppFlowLayout } from '@/shared/ui/app-ui'
@@ -119,24 +118,6 @@ export function AuthDivider() {
         <span className="bg-white/80 px-2 text-ink-faint">or</span>
       </div>
     </div>
-  )
-}
-
-export function AuthBackChevron({
-  to,
-  label,
-}: {
-  readonly to: string
-  readonly label: string
-}) {
-  return (
-    <Link
-      to={to}
-      aria-label={label}
-      className="fixed top-4 left-4 z-10 flex h-12 w-12 items-center justify-center rounded-full border border-border bg-white text-4xl leading-none text-ink shadow-soft transition-all duration-200 hover:bg-surface-muted"
-    >
-      ‹
-    </Link>
   )
 }
 

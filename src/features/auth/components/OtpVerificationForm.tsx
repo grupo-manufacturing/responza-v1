@@ -10,7 +10,6 @@ import { resolveDefaultAppPath } from '@/shared/utils/subscription-access'
 import {
   AUTH_OTP_LENGTH,
   AuthAlert,
-  AuthBackChevron,
   AuthCard,
   AuthHeader,
   AuthOtpInputs,
@@ -18,6 +17,12 @@ import {
 } from '@/features/auth/components/auth-ui'
 
 const RESEND_COOLDOWN_SECONDS = 60
+
+function formatCooldown(seconds: number): string {
+  const mins = Math.floor(seconds / 60)
+  const secs = seconds % 60
+  return `${mins}:${secs.toString().padStart(2, '0')}`
+}
 
 type VerifyLocationState = {
   email?: string
@@ -35,7 +40,7 @@ export function OtpVerificationForm() {
   const [isResending, setIsResending] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [resendMessage, setResendMessage] = useState<string | null>(null)
-  const [cooldown, setCooldown] = useState(0)
+  const [cooldown, setCooldown] = useState(RESEND_COOLDOWN_SECONDS)
 
   const from = state.from?.pathname || resolveDefaultAppPath(null)
 
@@ -96,8 +101,6 @@ export function OtpVerificationForm() {
 
   return (
     <>
-      <AuthBackChevron to="/auth?mode=login" label="Back to sign in" />
-
       <AuthHeader
         title={
           <>
@@ -136,18 +139,25 @@ export function OtpVerificationForm() {
           </AuthPrimaryButton>
         </form>
 
-        <div className="mt-3 text-center">
-          <p className="text-xs text-ink-muted">
-            Didn&apos;t receive the code?{' '}
-            <button
-              type="button"
-              onClick={() => void handleResend()}
-              disabled={cooldown > 0 || isResending}
-              className="font-semibold text-ink underline-offset-2 transition-colors hover:underline disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {isResending ? 'Sending...' : cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend code'}
-            </button>
-          </p>
+        <div className="mt-4 text-center">
+          {cooldown > 0 ? (
+            <p className="text-xs text-ink-muted">
+              Resend code in{' '}
+              <span className="font-semibold tabular-nums text-ink">{formatCooldown(cooldown)}</span>
+            </p>
+          ) : (
+            <p className="text-xs text-ink-muted">
+              Didn&apos;t receive the code?{' '}
+              <button
+                type="button"
+                onClick={() => void handleResend()}
+                disabled={isResending}
+                className="font-semibold text-ink underline-offset-2 transition-colors hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isResending ? 'Sending...' : 'Resend code'}
+              </button>
+            </p>
+          )}
         </div>
       </AuthCard>
     </>
