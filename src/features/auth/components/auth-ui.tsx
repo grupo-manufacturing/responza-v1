@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 import { APP_INPUT_CLASS, AppFlowLayout } from '@/shared/ui/app-ui'
 import { LandingLogo } from '@/shared/ui/brand-ui'
@@ -7,7 +7,7 @@ import { LandingLogo } from '@/shared/ui/brand-ui'
 export const AUTH_INPUT_CLASS = APP_INPUT_CLASS
 
 export function AuthLayout({ children }: { readonly children: React.ReactNode }) {
-  return <AppFlowLayout>{children}</AppFlowLayout>
+  return <AppFlowLayout compact>{children}</AppFlowLayout>
 }
 
 export function AuthHeader({
@@ -15,22 +15,22 @@ export function AuthHeader({
   description,
 }: {
   readonly title: React.ReactNode
-  readonly description: React.ReactNode
+  readonly description?: React.ReactNode
 }) {
   return (
-    <div className="mb-6 text-center">
-      <div className="mb-4 flex justify-center">
+    <div className="mb-4 text-center">
+      <div className="mb-3 flex justify-center">
         <LandingLogo variant="light" />
       </div>
       <h1 className="text-2xl font-semibold tracking-tight text-ink sm:text-3xl">{title}</h1>
-      <p className="mt-2 text-sm leading-relaxed text-ink-muted">{description}</p>
+      {description ? <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">{description}</p> : null}
     </div>
   )
 }
 
 export function AuthCard({ children }: { readonly children: React.ReactNode }) {
   return (
-    <div className="glass-light rounded-[var(--radius-card-lg)] border border-border p-6 shadow-card sm:p-8">
+    <div className="glass-light rounded-[var(--radius-card-lg)] border border-border p-5 shadow-card sm:p-6">
       {children}
     </div>
   )
@@ -61,7 +61,7 @@ export function AuthModeToggle({
   readonly onSelectRegister: () => void
 }) {
   return (
-    <div className="mb-5 flex rounded-[var(--radius-pill)] border border-border bg-surface-muted/80 p-1">
+    <div className="mb-4 flex rounded-[var(--radius-pill)] border border-border bg-surface-muted/80 p-1">
       <button
         type="button"
         onClick={onSelectLogin}
@@ -102,7 +102,7 @@ export function AuthPrimaryButton({
       type={type}
       disabled={disabled}
       onClick={onClick}
-      className="mt-4 flex w-full items-center justify-center gap-2 rounded-[var(--radius-pill)] bg-ink py-2.5 text-sm font-semibold text-on-dark transition-all duration-200 hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-50"
+      className="mt-3 flex w-full items-center justify-center gap-2 rounded-[var(--radius-pill)] bg-ink py-2.5 text-sm font-semibold text-on-dark transition-all duration-200 hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-50"
     >
       {children}
     </button>
@@ -111,7 +111,7 @@ export function AuthPrimaryButton({
 
 export function AuthDivider() {
   return (
-    <div className="relative my-5">
+    <div className="relative my-3.5">
       <div className="absolute inset-0 flex items-center">
         <div className="w-full border-t border-border" />
       </div>
@@ -122,12 +122,111 @@ export function AuthDivider() {
   )
 }
 
-export function AuthBackLink({ to, children }: { readonly to: string; readonly children: React.ReactNode }) {
+export function AuthBackChevron({
+  to,
+  label,
+}: {
+  readonly to: string
+  readonly label: string
+}) {
   return (
-    <div className="mt-5 text-center">
-      <Link to={to} className="text-xs text-ink-muted transition-colors hover:text-ink">
-        {children}
-      </Link>
+    <Link
+      to={to}
+      aria-label={label}
+      className="fixed top-4 left-4 z-10 flex h-12 w-12 items-center justify-center rounded-full border border-border bg-white text-4xl leading-none text-ink shadow-soft transition-all duration-200 hover:bg-surface-muted"
+    >
+      ‹
+    </Link>
+  )
+}
+
+export const AUTH_OTP_LENGTH = 6
+
+export function AuthOtpInputs({
+  value,
+  onChange,
+  disabled = false,
+}: {
+  readonly value: string
+  readonly onChange: (value: string) => void
+  readonly disabled?: boolean
+}) {
+  const refs = useRef<Array<HTMLInputElement | null>>([])
+  const digits = Array.from({ length: AUTH_OTP_LENGTH }, (_, i) => value[i] ?? '')
+
+  const focusAt = (index: number) => {
+    refs.current[index]?.focus()
+  }
+
+  const writeDigits = (next: string[]) => {
+    onChange(next.join('').slice(0, AUTH_OTP_LENGTH))
+  }
+
+  const handleChange = (index: number, raw: string) => {
+    const cleaned = raw.replace(/\D/g, '')
+    if (cleaned.length === 0) {
+      const next = [...digits]
+      next[index] = ''
+      writeDigits(next)
+      return
+    }
+
+    if (cleaned.length > 1) {
+      const next = [...digits]
+      const chars = cleaned.slice(0, AUTH_OTP_LENGTH - index).split('')
+      chars.forEach((char, offset) => {
+        next[index + offset] = char
+      })
+      writeDigits(next)
+      focusAt(Math.min(index + chars.length, AUTH_OTP_LENGTH - 1))
+      return
+    }
+
+    const next = [...digits]
+    next[index] = cleaned
+    writeDigits(next)
+    if (index < AUTH_OTP_LENGTH - 1) focusAt(index + 1)
+  }
+
+  const handleKeyDown = (index: number, event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Backspace' && digits[index] === '' && index > 0) {
+      event.preventDefault()
+      const next = [...digits]
+      next[index - 1] = ''
+      writeDigits(next)
+      focusAt(index - 1)
+    }
+  }
+
+  const handlePaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
+    event.preventDefault()
+    const pasted = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, AUTH_OTP_LENGTH)
+    if (pasted.length === 0) return
+    onChange(pasted)
+    focusAt(Math.min(pasted.length, AUTH_OTP_LENGTH) - 1)
+  }
+
+  return (
+    <div className="flex justify-center gap-2 sm:gap-2.5" role="group" aria-label="Verification code">
+      {digits.map((digit, index) => (
+        <input
+          key={index}
+          ref={(el) => {
+            refs.current[index] = el
+          }}
+          type="text"
+          inputMode="numeric"
+          autoComplete={index === 0 ? 'one-time-code' : 'off'}
+          aria-label={`Digit ${index + 1}`}
+          disabled={disabled}
+          value={digit}
+          onChange={(e) => handleChange(index, e.target.value)}
+          onKeyDown={(e) => handleKeyDown(index, e)}
+          onPaste={handlePaste}
+          onFocus={(e) => e.target.select()}
+          className="h-12 w-10 rounded-xl border border-border bg-white text-center text-lg font-semibold text-ink shadow-soft outline-none transition-all focus:border-ink focus:ring-2 focus:ring-ink/10 disabled:opacity-50 sm:h-14 sm:w-12 sm:text-xl"
+        />
+      ))}
     </div>
   )
 }

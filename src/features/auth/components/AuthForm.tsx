@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 import { Spinner } from '@/shared/ui/primitives/Spinner'
-import { SectionBadge } from '@/shared/ui/brand-ui'
 import { AuthService } from '@/features/auth/api/auth.service'
 import { isRegisterPending } from '@/features/auth/api/auth.types'
 import type { AuthFormData } from '@/features/auth/api/auth.types'
@@ -14,10 +13,10 @@ import { resolveDefaultAppPath } from '@/shared/utils/subscription-access'
 import {
   AUTH_INPUT_CLASS,
   AuthAlert,
-  AuthBackLink,
   AuthCard,
   AuthDivider,
   AuthHeader,
+  AuthBackChevron,
   AuthModeToggle,
   AuthPasswordInput,
   AuthPrimaryButton,
@@ -127,6 +126,8 @@ export function AuthForm() {
 
   return (
     <>
+      <AuthBackChevron to="/" label="Back to home" />
+
       <AuthHeader
         title={
           isLogin ? (
@@ -139,18 +140,9 @@ export function AuthForm() {
             </>
           )
         }
-        description={
-          isLogin
-            ? 'Pick up where you left off.'
-            : 'Start managing WhatsApp and Instagram conversations in one place.'
-        }
       />
 
       <AuthCard>
-        <AuthModeToggle isLogin={isLogin} onSelectLogin={switchToLogin} onSelectRegister={switchToRegister} />
-
-        {error && <AuthAlert variant="error">{error}</AuthAlert>}
-
         {googleAuthEnabled && (
           <>
             <button
@@ -162,7 +154,7 @@ export function AuthForm() {
               {isGoogleLoading ? (
                 <>
                   <Spinner size="sm" />
-                  Redirecting to Google...
+                  Redirecting...
                 </>
               ) : (
                 <>
@@ -171,17 +163,18 @@ export function AuthForm() {
                 </>
               )}
             </button>
-            <p className="mt-2 text-center text-[11px] text-ink-faint">
-              New or existing account — Google handles both the same way.
-            </p>
             <AuthDivider />
           </>
         )}
 
-        <form onSubmit={(e) => void handleSubmit(e)} className="space-y-3.5">
+        <AuthModeToggle isLogin={isLogin} onSelectLogin={switchToLogin} onSelectRegister={switchToRegister} />
+
+        {error && <AuthAlert variant="error">{error}</AuthAlert>}
+
+        <form onSubmit={(e) => void handleSubmit(e)} className="space-y-3">
           {!isLogin && (
             <div>
-              <label htmlFor="name" className="mb-1.5 block text-xs font-medium text-ink-muted">
+              <label htmlFor="name" className="mb-1 block text-xs font-medium text-ink-muted">
                 Organization name
               </label>
               <input
@@ -198,7 +191,7 @@ export function AuthForm() {
           )}
 
           <div>
-            <label htmlFor="email" className="mb-1.5 block text-xs font-medium text-ink-muted">
+            <label htmlFor="email" className="mb-1 block text-xs font-medium text-ink-muted">
               Email
             </label>
             <input
@@ -214,7 +207,7 @@ export function AuthForm() {
           </div>
 
           <div>
-            <label htmlFor="password" className="mb-1.5 block text-xs font-medium text-ink-muted">
+            <label htmlFor="password" className="mb-1 block text-xs font-medium text-ink-muted">
               Password
             </label>
             <AuthPasswordInput
@@ -228,14 +221,6 @@ export function AuthForm() {
               autoComplete={isLogin ? 'current-password' : 'new-password'}
             />
           </div>
-
-          {!isLogin && (
-            <div className="flex justify-center pt-1">
-              <SectionBadge variant="light" tone="teal">
-                3-day free trial on Basic
-              </SectionBadge>
-            </div>
-          )}
 
           <AuthPrimaryButton disabled={isBusy}>
             {isLoading ? (
@@ -251,7 +236,7 @@ export function AuthForm() {
           </AuthPrimaryButton>
         </form>
 
-        <div className="mt-5 text-center">
+        <div className="mt-3 text-center">
           <p className="text-xs text-ink-muted">
             {isLogin ? "Don't have an account? " : 'Already have an account? '}
             <button
@@ -265,7 +250,7 @@ export function AuthForm() {
         </div>
 
         {!isLogin && (
-          <p className="mt-3 text-center text-[10px] leading-relaxed text-ink-faint">
+          <p className="mt-2 text-center text-[10px] leading-relaxed text-ink-faint">
             By creating an account, you agree to our{' '}
             <Link to="/terms-conditions" className="underline-offset-2 hover:underline">
               Terms & Conditions
@@ -277,8 +262,6 @@ export function AuthForm() {
           </p>
         )}
       </AuthCard>
-
-      <AuthBackLink to="/">← Back to home</AuthBackLink>
     </>
   )
 }

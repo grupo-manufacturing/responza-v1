@@ -153,12 +153,19 @@ export function AppGateCard({
 export function AppFlowLayout({
   children,
   maxWidthClass = 'max-w-md',
+  compact = false,
 }: {
   readonly children: ReactNode
   readonly maxWidthClass?: string
+  readonly compact?: boolean
 }) {
   return (
-    <div className="bg-hero-gradient bg-grid-light relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10 sm:px-6">
+    <div
+      className={[
+        'bg-hero-gradient bg-grid-light relative flex min-h-screen items-center justify-center overflow-hidden px-4 sm:px-6',
+        compact ? 'py-6' : 'py-10',
+      ].join(' ')}
+    >
       <div
         className="pointer-events-none absolute top-1/4 -left-24 h-72 w-72 rounded-full bg-accent-soft/20 blur-3xl"
         aria-hidden
