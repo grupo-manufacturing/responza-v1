@@ -42,10 +42,13 @@ export function validateCatalogueFileBeforeUpload(file: File): string | null {
   return null
 }
 
+export const BRAND_NAME_MAX_LENGTH = 200
 export const BUSINESS_DESCRIPTION_MIN_LENGTH = 20
+export const BUSINESS_DESCRIPTION_MAX_LENGTH = 5000
+export const REFERRAL_CODE_MIN_LENGTH = 2
+export const REFERRAL_CODE_MAX_LENGTH = 32
 
-const INVALID_HTTP_URL_MESSAGE =
-  'Please enter a full link starting with https:// (e.g., https://yourshop.com)'
+const REFERRAL_CODE_PATTERN = /^[A-Za-z0-9_-]+$/
 
 function isValidOptionalUrl(value: string): boolean {
   const trimmed = value.trim()
@@ -61,11 +64,29 @@ function isValidOptionalUrl(value: string): boolean {
   }
 }
 
+function validateReferralCode(value: string): string | undefined {
+  const trimmed = value.trim()
+  if (trimmed.length === 0) {
+    return undefined
+  }
+
+  if (trimmed.length < REFERRAL_CODE_MIN_LENGTH) {
+    return `Referral code must be at least ${REFERRAL_CODE_MIN_LENGTH} characters`
+  }
+
+  if (trimmed.length > REFERRAL_CODE_MAX_LENGTH) {
+    return `Referral code must be ${REFERRAL_CODE_MAX_LENGTH} characters or less`
+  }
+
+  if (!REFERRAL_CODE_PATTERN.test(trimmed)) {
+    return 'Use only letters, numbers, hyphens, and underscores'
+  }
+
+  return undefined
+}
+
 export function canSubmitBusinessOnboarding(formData: BusinessOnboardingFormData): boolean {
-  return (
-    formData.brandName.trim().length > 0 &&
-    formData.businessDescription.trim().length >= BUSINESS_DESCRIPTION_MIN_LENGTH
-  )
+  return !hasBusinessOnboardingFieldErrors(validateBusinessOnboardingForm(formData))
 }
 
 export function validateBusinessOnboardingForm(
@@ -73,23 +94,32 @@ export function validateBusinessOnboardingForm(
 ): BusinessOnboardingFieldErrors {
   const errors: BusinessOnboardingFieldErrors = {}
 
-  if (formData.brandName.trim().length === 0) {
-    errors.brandName = 'Brand name is required'
+  const brandName = formData.brandName.trim()
+  if (brandName.length === 0) {
+    errors.brandName = 'Enter your brand name'
+  } else if (brandName.length > BRAND_NAME_MAX_LENGTH) {
+    errors.brandName = `Brand name must be ${BRAND_NAME_MAX_LENGTH} characters or less`
   }
 
   const description = formData.businessDescription.trim()
-  if (description.length === 0) {
-    errors.businessDescription = 'Business description is required'
-  } else if (description.length < BUSINESS_DESCRIPTION_MIN_LENGTH) {
-    errors.businessDescription = `Business description must be at least ${BUSINESS_DESCRIPTION_MIN_LENGTH} characters`
+  if (description.length < BUSINESS_DESCRIPTION_MIN_LENGTH) {
+    errors.businessDescription = `Tell us a bit more — at least ${BUSINESS_DESCRIPTION_MIN_LENGTH} characters`
+  } else if (description.length > BUSINESS_DESCRIPTION_MAX_LENGTH) {
+    errors.businessDescription = `Business description must be ${BUSINESS_DESCRIPTION_MAX_LENGTH} characters or less`
   }
 
   if (!isValidOptionalUrl(formData.websiteUrl)) {
-    errors.websiteUrl = INVALID_HTTP_URL_MESSAGE
+    errors.websiteUrl = 'Enter a full website link starting with https:// (e.g. https://yourshop.com)'
   }
 
   if (!isValidOptionalUrl(formData.instagramPageUrl)) {
-    errors.instagramPageUrl = INVALID_HTTP_URL_MESSAGE
+    errors.instagramPageUrl =
+      'Enter a full Instagram link starting with https:// (e.g. https://instagram.com/yourpage)'
+  }
+
+  const referralError = validateReferralCode(formData.referralCode)
+  if (referralError !== undefined) {
+    errors.referralCode = referralError
   }
 
   return errors
@@ -247,14 +277,29 @@ export function validateBusinessOnboardingStep(
   stepId: BusinessOnboardingStepId,
   formData: BusinessOnboardingFormData,
 ): BusinessOnboardingFieldErrors {
-  const step = BUSINESS_ONBOARDING_STEPS.find((item) => item.id === stepId)
-  if (step === undefined || step.field === undefined) {
+  if (stepId === 'catalogue') {
     return {}
   }
 
   const allErrors = validateBusinessOnboardingForm(formData)
-  const message = allErrors[step.field]
+  const errors: BusinessOnboardingFieldErrors = {}
 
+  if (stepId === 'businessDescription') {
+    if (allErrors.businessDescription !== undefined) {
+      errors.businessDescription = allErrors.businessDescription
+    }
+    if (allErrors.referralCode !== undefined) {
+      errors.referralCode = allErrors.referralCode
+    }
+    return errors
+  }
+
+  const step = BUSINESS_ONBOARDING_STEPS.find((item) => item.id === stepId)
+  if (step?.field === undefined) {
+    return {}
+  }
+
+  const message = allErrors[step.field]
   if (message === undefined) {
     return {}
   }
@@ -266,14 +311,19 @@ export function canProceedFromOnboardingStep(
   stepId: BusinessOnboardingStepId,
   formData: BusinessOnboardingFormData,
 ): boolean {
-  if (stepId === 'catalogue') {
-    return true
-  }
-
   return !hasBusinessOnboardingFieldErrors(validateBusinessOnboardingStep(stepId, formData))
 }
 
 export function findFirstOnboardingStepWithErrors(errors: BusinessOnboardingFieldErrors): number {
+  if (errors.referralCode !== undefined) {
+    const descriptionStepIndex = BUSINESS_ONBOARDING_STEPS.findIndex(
+      (step) => step.id === 'businessDescription',
+    )
+    if (descriptionStepIndex >= 0) {
+      return descriptionStepIndex
+    }
+  }
+
   for (let index = 0; index < BUSINESS_ONBOARDING_STEPS.length; index += 1) {
     const step = BUSINESS_ONBOARDING_STEPS[index]
     if (step.field !== undefined && errors[step.field] !== undefined) {
