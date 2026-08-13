@@ -169,17 +169,16 @@ export function BusinessOnboardingWizard({
     field: K,
     value: BusinessOnboardingFormData[K],
   ) => {
-    onChange({ ...formData, [field]: value })
+    const nextFormData = { ...formData, [field]: value }
+    onChange(nextFormData)
     onFieldEdit?.(field)
-    setLocalErrors((current) => {
-      if (current[field] === undefined) {
-        return current
-      }
 
-      const next = { ...current }
-      delete next[field]
-      return next
-    })
+    if (currentStep === undefined) {
+      return
+    }
+
+    const stepErrors = validateBusinessOnboardingStep(currentStep.id, nextFormData)
+    setLocalErrors(stepErrors)
   }
 
   const goToStep = (index: number) => {
@@ -216,6 +215,11 @@ export function BusinessOnboardingWizard({
       return
     }
 
+    if (currentStep.field !== undefined) {
+      onChange({ ...formData, [currentStep.field]: '' })
+      onFieldEdit?.(currentStep.field)
+    }
+
     goToStep(stepIndex + 1)
   }
 
@@ -235,11 +239,11 @@ export function BusinessOnboardingWizard({
 
     setCatalogueError(null)
     void onUploadCatalogue(file).catch((error: unknown) => {
-      const message =
+      setCatalogueError(
         error instanceof Error && error.message.length > 0
           ? error.message
-          : 'We could not upload this file. Please try a PDF, Word, Excel, PowerPoint, or text file under 10 MB.'
-      setCatalogueError(message)
+          : 'Could not upload this file. Try a PDF, Word, Excel, PowerPoint, or text file under 10 MB.',
+      )
     })
   }
 
@@ -496,7 +500,7 @@ export function BusinessOnboardingWizard({
           <AppButton
             type="button"
             onClick={handleNext}
-            disabled={isSaving || uploadingCatalogue || (!isLastStep && !canProceed && currentStep.required)}
+            disabled={isSaving || uploadingCatalogue || !canProceed}
           >
             {isSaving ? (
               <>

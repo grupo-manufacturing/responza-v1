@@ -28,15 +28,15 @@ export function validateCatalogueFileBeforeUpload(file: File): string | null {
   const extension = file.name.includes('.') ? (file.name.split('.').pop()?.toLowerCase() ?? '') : ''
 
   if (!CATALOGUE_ALLOWED_EXTENSIONS.includes(extension)) {
-    return `"${file.name}" is not a supported file type. Please upload a PDF, Word, Excel, PowerPoint, or text file.`
+    return 'Unsupported file type. Upload a PDF, Word, Excel, PowerPoint, or text file.'
   }
 
-  if (file.size === 0) {
-    return `"${file.name}" appears to be empty. Please choose a file with content.`
+  if (typeof file.size !== 'number' || file.size <= 0) {
+    return 'This file looks empty. Choose a file with content.'
   }
 
   if (file.size > CATALOGUE_MAX_FILE_SIZE_BYTES) {
-    return `"${file.name}" is larger than 10 MB. Try compressing it or splitting it into smaller files.`
+    return 'This file is larger than 10 MB. Choose a smaller file.'
   }
 
   return null

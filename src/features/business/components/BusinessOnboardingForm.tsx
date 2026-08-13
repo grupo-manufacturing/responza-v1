@@ -121,11 +121,11 @@ export function BusinessOnboardingForm({
 
     setCatalogueError(null)
     void onUploadCatalogue(file).catch((error: unknown) => {
-      const message =
+      setCatalogueError(
         error instanceof Error && error.message.length > 0
           ? error.message
-          : 'We could not upload this file. Please try a PDF, Word, Excel, PowerPoint, or text file under 10 MB.'
-      setCatalogueError(message)
+          : 'Could not upload this file. Try a PDF, Word, Excel, PowerPoint, or text file under 10 MB.',
+      )
     })
   }
 

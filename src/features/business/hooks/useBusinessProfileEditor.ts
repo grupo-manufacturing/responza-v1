@@ -73,7 +73,7 @@ export function useBusinessProfileEditor(options?: { onProfileMutated?: () => vo
       onProfileMutated?.()
     } catch (err: unknown) {
       throw new Error(
-        getApiErrorMessage(err, 'We could not upload this file right now. Please try again in a moment.'),
+        getApiErrorMessage(err, 'Could not upload this file. Try a file under 10 MB.'),
       )
     } finally {
       setUploadingCatalogue(false)
@@ -145,21 +145,14 @@ export function useBusinessProfileEditor(options?: { onProfileMutated?: () => vo
     }
   }
 
-  const handleFieldEdit = (field: keyof BusinessOnboardingFormData) => {
-    setFieldErrors((current) => {
-      if (current[field] === undefined) {
-        return current
-      }
-
-      const next = { ...current }
-      delete next[field]
-      return next
-    })
+  const handleFormChange = (nextFormData: BusinessOnboardingFormData) => {
+    setFormData(nextFormData)
+    setFieldErrors(validateBusinessOnboardingForm(nextFormData))
     setSaveMessage(null)
   }
 
-  const handleFormChange = (nextFormData: BusinessOnboardingFormData) => {
-    setFormData(nextFormData)
+  const handleFieldEdit = (_field: keyof BusinessOnboardingFormData) => {
+    setSaveMessage(null)
   }
 
   const isDirty =

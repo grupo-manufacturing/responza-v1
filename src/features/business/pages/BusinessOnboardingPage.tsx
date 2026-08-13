@@ -72,7 +72,7 @@ export function BusinessOnboardingPage() {
       setCatalogueFiles(result.profile.catalogueFiles)
     } catch (err: unknown) {
       throw new Error(
-        getApiErrorMessage(err, 'We could not upload this file right now. Please try again in a moment.'),
+        getApiErrorMessage(err, 'Could not upload this file. Try a file under 10 MB.'),
       )
     } finally {
       setUploadingCatalogue(false)
