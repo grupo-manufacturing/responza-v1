@@ -121,7 +121,7 @@ export function AuthDivider() {
   )
 }
 
-export const AUTH_OTP_LENGTH = 6
+export const AUTH_OTP_LENGTH = 8
 
 export function AuthOtpInputs({
   value,
@@ -188,7 +188,7 @@ export function AuthOtpInputs({
   }
 
   return (
-    <div className="flex justify-center gap-2 sm:gap-2.5" role="group" aria-label="Verification code">
+    <div className="flex justify-center gap-1.5 sm:gap-2" role="group" aria-label="Verification code">
       {digits.map((digit, index) => (
         <input
           key={index}
@@ -205,7 +205,7 @@ export function AuthOtpInputs({
           onKeyDown={(e) => handleKeyDown(index, e)}
           onPaste={handlePaste}
           onFocus={(e) => e.target.select()}
-          className="h-12 w-10 rounded-xl border border-border bg-white text-center text-lg font-semibold text-ink shadow-soft outline-none transition-all focus:border-ink focus:ring-2 focus:ring-ink/10 disabled:opacity-50 sm:h-14 sm:w-12 sm:text-xl"
+          className="h-11 w-9 rounded-xl border border-border bg-white text-center text-base font-semibold text-ink shadow-soft outline-none transition-all focus:border-ink focus:ring-2 focus:ring-ink/10 disabled:opacity-50 sm:h-12 sm:w-10 sm:text-lg"
         />
       ))}
     </div>
