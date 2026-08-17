@@ -1,12 +1,12 @@
 import { SubscriptionRequired } from '@/shared/ui/gates/SubscriptionRequired'
 import { Alert } from '@/shared/ui/primitives/Alert'
 import { SpinnerSection } from '@/shared/ui/primitives/Spinner'
-import { ComingSoonIntegrationRow } from '@/features/integrations/components/ComingSoonIntegrationRow'
-import { IntegrationRow } from '@/features/integrations/components/IntegrationRow'
+import { ComingSoonIntegrationCard } from '@/features/integrations/components/ComingSoonIntegrationCard'
+import { IntegrationCard } from '@/features/integrations/components/IntegrationCard'
 import { COMING_SOON_INTEGRATIONS } from '@/features/integrations/constants'
 import { useIntegrations } from '@/features/integrations/hooks/useIntegrations'
 import { isGmailFeatureEnabled } from '@/shared/config/features'
-import { AppCard, AppPage, AppPageHeader } from '@/shared/ui/app-ui'
+import { AppPage, AppPageHeader } from '@/shared/ui/app-ui'
 
 export function IntegrationsPage() {
   const {
@@ -30,8 +30,12 @@ export function IntegrationsPage() {
     return <SubscriptionRequired />
   }
 
+  const activeIntegrations = integrations.filter(
+    (integration) => integration.platform !== 'gmail' || isGmailFeatureEnabled(),
+  )
+
   return (
-    <AppPage className="max-w-4xl">
+    <AppPage className="max-w-5xl">
       <AppPageHeader
         title="Integrations"
         description="Connect messaging platforms to receive and reply to conversations in your inbox."
@@ -60,25 +64,19 @@ export function IntegrationsPage() {
 
       {loading && <SpinnerSection minHeightClassName="min-h-[40vh]" />}
 
-      {!loading && success !== null && (
-        <Alert variant="success" className="mb-4">
-          {success}
-        </Alert>
-      )}
-
-      {!loading && error !== null && (
-        <Alert variant="error" className="mb-4">
-          {error}
-        </Alert>
-      )}
-
       {!loading && (
-        <AppCard padding="none" className="overflow-hidden">
-          <div className="divide-y divide-border">
-            {integrations
-              .filter((integration) => integration.platform !== 'gmail' || isGmailFeatureEnabled())
-              .map((integration) => (
-              <IntegrationRow
+        <div className="animate-step-in space-y-4">
+          {success !== null && (
+            <Alert variant="success">{success}</Alert>
+          )}
+
+          {error !== null && (
+            <Alert variant="error">{error}</Alert>
+          )}
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            {activeIntegrations.map((integration, index) => (
+              <IntegrationCard
                 key={integration.platform}
                 platform={integration.platform}
                 status={integration.status}
@@ -88,13 +86,18 @@ export function IntegrationsPage() {
                 gmailDetails={integration.platform === 'gmail' ? gmailDetails : null}
                 onConnect={handleConnect}
                 onDisconnect={handleDisconnect}
+                animationDelayMs={index * 60}
               />
             ))}
-            {COMING_SOON_INTEGRATIONS.map((integration) => (
-              <ComingSoonIntegrationRow key={integration.platform} {...integration} />
+            {COMING_SOON_INTEGRATIONS.map((integration, index) => (
+              <ComingSoonIntegrationCard
+                key={integration.platform}
+                {...integration}
+                animationDelayMs={(activeIntegrations.length + index) * 60}
+              />
             ))}
           </div>
-        </AppCard>
+        </div>
       )}
     </AppPage>
   )
