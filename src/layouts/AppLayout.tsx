@@ -6,6 +6,7 @@ import { PageSuspense, SpinnerOverlay } from '@/shared/ui/primitives/Spinner'
 import { BusinessService } from '@/features/business/api/business.service'
 import { AppSidebar } from '@/layouts/AppSidebar'
 import { AppTopbar } from '@/layouts/AppTopbar'
+import { APP_MAIN_OFFSET_CLASS, APP_SHELL_PADDING_CLASS } from '@/layouts/app-layout.constants'
 import { SIDEBAR_COLLAPSED_STORAGE_KEY } from '@/layouts/sidebar.config'
 import { useSession } from '@/shared/hooks/useSession'
 import { SessionStorage } from '@/shared/session/storage'
@@ -98,15 +99,16 @@ export function AppLayout() {
         onToggleCollapse={toggleSidebarCollapsed}
         onNavigate={() => setSidebarOpen(false)}
       />
-      <AppTopbar collapsed={sidebarCollapsed} onMenuClick={() => setSidebarOpen(true)} />
+      <AppTopbar onMenuClick={() => setSidebarOpen(true)} />
 
       <main
         className={[
-          'min-h-screen w-full pt-16 transition-[padding] duration-300 ease-in-out',
+          'min-h-screen w-full transition-[padding] duration-300 ease-in-out',
+          APP_MAIN_OFFSET_CLASS,
           sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-72',
         ].join(' ')}
       >
-        <div className="p-4 sm:p-6">
+        <div className={APP_SHELL_PADDING_CLASS}>
           {showSubscriptionGate ? (
             <SubscriptionRequired />
           ) : (

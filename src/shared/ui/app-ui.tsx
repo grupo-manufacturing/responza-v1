@@ -109,7 +109,7 @@ export function AppPageHeader({
   readonly action?: ReactNode
 }) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+    <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-ink">{title}</h1>
         {description !== undefined && (

@@ -1,16 +1,13 @@
 interface AppTopbarProps {
   onMenuClick?: () => void
-  collapsed?: boolean
 }
 
-export function AppTopbar({ onMenuClick, collapsed = false }: AppTopbarProps) {
+export function AppTopbar({ onMenuClick }: AppTopbarProps) {
   return (
     <header
       className={[
-        'glass-light fixed top-0 right-0 left-0 z-40 flex h-16 w-full items-center',
+        'glass-light fixed top-0 right-0 left-0 z-40 flex h-16 w-full items-center lg:hidden',
         'border-b border-border px-4 sm:px-6',
-        'transition-[left,width] duration-300 ease-in-out',
-        collapsed ? 'lg:left-20 lg:w-[calc(100%-5rem)]' : 'lg:left-72 lg:w-[calc(100%-18rem)]',
       ].join(' ')}
     >
       <button

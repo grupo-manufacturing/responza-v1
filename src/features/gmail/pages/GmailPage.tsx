@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 
+import { APP_PANEL_WITH_HEADER_HEIGHT_CLASS } from '@/layouts/app-layout.constants'
 import { GmailComposeModal } from '@/features/gmail/components/GmailComposeModal'
 import { GmailMessageList } from '@/features/gmail/components/GmailMessageList'
 import { GmailMessageView } from '@/features/gmail/components/GmailMessageView'
@@ -160,7 +161,7 @@ export function GmailPage() {
   if (!connected || gmailRevoked) {
     return (
       <div className="mx-auto w-full max-w-4xl">
-        <header className="mb-6">
+        <header className="mb-4">
           <h1 className="text-2xl font-semibold tracking-tight text-ink">Gmail</h1>
           <p className="mt-1 text-sm text-ink-muted">Read and send Gmail from Responza.</p>
         </header>
@@ -180,7 +181,7 @@ export function GmailPage() {
       : null
 
   return (
-    <div className="flex h-[calc(100dvh-7.5rem)] min-h-[32rem] flex-col">
+    <div className={`flex min-h-[32rem] flex-col ${APP_PANEL_WITH_HEADER_HEIGHT_CLASS}`}>
       <header className="mb-4 flex shrink-0 flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-ink">Gmail</h1>

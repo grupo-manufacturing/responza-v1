@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
+import { APP_PANEL_HEIGHT_CLASS } from '@/layouts/app-layout.constants'
+
 import { IntegrationsRequired } from '@/shared/ui/gates/IntegrationsRequired'
 import { SubscriptionRequired } from '@/shared/ui/gates/SubscriptionRequired'
 import { Alert } from '@/shared/ui/primitives/Alert'
@@ -367,7 +369,7 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
   }
 
   return (
-    <div className="flex h-[calc(100vh-7rem)] flex-col">
+    <div className={`flex flex-col ${APP_PANEL_HEIGHT_CLASS}`}>
       {conversationLimitReached && (
         <Alert variant="warning" className="mb-3 shrink-0">
           Conversation limit reached for this billing period. Upgrade your plan to start new
