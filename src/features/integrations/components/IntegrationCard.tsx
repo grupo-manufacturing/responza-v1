@@ -1,7 +1,6 @@
 import { AppButton } from '@/shared/ui/app-ui'
 import { ConnectedAccountProfile } from '@/features/integrations/components/ConnectedAccountProfile'
 import {
-  INTEGRATION_PLATFORM_DESCRIPTIONS,
   INTEGRATION_PLATFORM_LOGOS,
   integrationPlatformLabel,
   integrationPlatformLogoClass,
@@ -26,7 +25,7 @@ type IntegrationCardProps = {
   animationDelayMs?: number
 }
 
-function StatusIndicator({ connected }: { connected: boolean }) {
+function StatusLabel({ connected }: { connected: boolean }) {
   return (
     <span className="inline-flex items-center gap-1.5 text-xs font-medium text-ink-muted">
       <span
@@ -63,67 +62,65 @@ export function IntegrationCard({
               ? 'Reconnect'
               : 'Connect'
 
+  const connectedProfile =
+    platform === 'whatsapp' && isConnected && whatsappDetails !== null ? (
+      <ConnectedAccountProfile
+        displayName={whatsappDetails.display_name}
+        profilePictureUrl={whatsappDetails.profile_picture_url}
+        fallbackInitial={whatsappDetails.display_name ?? 'W'}
+      />
+    ) : platform === 'instagram' && isConnected && instagramDetails !== null ? (
+      <ConnectedAccountProfile
+        displayName={instagramDetails.username !== null ? `@${instagramDetails.username}` : null}
+        profilePictureUrl={instagramDetails.profile_picture_url}
+        fallbackInitial={instagramDetails.username ?? 'I'}
+      />
+    ) : platform === 'gmail' && isConnected && gmailDetails !== null ? (
+      <ConnectedAccountProfile
+        displayName={gmailDetails.display_name ?? gmailDetails.email}
+        profilePictureUrl={gmailDetails.profile_picture_url}
+        fallbackInitial={gmailDetails.email}
+      />
+    ) : null
+
   return (
     <article
-      className="animate-step-in flex h-full flex-col rounded-[var(--radius-card)] border border-border bg-white p-5 shadow-soft"
+      className="animate-step-in rounded-[var(--radius-card)] border border-border bg-white px-4 py-3.5 shadow-soft"
       style={{ animationDelay: `${animationDelayMs}ms` }}
     >
-      <div className="flex items-start gap-3">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-surface-muted/80 p-2">
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-surface-muted/80 p-1.5">
           <img
             src={INTEGRATION_PLATFORM_LOGOS[platform]}
             alt=""
             className={integrationPlatformLogoClass(platform)}
           />
         </div>
-        <div className="min-w-0 flex-1">
-          <h2 className="text-base font-semibold text-ink">{integrationPlatformLabel(platform)}</h2>
-          <div className="mt-1">
-            <StatusIndicator connected={isConnected} />
-          </div>
+        <h2 className="min-w-0 flex-1 truncate text-base font-semibold text-ink">
+          {integrationPlatformLabel(platform)}
+        </h2>
+        <div className="flex shrink-0 flex-wrap justify-end gap-2">
+          <AppButton disabled={busy} onClick={() => onConnect(platform)} className="!px-3.5 !py-1.5">
+            {connectLabel}
+          </AppButton>
+          <AppButton
+            variant="secondary"
+            disabled={busy || !isConnected}
+            onClick={() => onDisconnect(platform)}
+            className="!px-3.5 !py-1.5"
+          >
+            {busy && isConnected ? 'Disconnecting…' : 'Disconnect'}
+          </AppButton>
         </div>
       </div>
 
-      <div className="mt-4 min-h-[3.25rem] flex-1">
-        {platform === 'whatsapp' && isConnected && whatsappDetails !== null ? (
-          <ConnectedAccountProfile
-            displayName={whatsappDetails.display_name}
-            profilePictureUrl={whatsappDetails.profile_picture_url}
-            fallbackInitial={whatsappDetails.display_name ?? 'W'}
-          />
-        ) : platform === 'instagram' && isConnected && instagramDetails !== null ? (
-          <ConnectedAccountProfile
-            displayName={
-              instagramDetails.username !== null ? `@${instagramDetails.username}` : null
-            }
-            profilePictureUrl={instagramDetails.profile_picture_url}
-            fallbackInitial={instagramDetails.username ?? 'I'}
-          />
-        ) : platform === 'gmail' && isConnected && gmailDetails !== null ? (
-          <ConnectedAccountProfile
-            displayName={gmailDetails.display_name ?? gmailDetails.email}
-            profilePictureUrl={gmailDetails.profile_picture_url}
-            fallbackInitial={gmailDetails.email}
-          />
-        ) : (
-          <p className="text-sm leading-relaxed text-ink-muted">
-            {INTEGRATION_PLATFORM_DESCRIPTIONS[platform]}
-          </p>
-        )}
-      </div>
-
-      <div className="mt-5 flex flex-wrap gap-2 border-t border-border pt-4">
-        <AppButton disabled={busy} onClick={() => onConnect(platform)} className="!px-4 !py-2">
-          {connectLabel}
-        </AppButton>
-        <AppButton
-          variant="secondary"
-          disabled={busy || !isConnected}
-          onClick={() => onDisconnect(platform)}
-          className="!px-4 !py-2"
-        >
-          {busy && isConnected ? 'Disconnecting…' : 'Disconnect'}
-        </AppButton>
+      <div className="mt-3 flex items-center gap-3 pl-[3.25rem]">
+        <div className="min-w-0 flex-1">
+          {connectedProfile}
+        </div>
+        <div className="shrink-0">
+          <StatusLabel connected={isConnected} />
+        </div>
       </div>
     </article>
   )
