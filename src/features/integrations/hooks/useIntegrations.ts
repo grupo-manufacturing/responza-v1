@@ -185,9 +185,6 @@ export function useIntegrations() {
     loading,
     busyPlatform,
     subscriptionRequired,
-    whatsappConfigured: isWhatsAppEmbeddedSignupConfigured(),
-    instagramConfigured: isInstagramOAuthConfigured(),
-    gmailConfigured: isGmailOAuthConfigured(),
     handleConnect,
     handleDisconnect,
   }

@@ -1,5 +1,4 @@
 import { SubscriptionRequired } from '@/shared/ui/gates/SubscriptionRequired'
-import { Alert } from '@/shared/ui/primitives/Alert'
 import { SpinnerSection } from '@/shared/ui/primitives/Spinner'
 import { ComingSoonIntegrationRow } from '@/features/integrations/components/ComingSoonIntegrationRow'
 import { IntegrationRow } from '@/features/integrations/components/IntegrationRow'
@@ -17,9 +16,6 @@ export function IntegrationsPage() {
     loading,
     busyPlatform,
     subscriptionRequired,
-    whatsappConfigured,
-    instagramConfigured,
-    gmailConfigured,
     handleConnect,
     handleDisconnect,
   } = useIntegrations()
@@ -34,27 +30,6 @@ export function IntegrationsPage() {
         title="Integrations"
         description="Connect messaging platforms to receive and reply to conversations in your inbox."
       />
-
-      {!whatsappConfigured && (
-        <Alert variant="warning" className="mb-4">
-          WhatsApp Embedded Signup env vars are missing. Add `VITE_META_APP_ID` and
-          `VITE_WHATSAPP_EMBEDDED_CONFIG_ID` to enable WhatsApp connect.
-        </Alert>
-      )}
-
-      {!instagramConfigured && (
-        <Alert variant="warning" className="mb-4">
-          Instagram OAuth env vars are missing. Add `VITE_INSTAGRAM_APP_ID` and
-          `VITE_INSTAGRAM_REDIRECT_URI` to enable Instagram connect.
-        </Alert>
-      )}
-
-      {!gmailConfigured && isGmailFeatureEnabled() && (
-        <Alert variant="warning" className="mb-4">
-          Gmail OAuth env vars are missing. Add `VITE_GOOGLE_CLIENT_ID` and
-          `VITE_GMAIL_REDIRECT_URI` to enable Gmail connect.
-        </Alert>
-      )}
 
       {loading && <SpinnerSection minHeightClassName="min-h-[40vh]" />}
 

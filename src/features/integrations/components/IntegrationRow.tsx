@@ -41,9 +41,7 @@ export function IntegrationRow({
       ? platform === 'whatsapp'
         ? 'Opening signup…'
         : 'Opening OAuth…'
-      : isConnected
-        ? 'Reconnect'
-        : 'Connect'
+      : 'Connect'
 
   const profile =
     platform === 'whatsapp' && isConnected && whatsappDetails !== null ? (
@@ -77,9 +75,11 @@ export function IntegrationRow({
       meta={profile}
       actions={
         <>
-          <AppButton disabled={busy} onClick={() => onConnect(platform)} className="!px-4 !py-2">
-            {connectLabel}
-          </AppButton>
+          {!isConnected && (
+            <AppButton disabled={busy} onClick={() => onConnect(platform)} className="!px-4 !py-2">
+              {connectLabel}
+            </AppButton>
+          )}
           <AppButton
             variant="secondary"
             disabled={busy || !isConnected}
