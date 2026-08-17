@@ -4,7 +4,10 @@ import { useQueryClient } from '@tanstack/react-query'
 import { startGmailOAuth } from '@/features/integrations/lib/gmailOAuth'
 import { startInstagramOAuth } from '@/features/integrations/lib/instagramOAuth'
 import { startWhatsAppEmbeddedSignup } from '@/features/integrations/lib/whatsappEmbeddedSignup'
-import type { IntegrationPlatform } from '@/features/integrations/constants'
+import {
+  integrationPlatformLabel,
+  type IntegrationPlatform,
+} from '@/features/integrations/constants'
 import {
   IntegrationsService,
   type InstagramConnectSummary,
@@ -24,7 +27,6 @@ import { integrationsGateKeys } from '@/shared/hooks/useIntegrationsGate'
 import { isGmailFeatureEnabled } from '@/shared/config/features'
 import { mergeByKey } from '@/shared/utils/upsert'
 import { getApiErrorCode, getApiErrorMessage } from '@/shared/utils/api-error'
-import { integrationPlatformLabel } from '@/features/integrations/constants'
 import { useToast } from '@/shared/ui/toast'
 
 export function useIntegrations() {
@@ -38,38 +40,6 @@ export function useIntegrations() {
   const [busyPlatform, setBusyPlatform] = useState<IntegrationPlatform | null>(null)
   const { subscriptionRequired, handleError, reset } = useSubscriptionGate()
 
-  const loadWhatsAppStatus = useCallback(async () => {
-    try {
-      const status = await IntegrationsService.getWhatsAppStatus()
-      setWhatsappDetails(status.connected ? status.whatsapp : null)
-    } catch {
-      setWhatsappDetails(null)
-    }
-  }, [])
-
-  const loadInstagramStatus = useCallback(async () => {
-    try {
-      const status = await IntegrationsService.getInstagramStatus()
-      setInstagramDetails(status.connected ? status.instagram : null)
-    } catch {
-      setInstagramDetails(null)
-    }
-  }, [])
-
-  const loadGmailStatus = useCallback(async () => {
-    if (!isGmailFeatureEnabled()) {
-      setGmailDetails(null)
-      return
-    }
-
-    try {
-      const status = await IntegrationsService.getGmailStatus()
-      setGmailDetails(status.connected ? status.gmail : null)
-    } catch {
-      setGmailDetails(null)
-    }
-  }, [])
-
   const refreshIntegrationsGate = useCallback(() => {
     void queryClient.invalidateQueries({ queryKey: integrationsGateKeys.all })
   }, [queryClient])
@@ -81,9 +51,9 @@ export function useIntegrations() {
     try {
       const result = await IntegrationsService.listIntegrations()
       setIntegrations(result.integrations)
-      await loadWhatsAppStatus()
-      await loadInstagramStatus()
-      await loadGmailStatus()
+      setWhatsappDetails(result.whatsapp)
+      setInstagramDetails(result.instagram)
+      setGmailDetails(isGmailFeatureEnabled() ? result.gmail : null)
       refreshIntegrationsGate()
     } catch (err) {
       if (handleError(err)) {
@@ -102,15 +72,7 @@ export function useIntegrations() {
     } finally {
       setLoading(false)
     }
-  }, [
-    handleError,
-    loadGmailStatus,
-    loadInstagramStatus,
-    loadWhatsAppStatus,
-    refreshIntegrationsGate,
-    reset,
-    toast,
-  ])
+  }, [handleError, refreshIntegrationsGate, reset, toast])
 
   useEffect(() => {
     void loadIntegrations()

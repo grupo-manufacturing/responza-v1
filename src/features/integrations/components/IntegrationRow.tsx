@@ -37,17 +37,13 @@ export function IntegrationRow({
 }: IntegrationRowProps) {
   const isConnected = status === 'connected'
   const connectLabel =
-    platform === 'whatsapp' && busy && !isConnected
-      ? 'Opening signup…'
-      : platform === 'instagram' && busy && !isConnected
-        ? 'Opening OAuth…'
-        : platform === 'gmail' && busy && !isConnected
-          ? 'Opening OAuth…'
-          : busy && !isConnected
-            ? 'Connecting…'
-            : isConnected
-              ? 'Reconnect'
-              : 'Connect'
+    busy && !isConnected
+      ? platform === 'whatsapp'
+        ? 'Opening signup…'
+        : 'Opening OAuth…'
+      : isConnected
+        ? 'Reconnect'
+        : 'Connect'
 
   const profile =
     platform === 'whatsapp' && isConnected && whatsappDetails !== null ? (

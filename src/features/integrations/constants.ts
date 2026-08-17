@@ -23,10 +23,6 @@ export function integrationPlatformLabel(platform: IntegrationPlatform): string 
   return INTEGRATION_PLATFORM_LABELS[platform]
 }
 
-export function integrationStatusLabel(status: IntegrationStatus): string {
-  return status === 'connected' ? 'Connected' : 'Disconnected'
-}
-
 const COMING_SOON_INTEGRATION_PLATFORMS = [
   'indiamart',
   'tally',
