@@ -25,17 +25,17 @@ import { isGmailFeatureEnabled } from '@/shared/config/features'
 import { mergeByKey } from '@/shared/utils/upsert'
 import { getApiErrorCode, getApiErrorMessage } from '@/shared/utils/api-error'
 import { integrationPlatformLabel } from '@/features/integrations/constants'
+import { useToast } from '@/shared/ui/toast'
 
 export function useIntegrations() {
   const queryClient = useQueryClient()
+  const toast = useToast()
   const [integrations, setIntegrations] = useState<Integration[]>([])
   const [whatsappDetails, setWhatsappDetails] = useState<WhatsAppConnectSummary | null>(null)
   const [instagramDetails, setInstagramDetails] = useState<InstagramConnectSummary | null>(null)
   const [gmailDetails, setGmailDetails] = useState<GmailConnectSummary | null>(null)
   const [loading, setLoading] = useState(true)
   const [busyPlatform, setBusyPlatform] = useState<IntegrationPlatform | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
   const { subscriptionRequired, handleError, reset } = useSubscriptionGate()
 
   const loadWhatsAppStatus = useCallback(async () => {
@@ -76,7 +76,6 @@ export function useIntegrations() {
 
   const loadIntegrations = useCallback(async () => {
     setLoading(true)
-    setError(null)
     reset()
 
     try {
@@ -95,7 +94,7 @@ export function useIntegrations() {
         return
       }
 
-      setError(getApiErrorMessage(err, 'Could not load integrations. Please try again.'))
+      toast.error(getApiErrorMessage(err, 'Could not load integrations. Please try again.'))
       setIntegrations([])
       setWhatsappDetails(null)
       setInstagramDetails(null)
@@ -103,7 +102,15 @@ export function useIntegrations() {
     } finally {
       setLoading(false)
     }
-  }, [handleError, loadGmailStatus, loadInstagramStatus, loadWhatsAppStatus, refreshIntegrationsGate, reset])
+  }, [
+    handleError,
+    loadGmailStatus,
+    loadInstagramStatus,
+    loadWhatsAppStatus,
+    refreshIntegrationsGate,
+    reset,
+    toast,
+  ])
 
   useEffect(() => {
     void loadIntegrations()
@@ -111,8 +118,6 @@ export function useIntegrations() {
 
   const handleConnect = async (platform: IntegrationPlatform) => {
     setBusyPlatform(platform)
-    setError(null)
-    setSuccess(null)
 
     try {
       if (platform === 'whatsapp') {
@@ -129,7 +134,7 @@ export function useIntegrations() {
         })
         setIntegrations((current) => mergeByKey(current, result.integration, 'platform'))
         setWhatsappDetails(result.whatsapp ?? null)
-        setSuccess('WhatsApp connected successfully. Open WhatsApp to view conversations.')
+        toast.success('WhatsApp connected successfully. Open WhatsApp to view conversations.')
         refreshIntegrationsGate()
         return
       }
@@ -149,7 +154,7 @@ export function useIntegrations() {
         })
         setIntegrations((current) => mergeByKey(current, result.integration, 'platform'))
         setInstagramDetails(result.instagram ?? null)
-        setSuccess('Instagram connected successfully. Open Instagram to view conversations.')
+        toast.success('Instagram connected successfully. Open Instagram to view conversations.')
         refreshIntegrationsGate()
         return
       }
@@ -169,7 +174,7 @@ export function useIntegrations() {
         })
         setIntegrations((current) => mergeByKey(current, result.integration, 'platform'))
         setGmailDetails(result.gmail ?? null)
-        setSuccess('Gmail connected successfully. Open Gmail to manage your email.')
+        toast.success('Gmail connected successfully. Open Gmail to manage your email.')
         refreshIntegrationsGate()
         return
       }
@@ -177,9 +182,9 @@ export function useIntegrations() {
       return
     } catch (err) {
       if (getApiErrorCode(err) === 'NOT_IMPLEMENTED') {
-        setError(getApiErrorMessage(err, `${integrationPlatformLabel(platform)} connect is coming soon.`))
+        toast.info(getApiErrorMessage(err, `${integrationPlatformLabel(platform)} connect is coming soon.`))
       } else {
-        setError(getApiErrorMessage(err, 'Could not connect integration. Please try again.'))
+        toast.error(getApiErrorMessage(err, 'Could not connect integration. Please try again.'))
       }
     } finally {
       setBusyPlatform(null)
@@ -188,8 +193,6 @@ export function useIntegrations() {
 
   const handleDisconnect = async (platform: IntegrationPlatform) => {
     setBusyPlatform(platform)
-    setError(null)
-    setSuccess(null)
 
     try {
       const result = await IntegrationsService.disconnectIntegration(platform)
@@ -203,10 +206,10 @@ export function useIntegrations() {
       if (platform === 'gmail') {
         setGmailDetails(null)
       }
-      setSuccess(`${integrationPlatformLabel(platform)} disconnected.`)
+      toast.success(`${integrationPlatformLabel(platform)} disconnected.`)
       refreshIntegrationsGate()
     } catch (err) {
-      setError(getApiErrorMessage(err, 'Could not disconnect integration. Please try again.'))
+      toast.error(getApiErrorMessage(err, 'Could not disconnect integration. Please try again.'))
     } finally {
       setBusyPlatform(null)
     }
@@ -219,8 +222,6 @@ export function useIntegrations() {
     gmailDetails,
     loading,
     busyPlatform,
-    error,
-    success,
     subscriptionRequired,
     whatsappConfigured: isWhatsAppEmbeddedSignupConfigured(),
     instagramConfigured: isInstagramOAuthConfigured(),

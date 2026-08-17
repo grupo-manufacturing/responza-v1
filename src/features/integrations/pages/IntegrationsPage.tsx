@@ -16,8 +16,6 @@ export function IntegrationsPage() {
     gmailDetails,
     loading,
     busyPlatform,
-    error,
-    success,
     subscriptionRequired,
     whatsappConfigured,
     instagramConfigured,
@@ -61,10 +59,7 @@ export function IntegrationsPage() {
       {loading && <SpinnerSection minHeightClassName="min-h-[40vh]" />}
 
       {!loading && (
-        <div className="animate-step-in space-y-4">
-          {success !== null && <Alert variant="success">{success}</Alert>}
-          {error !== null && <Alert variant="error">{error}</Alert>}
-
+        <div className="animate-step-in">
           <AppCard padding="none" className="overflow-hidden">
             <div className="divide-y divide-border">
               {integrations

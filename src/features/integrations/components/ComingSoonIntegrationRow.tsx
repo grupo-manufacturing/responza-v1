@@ -2,6 +2,7 @@ import {
   comingSoonIntegrationLogoClass,
   type ComingSoonIntegration,
 } from '@/features/integrations/constants'
+import { IntegrationRowLayout } from '@/features/integrations/components/IntegrationRowLayout'
 
 type ComingSoonIntegrationRowProps = ComingSoonIntegration
 
@@ -11,23 +12,22 @@ export function ComingSoonIntegrationRow({
   logo,
 }: ComingSoonIntegrationRowProps) {
   return (
-    <article className="px-5 py-4 sm:px-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 flex-1 gap-4">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-surface-muted/80 p-2">
-            <img src={logo} alt="" className={comingSoonIntegrationLogoClass(platform)} />
-          </div>
-          <div className="min-w-0 flex-1">
-            <h2 className="text-base font-semibold text-ink">{label}</h2>
-          </div>
-        </div>
-
-        <div className="flex shrink-0 sm:pl-4">
-          <span className="inline-flex items-center rounded-[var(--radius-pill)] border border-border bg-surface-muted/80 px-3 py-1.5 text-xs font-medium text-ink-muted">
-            Coming soon
-          </span>
-        </div>
-      </div>
-    </article>
+    <IntegrationRowLayout
+      logo={logo}
+      logoClassName={comingSoonIntegrationLogoClass(platform)}
+      title={label}
+      status={
+        <span className="inline-flex shrink-0 items-center gap-1.5 text-xs font-medium text-ink-muted">
+          <span className="h-1.5 w-1.5 rounded-full bg-border" aria-hidden />
+          Coming soon
+        </span>
+      }
+      meta={<p className="truncate text-sm text-ink-faint">Available soon</p>}
+      actions={
+        <span className="inline-flex h-9 items-center rounded-[var(--radius-pill)] border border-border bg-surface-muted/80 px-4 text-sm font-medium text-ink-muted">
+          Coming soon
+        </span>
+      }
+    />
   )
 }

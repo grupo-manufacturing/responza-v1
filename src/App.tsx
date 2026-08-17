@@ -4,6 +4,7 @@ import { SpeedInsights } from '@vercel/speed-insights/react'
 import { RouterProvider } from 'react-router-dom'
 
 import { router } from '@/app/router'
+import { ToastProvider } from '@/shared/ui/toast'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -16,7 +17,9 @@ const queryClient = new QueryClient({
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+      <ToastProvider>
+        <RouterProvider router={router} />
+      </ToastProvider>
       <Analytics />
       <SpeedInsights />
     </QueryClientProvider>
