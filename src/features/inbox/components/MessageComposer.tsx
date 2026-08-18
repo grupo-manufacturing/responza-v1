@@ -108,14 +108,6 @@ function composerActionIconClass(enabled: boolean, enabledClassName: string): st
     enabled ? enabledClassName : 'cursor-not-allowed opacity-40',
   ].join(' ')
 }
-}
-
-function composerActionIconClass(enabled: boolean, enabledClassName: string): string {
-  return [
-    composerActionButtonClass,
-    enabled ? enabledClassName : 'cursor-not-allowed opacity-40',
-  ].join(' ')
-}
 
 function AttachmentPreview({
   attachment,
