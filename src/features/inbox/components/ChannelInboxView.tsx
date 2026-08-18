@@ -96,30 +96,31 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
     setMobileShowThread(initialConversationId !== null)
   }, [initialConversationId, platform])
 
+  const showInboxQueryErrorToast = useCallback(
+    (error: unknown, fallbackMessage: string) => {
+      handleError(error)
+
+      if (!subscriptionRequired && !isIntegrationsRequiredError(error)) {
+        toast.error(getApiErrorMessage(error, fallbackMessage))
+      }
+    },
+    [handleError, subscriptionRequired, toast],
+  )
+
   useEffect(() => {
     if (conversationsQuery.error) {
-      handleError(conversationsQuery.error)
-      if (
-        !subscriptionRequired &&
-        !isIntegrationsRequiredError(conversationsQuery.error)
-      ) {
-        toast.error(
-          getApiErrorMessage(conversationsQuery.error, 'Could not load conversations. Please try again.'),
-        )
-      }
+      showInboxQueryErrorToast(
+        conversationsQuery.error,
+        'Could not load conversations. Please try again.',
+      )
     }
-  }, [conversationsQuery.error, handleError, subscriptionRequired, toast])
+  }, [conversationsQuery.error, showInboxQueryErrorToast])
 
   useEffect(() => {
     if (threadQuery.error) {
-      handleError(threadQuery.error)
-      if (!subscriptionRequired && !isIntegrationsRequiredError(threadQuery.error)) {
-        toast.error(
-          getApiErrorMessage(threadQuery.error, 'Could not load conversation. Please try again.'),
-        )
-      }
+      showInboxQueryErrorToast(threadQuery.error, 'Could not load conversation. Please try again.')
     }
-  }, [handleError, subscriptionRequired, threadQuery.error, toast])
+  }, [showInboxQueryErrorToast, threadQuery.error])
 
   useEffect(() => {
     if (!conversationLimitReached || limitToastShownRef.current) {
@@ -253,6 +254,26 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
     const optimisticPreviewUrl = input.attachment?.previewUrl ?? null
     const contentType = input.attachment?.contentType ?? 'text'
 
+    const bumpConversationLastMessage = (
+      content: string,
+      messageContentType: typeof contentType,
+      lastMessageAt: string,
+    ) => {
+      queryClient.setQueryData(
+        inboxKeys.conversations(platform),
+        (current: ConversationsInfiniteData | undefined) => {
+          if (current === undefined) {
+            return current
+          }
+
+          return bumpConversationInList(current, selectedConversationId, {
+            lastMessage: formatMessageListPreview(content, messageContentType),
+            lastMessageAt,
+          })
+        },
+      )
+    }
+
     const optimisticMessage: Message = {
       id: optimisticId,
       organizationId,
@@ -283,19 +304,7 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
       },
     )
 
-    queryClient.setQueryData(
-      inboxKeys.conversations(platform),
-      (current: ConversationsInfiniteData | undefined) => {
-        if (current === undefined) {
-          return current
-        }
-
-        return bumpConversationInList(current, selectedConversationId, {
-          lastMessage: formatMessageListPreview(input.content, contentType),
-          lastMessageAt: optimisticMessage.createdAt,
-        })
-      },
-    )
+    bumpConversationLastMessage(input.content, contentType, optimisticMessage.createdAt)
 
     void (async () => {
       try {
@@ -326,21 +335,10 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
           result.message,
         )
 
-        queryClient.setQueryData(
-          inboxKeys.conversations(platform),
-          (current: ConversationsInfiniteData | undefined) => {
-            if (current === undefined) {
-              return current
-            }
-
-            return bumpConversationInList(current, selectedConversationId, {
-              lastMessage: formatMessageListPreview(
-                result.message.content,
-                result.message.contentType,
-              ),
-              lastMessageAt: result.message.createdAt,
-            })
-          },
+        bumpConversationLastMessage(
+          result.message.content,
+          result.message.contentType,
+          result.message.createdAt,
         )
       } catch (err) {
         const details = getApiErrorDetails<SendMessageErrorDetails>(err)

@@ -6,6 +6,9 @@ import { PageSuspense } from '@/shared/ui/primitives/Spinner'
 import { AppLayout } from '@/layouts/AppLayout'
 import { isGmailFeatureEnabled } from '@/shared/config/features'
 import { lazyWithRetry } from '@/shared/utils/lazyWithRetry'
+import { ChannelInboxView } from '@/features/inbox/components/ChannelInboxView'
+import { WHATSAPP_PLATFORM } from '@/features/whatsapp/constants'
+import { INSTAGRAM_PLATFORM } from '@/features/instagram/constants'
 
 const LandingPage = lazyWithRetry(() =>
   import('@/features/landing/pages/LandingPage').then((m) => ({ default: m.LandingPage })),
@@ -32,12 +35,6 @@ const BusinessOnboardingPage = lazyWithRetry(() =>
 )
 const DashboardPage = lazyWithRetry(() =>
   import('@/features/dashboard/pages/DashboardPage').then((m) => ({ default: m.DashboardPage })),
-)
-const WhatsAppPage = lazyWithRetry(() =>
-  import('@/features/whatsapp/pages/WhatsAppPage').then((m) => ({ default: m.WhatsAppPage })),
-)
-const InstagramPage = lazyWithRetry(() =>
-  import('@/features/instagram/pages/InstagramPage').then((m) => ({ default: m.InstagramPage })),
 )
 const IntegrationsPage = lazyWithRetry(() =>
   import('@/features/integrations/pages/IntegrationsPage').then((m) => ({ default: m.IntegrationsPage })),
@@ -105,8 +102,8 @@ export const router = createBrowserRouter([
             element: <AppLayout />,
             children: [
               { path: '/dashboard', element: <DashboardPage /> },
-              { path: '/whatsapp', element: <WhatsAppPage /> },
-              { path: '/instagram', element: <InstagramPage /> },
+              { path: '/whatsapp', element: <ChannelInboxView platform={WHATSAPP_PLATFORM} /> },
+              { path: '/instagram', element: <ChannelInboxView platform={INSTAGRAM_PLATFORM} /> },
               { path: '/gmail', element: isGmailFeatureEnabled() ? <GmailPage /> : <Navigate to="/dashboard" replace /> },
               { path: '/leads', element: <Navigate to="/whatsapp" replace /> },
               { path: '/integrations', element: <IntegrationsPage /> },

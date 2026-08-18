@@ -14,6 +14,31 @@ export const INBOX_COMPOSER_ACTION_CLASS =
 export const INBOX_SCROLL_AREA_CLASS =
   'overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
 
+const OUTBOUND_BUBBLE_CLASS_BY_PLATFORM: Partial<Record<IntegrationPlatform, string>> = {
+  whatsapp: 'bg-[#DCF8C6] text-ink shadow-soft',
+  instagram: 'bg-gradient-to-br from-[#405DE6] to-brand-instagram text-white shadow-soft',
+}
+
+const OUTBOUND_META_CLASS_BY_PLATFORM: Partial<Record<IntegrationPlatform, string>> = {
+  whatsapp: 'text-ink-faint',
+  instagram: 'text-white/70',
+}
+
+const LIST_ITEM_SELECTED_CLASS_BY_PLATFORM: Partial<Record<IntegrationPlatform, string>> = {
+  whatsapp: 'bg-accent/8 border-l-2 border-brand-whatsapp',
+  instagram: 'bg-accent/8 border-l-2 border-brand-instagram',
+}
+
+const COMPOSER_SEND_BUTTON_CLASS_BY_PLATFORM: Partial<Record<IntegrationPlatform, string>> = {
+  whatsapp: 'bg-brand-whatsapp text-white hover:bg-brand-whatsapp/90',
+  instagram: 'bg-gradient-to-r from-[#405DE6] to-brand-instagram text-white hover:opacity-90',
+}
+
+const COMPOSER_FOCUS_RING_CLASS_BY_PLATFORM: Partial<Record<IntegrationPlatform, string>> = {
+  whatsapp: 'focus-within:border-brand-whatsapp focus-within:ring-2 focus-within:ring-brand-whatsapp/15',
+  instagram: 'focus-within:border-brand-instagram focus-within:ring-2 focus-within:ring-brand-instagram/15',
+}
+
 export function inboxThreadBackgroundClass(platform: IntegrationPlatform | null | undefined): string {
   if (platform === 'whatsapp') {
     return "bg-[url('/chat-bg.jpg')] bg-repeat bg-auto"
@@ -27,27 +52,19 @@ export function inboundBubbleClass(): string {
 }
 
 export function outboundBubbleClass(platform: IntegrationPlatform | null | undefined): string {
-  if (platform === 'whatsapp') {
-    return 'bg-[#DCF8C6] text-ink shadow-soft'
+  if (platform === null || platform === undefined) {
+    return 'bg-ink text-on-dark shadow-soft'
   }
 
-  if (platform === 'instagram') {
-    return 'bg-gradient-to-br from-[#405DE6] to-brand-instagram text-white shadow-soft'
-  }
-
-  return 'bg-ink text-on-dark shadow-soft'
+  return OUTBOUND_BUBBLE_CLASS_BY_PLATFORM[platform] ?? 'bg-ink text-on-dark shadow-soft'
 }
 
 export function outboundMetaClass(platform: IntegrationPlatform | null | undefined): string {
-  if (platform === 'whatsapp') {
-    return 'text-ink-faint'
+  if (platform === null || platform === undefined) {
+    return 'text-on-dark-muted'
   }
 
-  if (platform === 'instagram') {
-    return 'text-white/70'
-  }
-
-  return 'text-on-dark-muted'
+  return OUTBOUND_META_CLASS_BY_PLATFORM[platform] ?? 'text-on-dark-muted'
 }
 
 type PlatformTabFilter = IntegrationPlatform | 'all'
@@ -80,15 +97,7 @@ export function listItemSelectedClass(
     return 'hover:bg-surface-muted/70'
   }
 
-  if (platform === 'whatsapp') {
-    return 'bg-accent/8 border-l-2 border-brand-whatsapp'
-  }
-
-  if (platform === 'instagram') {
-    return 'bg-accent/8 border-l-2 border-brand-instagram'
-  }
-
-  return 'bg-accent/10 border-l-2 border-accent'
+  return LIST_ITEM_SELECTED_CLASS_BY_PLATFORM[platform] ?? 'bg-accent/10 border-l-2 border-accent'
 }
 
 export function composerSendButtonClass(
@@ -99,25 +108,20 @@ export function composerSendButtonClass(
     return 'bg-surface-muted text-ink-faint'
   }
 
-  if (platform === 'whatsapp') {
-    return 'bg-brand-whatsapp text-white hover:bg-brand-whatsapp/90'
+  if (platform === null || platform === undefined) {
+    return 'bg-ink text-on-dark hover:bg-ink/90'
   }
 
-  if (platform === 'instagram') {
-    return 'bg-gradient-to-r from-[#405DE6] to-brand-instagram text-white hover:opacity-90'
-  }
-
-  return 'bg-ink text-on-dark hover:bg-ink/90'
+  return COMPOSER_SEND_BUTTON_CLASS_BY_PLATFORM[platform] ?? 'bg-ink text-on-dark hover:bg-ink/90'
 }
 
 export function composerFocusRingClass(platform: IntegrationPlatform | null | undefined): string {
-  if (platform === 'whatsapp') {
-    return 'focus-within:border-brand-whatsapp focus-within:ring-2 focus-within:ring-brand-whatsapp/15'
+  if (platform === null || platform === undefined) {
+    return 'focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/15'
   }
 
-  if (platform === 'instagram') {
-    return 'focus-within:border-brand-instagram focus-within:ring-2 focus-within:ring-brand-instagram/15'
-  }
-
-  return 'focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/15'
+  return (
+    COMPOSER_FOCUS_RING_CLASS_BY_PLATFORM[platform] ??
+    'focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/15'
+  )
 }

@@ -1,12 +1,16 @@
-export const GMAIL_SHELL_CLASS =
-  'glass-light flex min-h-0 flex-1 overflow-hidden rounded-[var(--radius-card-lg)] border border-border shadow-card'
+import {
+  INBOX_PANEL_HEADER_CLASS,
+  INBOX_SHELL_CLASS,
+  INBOX_SCROLL_AREA_CLASS,
+} from '@/features/inbox/lib/inbox-ui'
 
-export const GMAIL_PANEL_HEADER_CLASS = 'shrink-0 border-b border-border px-3 py-2.5 sm:px-4'
+export const GMAIL_SHELL_CLASS = INBOX_SHELL_CLASS
+
+export const GMAIL_PANEL_HEADER_CLASS = INBOX_PANEL_HEADER_CLASS
 
 export const GMAIL_LIST_COLUMN_CLASS = 'w-full lg:w-[340px] lg:shrink-0'
 
-export const GMAIL_SCROLL_AREA_CLASS =
-  'overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
+export const GMAIL_SCROLL_AREA_CLASS = INBOX_SCROLL_AREA_CLASS
 
 export function gmailListItemSelectedClass(isSelected: boolean): string {
   if (!isSelected) {
