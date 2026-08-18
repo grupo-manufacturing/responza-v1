@@ -4,7 +4,7 @@ import { Spinner } from '@/shared/ui/primitives/Spinner'
 import { ContactAvatar } from '@/features/inbox/components/ContactAvatar'
 import { InboxEmptyState } from '@/features/inbox/components/InboxEmptyState'
 import { formatInboxTimestamp } from '@/features/inbox/constants'
-import { listItemSelectedClass } from '@/features/inbox/lib/inbox-ui'
+import { INBOX_SCROLL_AREA_CLASS, listItemSelectedClass } from '@/features/inbox/lib/inbox-ui'
 import type { ConversationListItem } from '@/features/inbox/api/inbox.service'
 
 type ConversationListProps = {
@@ -54,7 +54,7 @@ export function ConversationList({
   }
 
   return (
-    <ul className="min-h-0 flex-1 divide-y divide-border overflow-y-auto">
+    <ul className={`min-h-0 flex-1 divide-y divide-border ${INBOX_SCROLL_AREA_CLASS}`}>
       {conversations.map((conversation) => {
         const isSelected = conversation.id === selectedId
 

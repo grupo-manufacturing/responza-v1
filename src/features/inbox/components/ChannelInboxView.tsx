@@ -459,14 +459,16 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
               platform={activePlatform}
               actionsDisabled={threadLoading}
             />
-            <MessageComposer
-              conversationId={selectedConversationId}
-              disabled={selectedConversationId === null || threadLoading}
-              sending={sending}
-              platform={activePlatform}
-              agentDraft={agentDraft}
-              onSend={handleSendMessage}
-            />
+            {selectedConversationId !== null && (
+              <MessageComposer
+                conversationId={selectedConversationId}
+                disabled={threadLoading}
+                sending={sending}
+                platform={activePlatform}
+                agentDraft={agentDraft}
+                onSend={handleSendMessage}
+              />
+            )}
             <ConversationAnalyticsPanel
               open={analyticsOpen}
               loading={analyticsLoading}

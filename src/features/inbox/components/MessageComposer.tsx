@@ -27,7 +27,7 @@ export type SendComposerInput = {
 }
 
 type MessageComposerProps = {
-  readonly conversationId: string | null
+  readonly conversationId: string
   readonly disabled: boolean
   readonly sending: boolean
   readonly platform?: IntegrationPlatform | null
@@ -69,11 +69,7 @@ function AttachIcon() {
   )
 }
 
-function composerPlaceholder(disabled: boolean, hasAttachment: boolean): string {
-  if (disabled) {
-    return 'Select a conversation to reply'
-  }
-
+function composerPlaceholder(hasAttachment: boolean): string {
   if (hasAttachment) {
     return 'Add a caption (optional)…'
   }
@@ -81,7 +77,38 @@ function composerPlaceholder(disabled: boolean, hasAttachment: boolean): string 
   return 'Type a message…'
 }
 
+function AgentDraftChip({
+  reply,
+  disabled,
+  onUse,
+}: {
+  readonly reply: string
+  readonly disabled: boolean
+  readonly onUse: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onUse}
+      disabled={disabled}
+      className="mb-2 w-full rounded-2xl border border-accent/20 bg-accent/5 px-4 py-3 text-left transition-colors hover:border-accent/35 hover:bg-accent/10 disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      <p className="text-[11px] font-semibold tracking-wide text-accent uppercase">Agent draft</p>
+      <p className="mt-1 line-clamp-4 text-sm leading-relaxed text-ink">{reply}</p>
+      <p className="mt-2 text-xs text-ink-muted">Click to use in composer</p>
+    </button>
+  )
+}
+
 const composerActionButtonClass = INBOX_COMPOSER_ACTION_CLASS
+
+function composerActionIconClass(enabled: boolean, enabledClassName: string): string {
+  return [
+    composerActionButtonClass,
+    enabled ? enabledClassName : 'cursor-not-allowed opacity-40',
+  ].join(' ')
+}
+}
 
 function composerActionIconClass(enabled: boolean, enabledClassName: string): string {
   return [
@@ -160,27 +187,33 @@ export function MessageComposer({
   const [content, setContent] = useState('')
   const [attachment, setAttachment] = useState<SelectedAttachment | null>(null)
   const [attachmentError, setAttachmentError] = useState<string | null>(null)
+  const [dismissedDraftMessageId, setDismissedDraftMessageId] = useState<string | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const appliedAgentDraftMessageIdRef = useRef<string | null>(null)
-  const appliedAgentDraftReplyRef = useRef<string | null>(null)
-  const dismissedAgentDraftMessageIdsRef = useRef<Set<string>>(new Set())
   const attachmentsSupported = true
   const canSend =
     !disabled && !sending && (attachment !== null || content.trim().length > 0)
   const canAttach = !disabled && !sending && attachmentsSupported
+  const showAgentDraft =
+    agentDraft !== null &&
+    agentDraft.messageId !== dismissedDraftMessageId &&
+    content !== agentDraft.reply
 
-  const dismissAgentDraft = (messageId: string) => {
-    dismissedAgentDraftMessageIdsRef.current.add(messageId)
-    if (appliedAgentDraftMessageIdRef.current === messageId) {
-      appliedAgentDraftMessageIdRef.current = null
-      appliedAgentDraftReplyRef.current = null
+  const applyAgentDraft = () => {
+    if (agentDraft === null || disabled || sending) {
+      return
     }
+
+    setContent(agentDraft.reply)
+    requestAnimationFrame(() => {
+      textareaRef.current?.focus()
+    })
   }
 
   useEffect(() => {
     setContent('')
     setAttachmentError(null)
+    setDismissedDraftMessageId(null)
     setAttachment((current) => {
       if (current !== null) {
         URL.revokeObjectURL(current.previewUrl)
@@ -190,34 +223,7 @@ export function MessageComposer({
     if (fileInputRef.current !== null) {
       fileInputRef.current.value = ''
     }
-    appliedAgentDraftMessageIdRef.current = null
-    appliedAgentDraftReplyRef.current = null
   }, [conversationId])
-
-  useEffect(() => {
-    if (disabled || agentDraft === null) {
-      return
-    }
-
-    if (dismissedAgentDraftMessageIdsRef.current.has(agentDraft.messageId)) {
-      return
-    }
-
-    if (appliedAgentDraftMessageIdRef.current === agentDraft.messageId) {
-      return
-    }
-
-    if (content.trim().length > 0) {
-      return
-    }
-
-    setContent(agentDraft.reply)
-    appliedAgentDraftMessageIdRef.current = agentDraft.messageId
-    appliedAgentDraftReplyRef.current = agentDraft.reply
-    requestAnimationFrame(() => {
-      textareaRef.current?.focus()
-    })
-  }, [agentDraft, content, disabled])
 
   useEffect(() => {
     return () => {
@@ -256,7 +262,7 @@ export function MessageComposer({
     })
 
     if (agentDraft !== null) {
-      dismissAgentDraft(agentDraft.messageId)
+      setDismissedDraftMessageId(agentDraft.messageId)
     }
 
     setContent('')
@@ -308,6 +314,14 @@ export function MessageComposer({
           onChange={handleFileChange}
         />
 
+        {showAgentDraft && agentDraft !== null && (
+          <AgentDraftChip
+            reply={agentDraft.reply}
+            disabled={composerDisabled}
+            onUse={applyAgentDraft}
+          />
+        )}
+
         {attachment !== null && (
           <AttachmentPreview
             attachment={attachment}
@@ -342,21 +356,9 @@ export function MessageComposer({
             ref={textareaRef}
             value={content}
             onChange={(event) => {
-              const next = event.target.value
-              const appliedMessageId = appliedAgentDraftMessageIdRef.current
-              const appliedReply = appliedAgentDraftReplyRef.current
-
-              if (
-                appliedMessageId !== null &&
-                appliedReply !== null &&
-                (next.trim().length === 0 || next !== appliedReply)
-              ) {
-                dismissAgentDraft(appliedMessageId)
-              }
-
-              setContent(next)
+              setContent(event.target.value)
             }}
-            placeholder={composerPlaceholder(disabled, attachment !== null)}
+            placeholder={composerPlaceholder(attachment !== null)}
             disabled={composerDisabled}
             rows={1}
             className="min-h-[36px] max-h-28 flex-1 resize-none border-0 bg-transparent py-1.5 text-sm text-ink outline-none placeholder:text-ink-faint disabled:cursor-not-allowed"
