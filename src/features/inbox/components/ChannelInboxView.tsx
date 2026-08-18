@@ -13,7 +13,11 @@ import { ConversationList } from '@/features/inbox/components/ConversationList'
 import { ConversationThread } from '@/features/inbox/components/ConversationThread'
 import { ConversationThreadHeader } from '@/features/inbox/components/ConversationThreadHeader'
 import { MessageComposer, type SendComposerInput } from '@/features/inbox/components/MessageComposer'
-import type { MessagingPlatform } from '@/features/inbox/constants'
+import {
+  messagingPlatformLabel,
+  messagingPlatformLogo,
+  type MessagingPlatform,
+} from '@/features/inbox/constants'
 import {
   inboxKeys,
   isIntegrationsRequiredError,
@@ -22,7 +26,7 @@ import {
   useInboxThread,
 } from '@/features/inbox/hooks/useInboxQueries'
 import { useInboxRealtime } from '@/features/inbox/hooks/useInboxRealtime'
-import { replaceOptimisticThreadMessage, upsertThreadMessage } from '@/features/inbox/lib/mergeInboxCache'
+import { replaceOptimisticThreadMessage } from '@/features/inbox/lib/mergeInboxCache'
 import {
   bumpConversationInList,
   flattenConversations,
@@ -56,7 +60,6 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
   const initialConversationId = searchParams.get('conversation')
 
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(initialConversationId)
-  const [sending, setSending] = useState(false)
   const { subscriptionRequired, handleError } = useSubscriptionGate()
   const { integrationsLoading, integrationsRequired } = useIntegrationsGate(subscriptionRequired)
   const { me } = useSession()
@@ -213,102 +216,109 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
     }
   }
 
-  const handleSendMessage = async (input: SendComposerInput) => {
+  const handleSendMessage = (input: SendComposerInput) => {
     if (selectedConversationId === null || organizationId === null) {
       return
     }
 
-    setSending(true)
     setSendError(null)
 
-    const optimisticId =
-      input.attachment !== undefined ? `optimistic-${Date.now()}` : null
+    const optimisticId = `optimistic-${Date.now()}`
     const optimisticPreviewUrl = input.attachment?.previewUrl ?? null
+    const contentType = input.attachment?.contentType ?? 'text'
 
-    if (optimisticId !== null && input.attachment !== undefined && threadFirstPage !== undefined) {
-      const optimisticMessage: Message = {
-        id: optimisticId,
-        organizationId,
-        conversationId: selectedConversationId,
-        participantId: null,
-        direction: 'outbound',
-        platformMessageId: null,
-        content: input.content,
-        contentType: input.attachment.contentType,
-        mediaUrl: optimisticPreviewUrl,
-        mimeType: input.attachment.file.type || null,
-        status: 'pending',
-        suggestedReply: null,
-        createdAt: new Date().toISOString(),
-      }
-
-      queryClient.setQueryData(
-        inboxKeys.thread(selectedConversationId),
-        (current: ThreadInfiniteData | undefined) => {
-          if (current === undefined || current.pages.length === 0) {
-            return current
-          }
-
-          return updateThreadFirstPage(current, (page) => ({
-            ...page,
-            messages: [...page.messages, optimisticMessage],
-          }))
-        },
-      )
+    const optimisticMessage: Message = {
+      id: optimisticId,
+      organizationId,
+      conversationId: selectedConversationId,
+      participantId: null,
+      direction: 'outbound',
+      platformMessageId: null,
+      content: input.content,
+      contentType,
+      mediaUrl: optimisticPreviewUrl,
+      mimeType: input.attachment?.file.type || null,
+      status: 'pending',
+      suggestedReply: null,
+      createdAt: new Date().toISOString(),
     }
 
-    try {
-      const result =
-        input.attachment !== undefined
-          ? await (async () => {
-              const uploaded = await InboxService.uploadOutboundMedia(selectedConversationId, {
-                file: input.attachment!.file,
-                contentType: input.attachment!.contentType,
-                filename: input.attachment!.file.name,
-              })
+    queryClient.setQueryData(
+      inboxKeys.thread(selectedConversationId),
+      (current: ThreadInfiniteData | undefined) => {
+        if (current === undefined || current.pages.length === 0) {
+          return current
+        }
 
-              return InboxService.sendMessage(selectedConversationId, {
-                content: input.content,
-                contentType: input.attachment!.contentType,
-                storagePath: uploaded.media.storagePath,
-                mimeType: uploaded.media.mimeType,
-                fileSizeBytes: uploaded.media.fileSizeBytes,
-                filename: uploaded.media.filename ?? input.attachment!.file.name,
-              })
-            })()
-          : await InboxService.sendMessage(selectedConversationId, { content: input.content })
+        return updateThreadFirstPage(current, (page) => ({
+          ...page,
+          messages: [...page.messages, optimisticMessage],
+        }))
+      },
+    )
 
-      if (optimisticId !== null) {
+    queryClient.setQueryData(
+      inboxKeys.conversations(platform),
+      (current: ConversationsInfiniteData | undefined) => {
+        if (current === undefined) {
+          return current
+        }
+
+        return bumpConversationInList(current, selectedConversationId, {
+          lastMessage: formatMessageListPreview(input.content, contentType),
+          lastMessageAt: optimisticMessage.createdAt,
+        })
+      },
+    )
+
+    void (async () => {
+      try {
+        const result =
+          input.attachment !== undefined
+            ? await (async () => {
+                const uploaded = await InboxService.uploadOutboundMedia(selectedConversationId, {
+                  file: input.attachment!.file,
+                  contentType: input.attachment!.contentType,
+                  filename: input.attachment!.file.name,
+                })
+
+                return InboxService.sendMessage(selectedConversationId, {
+                  content: input.content,
+                  contentType: input.attachment!.contentType,
+                  storagePath: uploaded.media.storagePath,
+                  mimeType: uploaded.media.mimeType,
+                  fileSizeBytes: uploaded.media.fileSizeBytes,
+                  filename: uploaded.media.filename ?? input.attachment!.file.name,
+                })
+              })()
+            : await InboxService.sendMessage(selectedConversationId, { content: input.content })
+
         replaceOptimisticThreadMessage(
           queryClient,
           selectedConversationId,
           optimisticId,
           result.message,
         )
-      } else {
-        upsertThreadMessage(queryClient, selectedConversationId, result.message)
-      }
 
-      queryClient.setQueryData(
-        inboxKeys.conversations(platform),
-        (current: ConversationsInfiniteData | undefined) => {
-          if (current === undefined) {
-            return current
-          }
+        queryClient.setQueryData(
+          inboxKeys.conversations(platform),
+          (current: ConversationsInfiniteData | undefined) => {
+            if (current === undefined) {
+              return current
+            }
 
-          return bumpConversationInList(current, selectedConversationId, {
-            lastMessage: formatMessageListPreview(
-              result.message.content,
-              result.message.contentType,
-            ),
-            lastMessageAt: result.message.createdAt,
-          })
-        },
-      )
-    } catch (err) {
-      const details = getApiErrorDetails<SendMessageErrorDetails>(err)
+            return bumpConversationInList(current, selectedConversationId, {
+              lastMessage: formatMessageListPreview(
+                result.message.content,
+                result.message.contentType,
+              ),
+              lastMessageAt: result.message.createdAt,
+            })
+          },
+        )
+      } catch (err) {
+        const details = getApiErrorDetails<SendMessageErrorDetails>(err)
 
-      if (optimisticId !== null) {
         if (details?.message) {
           replaceOptimisticThreadMessage(
             queryClient,
@@ -326,19 +336,17 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
 
               return updateThreadFirstPage(current, (page) => ({
                 ...page,
-                messages: page.messages.filter((message) => message.id !== optimisticId),
+                messages: page.messages.map((message) =>
+                  message.id === optimisticId ? { ...message, status: 'failed' as const } : message,
+                ),
               }))
             },
           )
         }
-      } else if (details?.message) {
-        upsertThreadMessage(queryClient, selectedConversationId, details.message)
-      }
 
-      setSendError(getApiErrorMessage(err, 'Could not send message. Please try again.'))
-    } finally {
-      setSending(false)
-    }
+        setSendError(getApiErrorMessage(err, 'Could not send message. Please try again.'))
+      }
+    })()
   }
 
   const selectedListItem =
@@ -393,6 +401,17 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
                 mobileShowThread ? 'hidden lg:flex' : 'flex',
               ].join(' ')}
             >
+              <div className={INBOX_PANEL_HEADER_CLASS}>
+                <div className="flex items-center gap-2.5">
+                  <img
+                    src={messagingPlatformLogo(platform)}
+                    alt=""
+                    className="h-6 w-6 object-contain"
+                  />
+                  <h1 className="text-sm font-semibold text-ink">{messagingPlatformLabel(platform)}</h1>
+                </div>
+              </div>
+
               <ConversationList
                 conversations={conversations}
                 selectedId={selectedConversationId}
@@ -445,7 +464,6 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
                 <MessageComposer
                   conversationId={selectedConversationId}
                   disabled={threadLoading}
-                  sending={sending}
                   platform={activePlatform}
                   agentDraft={agentDraft}
                   onSend={handleSendMessage}

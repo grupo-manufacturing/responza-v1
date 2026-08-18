@@ -1,10 +1,18 @@
-import { Spinner } from '@/shared/ui/primitives/Spinner'
 import type { MessageStatus } from '@/features/inbox/constants'
 import type { IntegrationPlatform } from '@/features/integrations/constants'
 
 type MessageStatusIndicatorProps = {
   readonly status: MessageStatus
   readonly platform?: IntegrationPlatform | null
+}
+
+function ClockIcon({ className }: { readonly className: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <circle cx="12" cy="12" r="8" strokeWidth={2} />
+      <path strokeLinecap="round" strokeWidth={2} d="M12 8v4l2.5 1.5" />
+    </svg>
+  )
 }
 
 function SingleCheck({ className }: { readonly className: string }) {
@@ -29,7 +37,7 @@ function readCheckClass(): string {
 
 export function MessageStatusIndicator({ status, platform = null }: MessageStatusIndicatorProps) {
   if (status === 'pending') {
-    return <Spinner size="sm" variant="muted" />
+    return <ClockIcon className="h-3.5 w-3.5 text-ink-faint" />
   }
 
   if (status === 'sent') {

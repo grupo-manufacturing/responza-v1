@@ -1,6 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-
-import { Spinner } from '@/shared/ui/primitives/Spinner'
 import {
   attachmentPreviewLabel,
   canPreviewAttachmentLocally,
@@ -30,10 +28,9 @@ export type SendComposerInput = {
 type MessageComposerProps = {
   readonly conversationId: string
   readonly disabled: boolean
-  readonly sending: boolean
   readonly platform?: IntegrationPlatform | null
   readonly agentDraft?: { messageId: string; reply: string } | null
-  readonly onSend: (input: SendComposerInput) => Promise<void>
+  readonly onSend: (input: SendComposerInput) => void
 }
 
 type SelectedAttachment = OutboundComposerAttachment
@@ -169,10 +166,11 @@ function AttachmentPreview({
   )
 }
 
+const COMPOSER_MAX_HEIGHT_PX = 128
+
 export function MessageComposer({
   conversationId,
   disabled,
-  sending,
   platform = null,
   agentDraft = null,
   onSend,
@@ -184,16 +182,15 @@ export function MessageComposer({
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const attachmentsSupported = true
-  const canSend =
-    !disabled && !sending && (attachment !== null || content.trim().length > 0)
-  const canAttach = !disabled && !sending && attachmentsSupported
+  const canSend = !disabled && (attachment !== null || content.trim().length > 0)
+  const canAttach = !disabled && attachmentsSupported
   const showAgentDraft =
     agentDraft !== null &&
     agentDraft.messageId !== dismissedDraftMessageId &&
     content !== agentDraft.reply
 
   const applyAgentDraft = () => {
-    if (agentDraft === null || disabled || sending) {
+    if (agentDraft === null || disabled) {
       return
     }
 
@@ -232,8 +229,10 @@ export function MessageComposer({
       return
     }
 
-    textarea.style.height = 'auto'
-    textarea.style.height = `${textarea.scrollHeight}px`
+    textarea.style.height = '0px'
+    const nextHeight = Math.min(textarea.scrollHeight, COMPOSER_MAX_HEIGHT_PX)
+    textarea.style.height = `${nextHeight}px`
+    textarea.style.overflowY = textarea.scrollHeight > COMPOSER_MAX_HEIGHT_PX ? 'auto' : 'hidden'
   }, [content])
 
   const clearAttachment = () => {
@@ -247,10 +246,10 @@ export function MessageComposer({
     }
   }
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault()
 
-    if (disabled || sending) {
+    if (disabled) {
       return
     }
 
@@ -259,7 +258,7 @@ export function MessageComposer({
       return
     }
 
-    await onSend({
+    onSend({
       content: trimmed,
       attachment: attachment ?? undefined,
     })
@@ -299,14 +298,12 @@ export function MessageComposer({
     event.target.value = ''
   }
 
-  const composerDisabled = disabled || sending
+  const composerDisabled = disabled
 
   return (
     <div className="relative shrink-0">
       <form
-        onSubmit={(event) => {
-          void handleSubmit(event)
-        }}
+        onSubmit={handleSubmit}
         className="border-t border-border bg-white/95 px-3 py-3 backdrop-blur-sm sm:px-4"
       >
         <input
@@ -335,7 +332,7 @@ export function MessageComposer({
 
         <div
           className={[
-            'flex items-end gap-1 rounded-[var(--radius-pill)] border border-border bg-white px-2 py-1.5 transition-all',
+            'flex items-end gap-1 rounded-2xl border border-border bg-white px-2 py-1.5 transition-all',
             composerFocusRingClass(platform),
             composerDisabled ? 'bg-surface-muted/80' : '',
           ].join(' ')}
@@ -349,7 +346,7 @@ export function MessageComposer({
               title="Attach file"
               className={composerActionIconClass(
                 canAttach,
-                'text-ink-muted hover:bg-surface-muted hover:text-ink',
+                'mb-0.5 text-ink-muted hover:bg-surface-muted hover:text-ink',
               )}
             >
               <AttachIcon />
@@ -372,15 +369,19 @@ export function MessageComposer({
             placeholder={composerPlaceholder(attachment !== null)}
             disabled={composerDisabled}
             rows={1}
-            className={`min-h-[36px] max-h-48 flex-1 resize-none border-0 bg-transparent py-1.5 text-sm leading-5 text-ink outline-none placeholder:text-ink-faint disabled:cursor-not-allowed ${INBOX_SCROLL_AREA_CLASS}`}
+            className={`max-h-32 min-h-8 flex-1 resize-none overflow-hidden border-0 bg-transparent py-1.5 text-sm leading-5 text-ink outline-none placeholder:text-ink-faint disabled:cursor-not-allowed ${INBOX_SCROLL_AREA_CLASS}`}
           />
           <button
             type="submit"
             disabled={!canSend}
-            aria-label={sending ? 'Sending message' : 'Send message'}
-            className={[composerActionButtonClass, 'rounded-[var(--radius-pill)]', composerSendButtonClass(canSend, platform)].join(' ')}
+            aria-label="Send message"
+            className={[
+              composerActionButtonClass,
+              'mb-0.5 rounded-full',
+              composerSendButtonClass(canSend, platform),
+            ].join(' ')}
           >
-            {sending ? <Spinner size="sm" variant="muted" /> : <SendIcon />}
+            <SendIcon />
           </button>
         </div>
         {attachmentError !== null && (
