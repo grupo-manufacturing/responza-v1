@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
 
 import { APP_PANEL_HEIGHT_CLASS } from '@/layouts/app-layout.constants'
@@ -8,48 +7,37 @@ import { IntegrationsRequired } from '@/shared/ui/gates/IntegrationsRequired'
 import { SubscriptionRequired } from '@/shared/ui/gates/SubscriptionRequired'
 import { Spinner, SpinnerSection } from '@/shared/ui/primitives/Spinner'
 import { useToast } from '@/shared/ui/toast'
-import { AiService, type ConversationAnalyticsResponse } from '@/features/ai/api/ai.service'
 import { ConversationAnalyticsPanel } from '@/features/inbox/components/ConversationAnalyticsPanel'
 import { ConversationList } from '@/features/inbox/components/ConversationList'
 import { ConversationThread } from '@/features/inbox/components/ConversationThread'
 import { ConversationThreadHeader } from '@/features/inbox/components/ConversationThreadHeader'
-import { MessageComposer, type SendComposerInput } from '@/features/inbox/components/MessageComposer'
+import { MessageComposer } from '@/features/inbox/components/MessageComposer'
 import {
+  isMessagingPlatform,
   messagingPlatformLabel,
   messagingPlatformLogo,
   type MessagingPlatform,
 } from '@/features/inbox/constants'
+import { useConversationAnalytics } from '@/features/inbox/hooks/useConversationAnalytics'
 import {
-  inboxKeys,
   isIntegrationsRequiredError,
   useInboxConversations,
   useInboxThread,
 } from '@/features/inbox/hooks/useInboxQueries'
+import { useInboxQueryErrorToast } from '@/features/inbox/hooks/useInboxQueryErrorToast'
 import { useInboxRealtime } from '@/features/inbox/hooks/useInboxRealtime'
-import { replaceOptimisticThreadMessage } from '@/features/inbox/lib/mergeInboxCache'
+import { useSendInboxMessage } from '@/features/inbox/hooks/useSendInboxMessage'
 import {
-  bumpConversationInList,
   flattenConversations,
   flattenThreadMessages,
-  type ConversationsInfiniteData,
-  type ThreadInfiniteData,
-  updateThreadFirstPage,
 } from '@/features/inbox/lib/inboxQueryData'
-import { formatMessageListPreview } from '@/features/inbox/lib/inbox.preview'
 import { INBOX_PANEL_HEADER_CLASS, INBOX_SHELL_CLASS } from '@/features/inbox/lib/inbox-ui'
-import { InboxService, type Message } from '@/features/inbox/api/inbox.service'
 import { useSubscriptionGate } from '@/shared/hooks/useSubscriptionGate'
 import { useIntegrationsGate } from '@/shared/hooks/useIntegrationsGate'
 import { useSession } from '@/shared/hooks/useSession'
 import { SessionStorage } from '@/shared/session/storage'
-import { getApiErrorDetails, getApiErrorMessage } from '@/shared/utils/api-error'
-import { canAccessAiAnalytics } from '@/shared/utils/subscription-access'
 
 const LIST_COLUMN_CLASS = 'w-full lg:w-[300px] lg:shrink-0'
-
-type SendMessageErrorDetails = {
-  message?: Message
-}
 
 type ChannelInboxViewProps = {
   platform: MessagingPlatform
@@ -66,11 +54,6 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
   const toast = useToast()
   const limitToastShownRef = useRef(false)
   const [mobileShowThread, setMobileShowThread] = useState(initialConversationId !== null)
-  const [analyticsLoading, setAnalyticsLoading] = useState(false)
-  const [analyticsOpen, setAnalyticsOpen] = useState(false)
-  const [analyticsLocked, setAnalyticsLocked] = useState(false)
-  const [analyticsData, setAnalyticsData] = useState<ConversationAnalyticsResponse | null>(null)
-  const queryClient = useQueryClient()
 
   const queriesEnabled =
     !subscriptionRequired && !integrationsRequired && !integrationsLoading
@@ -85,6 +68,26 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
     subscription.conversationsRemaining !== null &&
     subscription.conversationsRemaining <= 0
 
+  const inboxQueryErrors = useMemo(
+    () => [
+      {
+        error: conversationsQuery.error,
+        fallbackMessage: 'Could not load conversations. Please try again.',
+      },
+      {
+        error: threadQuery.error,
+        fallbackMessage: 'Could not load conversation. Please try again.',
+      },
+    ],
+    [conversationsQuery.error, threadQuery.error],
+  )
+
+  useInboxQueryErrorToast({
+    subscriptionRequired,
+    handleError,
+    queryErrors: inboxQueryErrors,
+  })
+
   useInboxRealtime({
     organizationId,
     selectedConversationId,
@@ -96,32 +99,6 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
     setMobileShowThread(initialConversationId !== null)
   }, [initialConversationId, platform])
 
-  const showInboxQueryErrorToast = useCallback(
-    (error: unknown, fallbackMessage: string) => {
-      handleError(error)
-
-      if (!subscriptionRequired && !isIntegrationsRequiredError(error)) {
-        toast.error(getApiErrorMessage(error, fallbackMessage))
-      }
-    },
-    [handleError, subscriptionRequired, toast],
-  )
-
-  useEffect(() => {
-    if (conversationsQuery.error) {
-      showInboxQueryErrorToast(
-        conversationsQuery.error,
-        'Could not load conversations. Please try again.',
-      )
-    }
-  }, [conversationsQuery.error, showInboxQueryErrorToast])
-
-  useEffect(() => {
-    if (threadQuery.error) {
-      showInboxQueryErrorToast(threadQuery.error, 'Could not load conversation. Please try again.')
-    }
-  }, [showInboxQueryErrorToast, threadQuery.error])
-
   useEffect(() => {
     if (!conversationLimitReached || limitToastShownRef.current) {
       return
@@ -132,13 +109,6 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
       'Conversation limit reached for this billing period. Upgrade your plan to start new conversations. You can still reply in existing threads.',
     )
   }, [conversationLimitReached, toast])
-
-  useEffect(() => {
-    setAnalyticsOpen(false)
-    setAnalyticsLocked(false)
-    setAnalyticsData(null)
-    setAnalyticsLoading(false)
-  }, [selectedConversationId])
 
   const integrationsRequiredFromApi =
     queriesEnabled &&
@@ -156,6 +126,18 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
   const participants = threadFirstPage?.participants ?? []
   const messages = flattenThreadMessages(threadQuery.data)
   const hasMoreOlder = threadQuery.hasNextPage ?? false
+
+  const analytics = useConversationAnalytics({
+    conversationId: selectedConversationId,
+    threadLoading,
+    subscription,
+  })
+
+  const { sendMessage } = useSendInboxMessage({
+    platform,
+    organizationId,
+    conversationId: selectedConversationId,
+  })
 
   const agentDraft = useMemo(() => {
     let latestInbound: (typeof messages)[number] | null = null
@@ -215,170 +197,14 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
     setMobileShowThread(true)
   }
 
-  const handleAnalyzeConversation = async () => {
-    if (selectedConversationId === null || analyticsLoading || threadLoading) {
-      return
-    }
-
-    setAnalyticsOpen(true)
-
-    if (!canAccessAiAnalytics(subscription)) {
-      setAnalyticsLocked(true)
-      setAnalyticsData(null)
-      setAnalyticsLoading(false)
-      return
-    }
-
-    setAnalyticsLocked(false)
-    setAnalyticsLoading(true)
-
-    try {
-      const result = await AiService.analyzeConversation(selectedConversationId)
-      setAnalyticsData(result)
-    } catch (err: unknown) {
-      setAnalyticsData(null)
-      toast.error(
-        getApiErrorMessage(err, 'Could not generate conversation analytics. Please try again.'),
-      )
-    } finally {
-      setAnalyticsLoading(false)
-    }
-  }
-
-  const handleSendMessage = (input: SendComposerInput) => {
-    if (selectedConversationId === null || organizationId === null) {
-      return
-    }
-
-    const optimisticId = `optimistic-${Date.now()}`
-    const optimisticPreviewUrl = input.attachment?.previewUrl ?? null
-    const contentType = input.attachment?.contentType ?? 'text'
-
-    const bumpConversationLastMessage = (
-      content: string,
-      messageContentType: typeof contentType,
-      lastMessageAt: string,
-    ) => {
-      queryClient.setQueryData(
-        inboxKeys.conversations(platform),
-        (current: ConversationsInfiniteData | undefined) => {
-          if (current === undefined) {
-            return current
-          }
-
-          return bumpConversationInList(current, selectedConversationId, {
-            lastMessage: formatMessageListPreview(content, messageContentType),
-            lastMessageAt,
-          })
-        },
-      )
-    }
-
-    const optimisticMessage: Message = {
-      id: optimisticId,
-      organizationId,
-      conversationId: selectedConversationId,
-      participantId: null,
-      direction: 'outbound',
-      platformMessageId: null,
-      content: input.content,
-      contentType,
-      mediaUrl: optimisticPreviewUrl,
-      mimeType: input.attachment?.file.type || null,
-      status: 'pending',
-      suggestedReply: null,
-      createdAt: new Date().toISOString(),
-    }
-
-    queryClient.setQueryData(
-      inboxKeys.thread(selectedConversationId),
-      (current: ThreadInfiniteData | undefined) => {
-        if (current === undefined || current.pages.length === 0) {
-          return current
-        }
-
-        return updateThreadFirstPage(current, (page) => ({
-          ...page,
-          messages: [...page.messages, optimisticMessage],
-        }))
-      },
-    )
-
-    bumpConversationLastMessage(input.content, contentType, optimisticMessage.createdAt)
-
-    void (async () => {
-      try {
-        const result =
-          input.attachment !== undefined
-            ? await (async () => {
-                const uploaded = await InboxService.uploadOutboundMedia(selectedConversationId, {
-                  file: input.attachment!.file,
-                  contentType: input.attachment!.contentType,
-                  filename: input.attachment!.file.name,
-                })
-
-                return InboxService.sendMessage(selectedConversationId, {
-                  content: input.content,
-                  contentType: input.attachment!.contentType,
-                  storagePath: uploaded.media.storagePath,
-                  mimeType: uploaded.media.mimeType,
-                  fileSizeBytes: uploaded.media.fileSizeBytes,
-                  filename: uploaded.media.filename ?? input.attachment!.file.name,
-                })
-              })()
-            : await InboxService.sendMessage(selectedConversationId, { content: input.content })
-
-        replaceOptimisticThreadMessage(
-          queryClient,
-          selectedConversationId,
-          optimisticId,
-          result.message,
-        )
-
-        bumpConversationLastMessage(
-          result.message.content,
-          result.message.contentType,
-          result.message.createdAt,
-        )
-      } catch (err) {
-        const details = getApiErrorDetails<SendMessageErrorDetails>(err)
-
-        if (details?.message) {
-          replaceOptimisticThreadMessage(
-            queryClient,
-            selectedConversationId,
-            optimisticId,
-            details.message,
-          )
-        } else {
-          queryClient.setQueryData(
-            inboxKeys.thread(selectedConversationId),
-            (current: ThreadInfiniteData | undefined) => {
-              if (current === undefined || current.pages.length === 0) {
-                return current
-              }
-
-              return updateThreadFirstPage(current, (page) => ({
-                ...page,
-                messages: page.messages.map((message) =>
-                  message.id === optimisticId ? { ...message, status: 'failed' as const } : message,
-                ),
-              }))
-            },
-          )
-        }
-
-        toast.error(getApiErrorMessage(err, 'Could not send message. Please try again.'))
-      }
-    })()
-  }
-
   const selectedListItem =
     selectedConversationId !== null
       ? conversations.find((item) => item.id === selectedConversationId)
       : undefined
 
-  const activePlatform = selectedListItem?.platform ?? platform
+  const listPlatform = selectedListItem?.platform
+  const activePlatform: MessagingPlatform =
+    listPlatform !== undefined && isMessagingPlatform(listPlatform) ? listPlatform : platform
 
   if (subscriptionRequired) {
     return <SubscriptionRequired />
@@ -449,10 +275,10 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
                       : null
                   }
                   onBack={() => setMobileShowThread(false)}
-                  analyticsLoading={analyticsLoading}
+                  analyticsLoading={analytics.loading}
                   analyticsDisabled={selectedConversationId === null || threadLoading}
                   onAnalyze={() => {
-                    void handleAnalyzeConversation()
+                    void analytics.analyze()
                   }}
                 />
               </div>
@@ -473,15 +299,15 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
                   disabled={threadLoading}
                   platform={activePlatform}
                   agentDraft={agentDraft}
-                  onSend={handleSendMessage}
+                  onSend={sendMessage}
                 />
               )}
               <ConversationAnalyticsPanel
-                open={analyticsOpen}
-                loading={analyticsLoading}
-                locked={analyticsLocked}
-                data={analyticsData}
-                onClose={() => setAnalyticsOpen(false)}
+                open={analytics.open}
+                loading={analytics.loading}
+                locked={analytics.locked}
+                data={analytics.data}
+                onClose={analytics.close}
               />
             </div>
           </div>
