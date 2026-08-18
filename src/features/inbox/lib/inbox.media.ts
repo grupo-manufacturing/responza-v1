@@ -102,7 +102,3 @@ export function attachmentPreviewLabel(contentType: MediaContentType, filename: 
 
   return formatMessageListPreview('', contentType)
 }
-
-export function canPreviewAttachmentLocally(contentType: MediaContentType): boolean {
-  return contentType === 'image' || contentType === 'video' || contentType === 'audio'
-}

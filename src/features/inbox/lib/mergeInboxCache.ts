@@ -108,17 +108,6 @@ function updateThreadCache(
   )
 }
 
-export function upsertThreadMessage(
-  queryClient: QueryClient,
-  conversationId: string,
-  message: Message,
-): void {
-  updateThreadCache(queryClient, conversationId, (current) => ({
-    ...current,
-    messages: upsertMessageInList(current.messages, message),
-  }))
-}
-
 export function replaceOptimisticThreadMessage(
   queryClient: QueryClient,
   conversationId: string,

@@ -352,7 +352,7 @@ export function ConversationThread({
                           ].join(' ')}
                         >
                           {isOutbound && (
-                            <MessageStatusIndicator status={message.status} platform={platform} />
+                            <MessageStatusIndicator status={message.status} />
                           )}
                           <span>{formatInboxTimestamp(message.createdAt)}</span>
                         </div>

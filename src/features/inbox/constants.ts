@@ -6,8 +6,6 @@ import {
 
 export type MessagingPlatform = Extract<IntegrationPlatform, 'whatsapp' | 'instagram'>
 
-export const MESSAGING_PLATFORMS: MessagingPlatform[] = ['whatsapp', 'instagram']
-
 export type MessageDirection = 'inbound' | 'outbound'
 
 export type MessageStatus = 'pending' | 'sent' | 'failed' | 'read'

@@ -8,7 +8,6 @@ type ConversationAnalyticsPanelProps = {
   readonly loading: boolean
   readonly locked?: boolean
   readonly data: ConversationAnalyticsResponse | null
-  readonly error: string | null
   readonly onClose: () => void
 }
 
@@ -31,7 +30,6 @@ export function ConversationAnalyticsPanel({
   loading,
   locked = false,
   data,
-  error,
   onClose,
 }: ConversationAnalyticsPanelProps) {
   return (
@@ -63,7 +61,7 @@ export function ConversationAnalyticsPanel({
           </div>
         )}
 
-        {!locked && !loading && error === null && data !== null && (
+        {!locked && !loading && data !== null && (
           <div className="space-y-5">
             <section>
               <h3 className="text-xs font-medium tracking-wide text-ink-faint uppercase">Lead score</h3>

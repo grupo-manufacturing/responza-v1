@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { useToast } from '@/shared/ui/toast'
 import {
   attachmentPreviewLabel,
-  canPreviewAttachmentLocally,
   OUTBOUND_MEDIA_ACCEPT,
   validateOutboundMediaFile,
 } from '@/features/inbox/lib/inbox.media'
@@ -129,7 +128,7 @@ function AttachmentPreview({
         />
       )}
 
-      {attachment.contentType === 'video' && canPreviewAttachmentLocally('video') && (
+      {attachment.contentType === 'video' && (
         <video
           src={attachment.previewUrl}
           className="h-14 w-14 rounded-lg border border-border object-cover"
@@ -182,9 +181,7 @@ export function MessageComposer({
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const toast = useToast()
-  const attachmentsSupported = true
   const canSend = !disabled && (attachment !== null || content.trim().length > 0)
-  const canAttach = !disabled && attachmentsSupported
   const showAgentDraft =
     agentDraft !== null && agentDraft.messageId !== dismissedDraftMessageId
 
@@ -295,8 +292,6 @@ export function MessageComposer({
     event.target.value = ''
   }
 
-  const composerDisabled = disabled
-
   return (
     <div className="relative shrink-0">
       <form
@@ -314,7 +309,7 @@ export function MessageComposer({
         {showAgentDraft && agentDraft !== null && (
           <AgentDraftChip
             reply={agentDraft.reply}
-            disabled={composerDisabled}
+            disabled={disabled}
             onUse={applyAgentDraft}
           />
         )}
@@ -322,7 +317,7 @@ export function MessageComposer({
         {attachment !== null && (
           <AttachmentPreview
             attachment={attachment}
-            disabled={composerDisabled}
+            disabled={disabled}
             onRemove={clearAttachment}
           />
         )}
@@ -331,24 +326,22 @@ export function MessageComposer({
           className={[
             'flex items-end gap-1 rounded-2xl border border-border bg-white px-2 py-1.5 transition-all',
             composerFocusRingClass(platform),
-            composerDisabled ? 'bg-surface-muted/80' : '',
+            disabled ? 'bg-surface-muted/80' : '',
           ].join(' ')}
         >
-          {attachmentsSupported && (
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={!canAttach}
-              aria-label="Attach file"
-              title="Attach file"
-              className={composerActionIconClass(
-                canAttach,
-                'mb-0.5 text-ink-muted hover:bg-surface-muted hover:text-ink',
-              )}
-            >
-              <AttachIcon />
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={disabled}
+            aria-label="Attach file"
+            title="Attach file"
+            className={composerActionIconClass(
+              !disabled,
+              'mb-0.5 text-ink-muted hover:bg-surface-muted hover:text-ink',
+            )}
+          >
+            <AttachIcon />
+          </button>
           <textarea
             ref={textareaRef}
             value={content}
@@ -364,7 +357,7 @@ export function MessageComposer({
               event.currentTarget.form?.requestSubmit()
             }}
             placeholder={composerPlaceholder(attachment !== null)}
-            disabled={composerDisabled}
+            disabled={disabled}
             rows={1}
             className={`max-h-32 min-h-8 flex-1 resize-none overflow-hidden border-0 bg-transparent py-1.5 text-sm leading-5 text-ink outline-none placeholder:text-ink-faint disabled:cursor-not-allowed ${INBOX_SCROLL_AREA_CLASS}`}
           />

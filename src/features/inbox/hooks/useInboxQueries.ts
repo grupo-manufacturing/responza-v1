@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useQueryClient, type InfiniteData } from '@tanstack/react-query'
+import { useInfiniteQuery, type InfiniteData } from '@tanstack/react-query'
 
 import type { MessagingPlatform } from '@/features/inbox/constants'
 import {
@@ -58,8 +58,4 @@ export function useInboxThread(conversationId: string | null, enabled: boolean) 
     enabled: enabled && conversationId !== null,
     refetchOnWindowFocus: true,
   })
-}
-
-export function useInboxQueryClient() {
-  return useQueryClient()
 }

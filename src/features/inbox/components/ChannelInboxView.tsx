@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
 
 import { APP_PANEL_HEIGHT_CLASS } from '@/layouts/app-layout.constants'
@@ -22,7 +23,6 @@ import {
   inboxKeys,
   isIntegrationsRequiredError,
   useInboxConversations,
-  useInboxQueryClient,
   useInboxThread,
 } from '@/features/inbox/hooks/useInboxQueries'
 import { useInboxRealtime } from '@/features/inbox/hooks/useInboxRealtime'
@@ -70,8 +70,7 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
   const [analyticsOpen, setAnalyticsOpen] = useState(false)
   const [analyticsLocked, setAnalyticsLocked] = useState(false)
   const [analyticsData, setAnalyticsData] = useState<ConversationAnalyticsResponse | null>(null)
-  const [analyticsError, setAnalyticsError] = useState<string | null>(null)
-  const queryClient = useInboxQueryClient()
+  const queryClient = useQueryClient()
 
   const queriesEnabled =
     !subscriptionRequired && !integrationsRequired && !integrationsLoading
@@ -137,7 +136,6 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
     setAnalyticsOpen(false)
     setAnalyticsLocked(false)
     setAnalyticsData(null)
-    setAnalyticsError(null)
     setAnalyticsLoading(false)
   }, [selectedConversationId])
 
@@ -226,23 +224,18 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
     if (!canAccessAiAnalytics(subscription)) {
       setAnalyticsLocked(true)
       setAnalyticsData(null)
-      setAnalyticsError(null)
       setAnalyticsLoading(false)
       return
     }
 
     setAnalyticsLocked(false)
     setAnalyticsLoading(true)
-    setAnalyticsError(null)
 
     try {
       const result = await AiService.analyzeConversation(selectedConversationId)
       setAnalyticsData(result)
     } catch (err: unknown) {
       setAnalyticsData(null)
-      setAnalyticsError(
-        getApiErrorMessage(err, 'Could not generate conversation analytics. Please try again.'),
-      )
       toast.error(
         getApiErrorMessage(err, 'Could not generate conversation analytics. Please try again.'),
       )
@@ -490,7 +483,6 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
                 loading={analyticsLoading}
                 locked={analyticsLocked}
                 data={analyticsData}
-                error={analyticsError}
                 onClose={() => setAnalyticsOpen(false)}
               />
             </div>
