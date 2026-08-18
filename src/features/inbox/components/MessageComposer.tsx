@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useToast } from '@/shared/ui/toast'
 import {
   attachmentPreviewLabel,
   canPreviewAttachmentLocally,
@@ -177,10 +178,10 @@ export function MessageComposer({
 }: MessageComposerProps) {
   const [content, setContent] = useState('')
   const [attachment, setAttachment] = useState<SelectedAttachment | null>(null)
-  const [attachmentError, setAttachmentError] = useState<string | null>(null)
   const [dismissedDraftMessageId, setDismissedDraftMessageId] = useState<string | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const toast = useToast()
   const attachmentsSupported = true
   const canSend = !disabled && (attachment !== null || content.trim().length > 0)
   const canAttach = !disabled && attachmentsSupported
@@ -201,7 +202,6 @@ export function MessageComposer({
 
   useEffect(() => {
     setContent('')
-    setAttachmentError(null)
     setDismissedDraftMessageId(null)
     setAttachment((current) => {
       if (current !== null) {
@@ -239,7 +239,6 @@ export function MessageComposer({
       URL.revokeObjectURL(attachment.previewUrl)
     }
     setAttachment(null)
-    setAttachmentError(null)
     if (fileInputRef.current !== null) {
       fileInputRef.current.value = ''
     }
@@ -278,7 +277,7 @@ export function MessageComposer({
 
     const validation = validateOutboundMediaFile(file)
     if (!validation.valid) {
-      setAttachmentError(validation.message)
+      toast.error(validation.message)
       event.target.value = ''
       return
     }
@@ -293,7 +292,6 @@ export function MessageComposer({
       contentType: validation.contentType,
       previewUrl,
     })
-    setAttachmentError(null)
     event.target.value = ''
   }
 
@@ -383,11 +381,6 @@ export function MessageComposer({
             <SendIcon />
           </button>
         </div>
-        {attachmentError !== null && (
-          <p className="mt-2 text-xs text-red-600" role="alert">
-            {attachmentError}
-          </p>
-        )}
       </form>
     </div>
   )

@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
 import { APP_PANEL_HEIGHT_CLASS } from '@/layouts/app-layout.constants'
 
 import { IntegrationsRequired } from '@/shared/ui/gates/IntegrationsRequired'
 import { SubscriptionRequired } from '@/shared/ui/gates/SubscriptionRequired'
-import { Alert } from '@/shared/ui/primitives/Alert'
 import { Spinner, SpinnerSection } from '@/shared/ui/primitives/Spinner'
+import { useToast } from '@/shared/ui/toast'
 import { AiService, type ConversationAnalyticsResponse } from '@/features/ai/api/ai.service'
 import { ConversationAnalyticsPanel } from '@/features/inbox/components/ConversationAnalyticsPanel'
 import { ConversationList } from '@/features/inbox/components/ConversationList'
@@ -63,7 +63,8 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
   const { subscriptionRequired, handleError } = useSubscriptionGate()
   const { integrationsLoading, integrationsRequired } = useIntegrationsGate(subscriptionRequired)
   const { me } = useSession()
-  const [sendError, setSendError] = useState<string | null>(null)
+  const toast = useToast()
+  const limitToastShownRef = useRef(false)
   const [mobileShowThread, setMobileShowThread] = useState(initialConversationId !== null)
   const [analyticsLoading, setAnalyticsLoading] = useState(false)
   const [analyticsOpen, setAnalyticsOpen] = useState(false)
@@ -80,6 +81,10 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
 
   const organizationId = me?.organization.id ?? SessionStorage.getStoredOrganization()?.id ?? null
   const subscription = me?.subscription ?? SessionStorage.getStoredSubscription()
+  const conversationLimitReached =
+    subscription?.conversationQuotaEnforced === true &&
+    subscription.conversationsRemaining !== null &&
+    subscription.conversationsRemaining <= 0
 
   useInboxRealtime({
     organizationId,
@@ -95,14 +100,38 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
   useEffect(() => {
     if (conversationsQuery.error) {
       handleError(conversationsQuery.error)
+      if (
+        !subscriptionRequired &&
+        !isIntegrationsRequiredError(conversationsQuery.error)
+      ) {
+        toast.error(
+          getApiErrorMessage(conversationsQuery.error, 'Could not load conversations. Please try again.'),
+        )
+      }
     }
-  }, [conversationsQuery.error, handleError])
+  }, [conversationsQuery.error, handleError, subscriptionRequired, toast])
 
   useEffect(() => {
     if (threadQuery.error) {
       handleError(threadQuery.error)
+      if (!subscriptionRequired && !isIntegrationsRequiredError(threadQuery.error)) {
+        toast.error(
+          getApiErrorMessage(threadQuery.error, 'Could not load conversation. Please try again.'),
+        )
+      }
     }
-  }, [handleError, threadQuery.error])
+  }, [handleError, subscriptionRequired, threadQuery.error, toast])
+
+  useEffect(() => {
+    if (!conversationLimitReached || limitToastShownRef.current) {
+      return
+    }
+
+    limitToastShownRef.current = true
+    toast.info(
+      'Conversation limit reached for this billing period. Upgrade your plan to start new conversations. You can still reply in existing threads.',
+    )
+  }, [conversationLimitReached, toast])
 
   useEffect(() => {
     setAnalyticsOpen(false)
@@ -116,22 +145,6 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
     queriesEnabled &&
     ((conversationsQuery.error !== null && isIntegrationsRequiredError(conversationsQuery.error)) ||
       (threadQuery.error !== null && isIntegrationsRequiredError(threadQuery.error)))
-
-  const listError =
-    conversationsQuery.error !== null &&
-    !subscriptionRequired &&
-    !isIntegrationsRequiredError(conversationsQuery.error)
-      ? getApiErrorMessage(conversationsQuery.error, 'Could not load conversations. Please try again.')
-      : null
-
-  const threadError =
-    threadQuery.error !== null &&
-    !subscriptionRequired &&
-    !isIntegrationsRequiredError(threadQuery.error)
-      ? getApiErrorMessage(threadQuery.error, 'Could not load conversation. Please try again.')
-      : null
-
-  const error = sendError ?? listError ?? threadError
 
   const conversations = flattenConversations(conversationsQuery.data)
   const listLoading = conversationsQuery.isLoading
@@ -230,6 +243,9 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
       setAnalyticsError(
         getApiErrorMessage(err, 'Could not generate conversation analytics. Please try again.'),
       )
+      toast.error(
+        getApiErrorMessage(err, 'Could not generate conversation analytics. Please try again.'),
+      )
     } finally {
       setAnalyticsLoading(false)
     }
@@ -239,8 +255,6 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
     if (selectedConversationId === null || organizationId === null) {
       return
     }
-
-    setSendError(null)
 
     const optimisticId = `optimistic-${Date.now()}`
     const optimisticPreviewUrl = input.attachment?.previewUrl ?? null
@@ -363,7 +377,7 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
           )
         }
 
-        setSendError(getApiErrorMessage(err, 'Could not send message. Please try again.'))
+        toast.error(getApiErrorMessage(err, 'Could not send message. Please try again.'))
       }
     })()
   }
@@ -374,10 +388,6 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
       : undefined
 
   const activePlatform = selectedListItem?.platform ?? platform
-  const conversationLimitReached =
-    subscription?.conversationQuotaEnforced === true &&
-    subscription.conversationsRemaining !== null &&
-    subscription.conversationsRemaining <= 0
 
   if (subscriptionRequired) {
     return <SubscriptionRequired />
@@ -393,19 +403,6 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
 
   return (
     <div className={`flex flex-col ${APP_PANEL_HEIGHT_CLASS}`}>
-      {conversationLimitReached && (
-        <Alert variant="warning" className="mb-3 shrink-0">
-          Conversation limit reached for this billing period. Upgrade your plan to start new
-          conversations. You can still reply in existing threads.
-        </Alert>
-      )}
-
-      {error !== null && (
-        <Alert variant="error" className="mb-3 shrink-0">
-          {error}
-        </Alert>
-      )}
-
       {listLoading ? (
         <div className="flex min-h-0 flex-1 items-center justify-center">
           <Spinner />

@@ -23,6 +23,7 @@ import { isTranslatableMessageContent } from '@/features/inbox/lib/translation'
 import type { IntegrationPlatform } from '@/features/integrations/constants'
 import type { Conversation, Message } from '@/features/inbox/api/inbox.service'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
+import { useToast } from '@/shared/ui/toast'
 
 type ConversationThreadProps = {
   readonly conversation: Conversation | null
@@ -38,7 +39,6 @@ type ConversationThreadProps = {
 type MessageTranslationState =
   | { status: 'loading' }
   | { status: 'success'; translated: string; showOriginal: boolean }
-  | { status: 'error'; message: string }
 
 const MESSAGE_ACTIONS_HEIGHT_CLASS = 'pt-9'
 
@@ -62,6 +62,7 @@ export function ConversationThread({
   const seededConversationIdRef = useRef<string | null>(null)
   const [enteringMessageIds, setEnteringMessageIds] = useState<Set<string>>(() => new Set())
   const [translations, setTranslations] = useState<Record<string, MessageTranslationState>>({})
+  const toast = useToast()
 
   useEffect(() => {
     setTranslations({})
@@ -186,13 +187,12 @@ export function ConversationThread({
         [messageId]: { status: 'success', translated: result.translated, showOriginal: false },
       }))
     } catch (err: unknown) {
-      setTranslations((current) => ({
-        ...current,
-        [messageId]: {
-          status: 'error',
-          message: getApiErrorMessage(err, 'Could not translate this message.'),
-        },
-      }))
+      toast.error(getApiErrorMessage(err, 'Could not translate this message.'))
+      setTranslations((current) => {
+        const next = { ...current }
+        delete next[messageId]
+        return next
+      })
     }
   }
 
@@ -343,10 +343,6 @@ export function ConversationThread({
                           >
                             {displayContent}
                           </p>
-                        )}
-
-                        {translation?.status === 'error' && (
-                          <p className="mt-2 text-xs text-red-600">{translation.message}</p>
                         )}
 
                         <div
