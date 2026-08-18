@@ -54,16 +54,22 @@ export function ConversationThread({
 }: ConversationThreadProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const previousMessageCountRef = useRef(messages.length)
+  const previousMessageIdsRef = useRef<string[]>(messages.map((message) => message.id))
   const firstMessageIdRef = useRef<string | null>(messages[0]?.id ?? null)
   const pendingOlderScrollRef = useRef(false)
   const scrollHeightBeforeOlderLoadRef = useRef(0)
   const scrollTopBeforeOlderLoadRef = useRef(0)
+  const seededConversationIdRef = useRef<string | null>(null)
+  const [enteringMessageIds, setEnteringMessageIds] = useState<Set<string>>(() => new Set())
   const [translations, setTranslations] = useState<Record<string, MessageTranslationState>>({})
 
   useEffect(() => {
     setTranslations({})
     firstMessageIdRef.current = null
     previousMessageCountRef.current = 0
+    previousMessageIdsRef.current = []
+    seededConversationIdRef.current = null
+    setEnteringMessageIds(new Set())
   }, [conversation?.id])
 
   useEffect(() => {
@@ -111,11 +117,13 @@ export function ConversationThread({
     const container = scrollRef.current
     if (container === null) {
       previousMessageCountRef.current = messages.length
+      previousMessageIdsRef.current = messages.map((message) => message.id)
       firstMessageIdRef.current = messages[0]?.id ?? null
       return
     }
 
     const firstMessageId = messages[0]?.id ?? null
+    const currentIds = messages.map((message) => message.id)
     const prependedOlder =
       pendingOlderScrollRef.current &&
       firstMessageIdRef.current !== null &&
@@ -126,21 +134,44 @@ export function ConversationThread({
         container.scrollHeight - scrollHeightBeforeOlderLoadRef.current
       container.scrollTop = scrollTopBeforeOlderLoadRef.current + heightDelta
       pendingOlderScrollRef.current = false
+      previousMessageIdsRef.current = currentIds
     } else {
-      const grew = messages.length > previousMessageCountRef.current
+      const previousIds = previousMessageIdsRef.current
+      const previousIdSet = new Set(previousIds)
+      const addedIds = currentIds.filter((id) => !previousIdSet.has(id))
+      const removedOptimistic =
+        previousIds.some((id) => id.startsWith('optimistic-')) &&
+        !currentIds.some((id) => id.startsWith('optimistic-'))
+
+      const shouldAnimate =
+        seededConversationIdRef.current === conversation?.id &&
+        addedIds.length > 0 &&
+        !removedOptimistic
+
+      const grew = messages.length > previousMessageCountRef.current || addedIds.length > 0
       if (grew) {
         const distanceFromBottom =
           container.scrollHeight - container.scrollTop - container.clientHeight
+        const atEnd = distanceFromBottom < 120
 
-        if (distanceFromBottom < 120) {
-          container.scrollTop = container.scrollHeight
+        if (atEnd) {
+          if (shouldAnimate) {
+            setEnteringMessageIds(new Set(addedIds))
+          }
+          container.scrollTo({ top: container.scrollHeight, behavior: shouldAnimate ? 'smooth' : 'auto' })
         }
       }
+
+      previousMessageIdsRef.current = currentIds
+    }
+
+    if (conversation?.id !== undefined && seededConversationIdRef.current !== conversation.id) {
+      seededConversationIdRef.current = conversation.id
     }
 
     previousMessageCountRef.current = messages.length
     firstMessageIdRef.current = firstMessageId
-  }, [messages])
+  }, [conversation?.id, messages])
 
   const handleTranslate = async (messageId: string) => {
     setTranslations((current) => ({
@@ -242,7 +273,11 @@ export function ConversationThread({
               return (
                 <div
                   key={message.id}
-                  className={['flex', isOutbound ? 'justify-end' : 'justify-start'].join(' ')}
+                  className={[
+                    'flex',
+                    isOutbound ? 'justify-end' : 'justify-start',
+                    enteringMessageIds.has(message.id) ? 'animate-message-in' : '',
+                  ].join(' ')}
                 >
                   <div
                     className={[

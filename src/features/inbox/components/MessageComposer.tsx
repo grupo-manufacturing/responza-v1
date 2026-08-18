@@ -185,9 +185,7 @@ export function MessageComposer({
   const canSend = !disabled && (attachment !== null || content.trim().length > 0)
   const canAttach = !disabled && attachmentsSupported
   const showAgentDraft =
-    agentDraft !== null &&
-    agentDraft.messageId !== dismissedDraftMessageId &&
-    content !== agentDraft.reply
+    agentDraft !== null && agentDraft.messageId !== dismissedDraftMessageId
 
   const applyAgentDraft = () => {
     if (agentDraft === null || disabled) {
@@ -195,6 +193,7 @@ export function MessageComposer({
     }
 
     setContent(agentDraft.reply)
+    setDismissedDraftMessageId(agentDraft.messageId)
     requestAnimationFrame(() => {
       textareaRef.current?.focus()
     })

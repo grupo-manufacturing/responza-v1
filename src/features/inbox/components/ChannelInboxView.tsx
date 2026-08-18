@@ -146,21 +146,40 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
   const hasMoreOlder = threadQuery.hasNextPage ?? false
 
   const agentDraft = useMemo(() => {
+    let latestInbound: (typeof messages)[number] | null = null
+
     for (let index = messages.length - 1; index >= 0; index -= 1) {
-      const message = messages[index]
-      if (
-        message.direction === 'inbound' &&
-        message.suggestedReply !== null &&
-        message.suggestedReply.trim().length > 0
-      ) {
-        return {
-          messageId: message.id,
-          reply: message.suggestedReply,
-        }
+      if (messages[index].direction === 'inbound') {
+        latestInbound = messages[index]
+        break
       }
     }
 
-    return null
+    if (latestInbound === null) {
+      return null
+    }
+
+    const reply = latestInbound.suggestedReply
+    if (reply === null || reply.trim().length === 0) {
+      return null
+    }
+
+    const inboundIndex = messages.findIndex((message) => message.id === latestInbound.id)
+    if (inboundIndex === -1) {
+      return null
+    }
+    const hasOutboundAfter = messages
+      .slice(inboundIndex + 1)
+      .some((message) => message.direction === 'outbound')
+
+    if (hasOutboundAfter) {
+      return null
+    }
+
+    return {
+      messageId: latestInbound.id,
+      reply: reply.trim(),
+    }
   }, [messages])
 
   const handleLoadMoreConversations = useCallback(() => {

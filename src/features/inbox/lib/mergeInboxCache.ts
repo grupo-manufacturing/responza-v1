@@ -56,13 +56,31 @@ function mergeRealtimeMessage(existing: Message | undefined, incoming: Message):
   }
 }
 
+function findMessageIndex(messages: Message[], incoming: Message): number {
+  return messages.findIndex((item) => {
+    if (item.id === incoming.id) {
+      return true
+    }
+
+    if (
+      incoming.platformMessageId !== null &&
+      item.platformMessageId === incoming.platformMessageId
+    ) {
+      return true
+    }
+
+    return (
+      item.id.startsWith('optimistic-') &&
+      item.direction === 'outbound' &&
+      incoming.direction === 'outbound' &&
+      item.content === incoming.content &&
+      item.contentType === incoming.contentType
+    )
+  })
+}
+
 function upsertMessageInList(messages: Message[], incoming: Message): Message[] {
-  const index = messages.findIndex(
-    (item) =>
-      item.id === incoming.id ||
-      (incoming.platformMessageId !== null &&
-        item.platformMessageId === incoming.platformMessageId),
-  )
+  const index = findMessageIndex(messages, incoming)
 
   if (index === -1) {
     return [...messages, incoming]
@@ -163,12 +181,7 @@ export function applyMessageUpdate(
   }
 
   updateThreadCache(queryClient, input.selectedConversationId, (current) => {
-    const index = current.messages.findIndex(
-      (item) =>
-        item.id === message.id ||
-        (message.platformMessageId !== null &&
-          item.platformMessageId === message.platformMessageId),
-    )
+    const index = findMessageIndex(current.messages, message)
 
     if (index === -1) {
       return {
