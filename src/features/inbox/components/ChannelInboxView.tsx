@@ -13,11 +13,7 @@ import { ConversationList } from '@/features/inbox/components/ConversationList'
 import { ConversationThread } from '@/features/inbox/components/ConversationThread'
 import { ConversationThreadHeader } from '@/features/inbox/components/ConversationThreadHeader'
 import { MessageComposer, type SendComposerInput } from '@/features/inbox/components/MessageComposer'
-import {
-  messagingPlatformLabel,
-  messagingPlatformLogo,
-  type MessagingPlatform,
-} from '@/features/inbox/constants'
+import type { MessagingPlatform } from '@/features/inbox/constants'
 import {
   inboxKeys,
   isIntegrationsRequiredError,
@@ -383,103 +379,90 @@ export function ChannelInboxView({ platform }: ChannelInboxViewProps) {
         </Alert>
       )}
 
-      <div className={INBOX_SHELL_CLASS}>
-        <div className="flex min-h-0 flex-1">
-          <div
-            className={[
-              LIST_COLUMN_CLASS,
-              'flex min-h-0 flex-col border-border lg:border-r',
-              mobileShowThread ? 'hidden lg:flex' : 'flex',
-            ].join(' ')}
-          >
-            <div className={INBOX_PANEL_HEADER_CLASS}>
-              <div className="flex items-center gap-2.5">
-                <img
-                  src={messagingPlatformLogo(platform)}
-                  alt=""
-                  className="h-6 w-6 object-contain"
-                />
-                <h1 className="text-sm font-semibold text-ink">{messagingPlatformLabel(platform)}</h1>
-              </div>
+      {listLoading ? (
+        <div className="flex min-h-0 flex-1 items-center justify-center">
+          <Spinner />
+        </div>
+      ) : (
+        <div className={`${INBOX_SHELL_CLASS} animate-step-in`}>
+          <div className="flex min-h-0 flex-1">
+            <div
+              className={[
+                LIST_COLUMN_CLASS,
+                'flex min-h-0 flex-col border-border lg:border-r',
+                mobileShowThread ? 'hidden lg:flex' : 'flex',
+              ].join(' ')}
+            >
+              <ConversationList
+                conversations={conversations}
+                selectedId={selectedConversationId}
+                hasMore={conversationsQuery.hasNextPage ?? false}
+                loadingMore={listLoadingMore}
+                onLoadMore={handleLoadMoreConversations}
+                onSelect={(item) => handleSelectConversation(item.id)}
+              />
             </div>
 
-            {listLoading ? (
-              <div className="flex flex-1 items-center justify-center py-16">
-                <Spinner />
-              </div>
-            ) : (
-              <div className="flex min-h-0 flex-1 flex-col">
-                <ConversationList
-                  conversations={conversations}
-                  selectedId={selectedConversationId}
-                  hasMore={conversationsQuery.hasNextPage ?? false}
-                  loadingMore={listLoadingMore}
-                  onLoadMore={handleLoadMoreConversations}
-                  onSelect={(item) => handleSelectConversation(item.id)}
+            <div
+              className={[
+                'relative flex min-h-0 min-w-0 flex-1 flex-col',
+                mobileShowThread ? 'flex' : 'hidden lg:flex',
+              ].join(' ')}
+            >
+              <div className={INBOX_PANEL_HEADER_CLASS}>
+                <ConversationThreadHeader
+                  conversation={activeConversation}
+                  participants={participants}
+                  platform={activePlatform}
+                  pendingContact={
+                    threadLoading && selectedListItem !== undefined
+                      ? {
+                          displayName: selectedListItem.displayName,
+                          avatarUrl: selectedListItem.avatarUrl,
+                        }
+                      : null
+                  }
+                  onBack={() => setMobileShowThread(false)}
+                  analyticsLoading={analyticsLoading}
+                  analyticsDisabled={selectedConversationId === null || threadLoading}
+                  onAnalyze={() => {
+                    void handleAnalyzeConversation()
+                  }}
                 />
               </div>
-            )}
-          </div>
 
-          <div
-            className={[
-              'relative flex min-h-0 min-w-0 flex-1 flex-col',
-              mobileShowThread ? 'flex' : 'hidden lg:flex',
-            ].join(' ')}
-          >
-            <div className={INBOX_PANEL_HEADER_CLASS}>
-              <ConversationThreadHeader
+              <ConversationThread
                 conversation={activeConversation}
-                participants={participants}
+                messages={messages}
+                loading={threadLoading}
+                hasMoreOlder={hasMoreOlder}
+                loadingOlder={threadLoadingOlder}
+                onLoadOlder={handleLoadOlderMessages}
                 platform={activePlatform}
-                pendingContact={
-                  threadLoading && selectedListItem !== undefined
-                    ? {
-                        displayName: selectedListItem.displayName,
-                        avatarUrl: selectedListItem.avatarUrl,
-                      }
-                    : null
-                }
-                onBack={() => setMobileShowThread(false)}
-                analyticsLoading={analyticsLoading}
-                analyticsDisabled={selectedConversationId === null || threadLoading}
-                onAnalyze={() => {
-                  void handleAnalyzeConversation()
-                }}
+                actionsDisabled={threadLoading}
+              />
+              {selectedConversationId !== null && (
+                <MessageComposer
+                  conversationId={selectedConversationId}
+                  disabled={threadLoading}
+                  sending={sending}
+                  platform={activePlatform}
+                  agentDraft={agentDraft}
+                  onSend={handleSendMessage}
+                />
+              )}
+              <ConversationAnalyticsPanel
+                open={analyticsOpen}
+                loading={analyticsLoading}
+                locked={analyticsLocked}
+                data={analyticsData}
+                error={analyticsError}
+                onClose={() => setAnalyticsOpen(false)}
               />
             </div>
-
-            <ConversationThread
-              conversation={activeConversation}
-              messages={messages}
-              loading={threadLoading}
-              hasMoreOlder={hasMoreOlder}
-              loadingOlder={threadLoadingOlder}
-              onLoadOlder={handleLoadOlderMessages}
-              platform={activePlatform}
-              actionsDisabled={threadLoading}
-            />
-            {selectedConversationId !== null && (
-              <MessageComposer
-                conversationId={selectedConversationId}
-                disabled={threadLoading}
-                sending={sending}
-                platform={activePlatform}
-                agentDraft={agentDraft}
-                onSend={handleSendMessage}
-              />
-            )}
-            <ConversationAnalyticsPanel
-              open={analyticsOpen}
-              loading={analyticsLoading}
-              locked={analyticsLocked}
-              data={analyticsData}
-              error={analyticsError}
-              onClose={() => setAnalyticsOpen(false)}
-            />
           </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

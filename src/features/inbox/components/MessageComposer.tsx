@@ -10,6 +10,7 @@ import {
 import type { MediaContentType } from '@/features/inbox/lib/inbox.preview'
 import {
   INBOX_COMPOSER_ACTION_CLASS,
+  INBOX_SCROLL_AREA_CLASS,
   composerFocusRingClass,
   composerSendButtonClass,
 } from '@/features/inbox/lib/inbox-ui'
@@ -225,6 +226,16 @@ export function MessageComposer({
     }
   }, [attachment])
 
+  useEffect(() => {
+    const textarea = textareaRef.current
+    if (textarea === null) {
+      return
+    }
+
+    textarea.style.height = 'auto'
+    textarea.style.height = `${textarea.scrollHeight}px`
+  }, [content])
+
   const clearAttachment = () => {
     if (attachment !== null) {
       URL.revokeObjectURL(attachment.previewUrl)
@@ -324,7 +335,7 @@ export function MessageComposer({
 
         <div
           className={[
-            'flex items-center gap-1 rounded-[var(--radius-pill)] border border-border bg-white px-2 py-1.5 transition-all',
+            'flex items-end gap-1 rounded-[var(--radius-pill)] border border-border bg-white px-2 py-1.5 transition-all',
             composerFocusRingClass(platform),
             composerDisabled ? 'bg-surface-muted/80' : '',
           ].join(' ')}
@@ -350,10 +361,18 @@ export function MessageComposer({
             onChange={(event) => {
               setContent(event.target.value)
             }}
+            onKeyDown={(event) => {
+              if (event.key !== 'Enter' || event.shiftKey || event.nativeEvent.isComposing) {
+                return
+              }
+
+              event.preventDefault()
+              event.currentTarget.form?.requestSubmit()
+            }}
             placeholder={composerPlaceholder(attachment !== null)}
             disabled={composerDisabled}
             rows={1}
-            className="min-h-[36px] max-h-28 flex-1 resize-none border-0 bg-transparent py-1.5 text-sm text-ink outline-none placeholder:text-ink-faint disabled:cursor-not-allowed"
+            className={`min-h-[36px] max-h-48 flex-1 resize-none border-0 bg-transparent py-1.5 text-sm leading-5 text-ink outline-none placeholder:text-ink-faint disabled:cursor-not-allowed ${INBOX_SCROLL_AREA_CLASS}`}
           />
           <button
             type="submit"
