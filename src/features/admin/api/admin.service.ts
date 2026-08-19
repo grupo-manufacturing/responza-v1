@@ -10,14 +10,6 @@ import type {
   AdminDashboardResponse,
 } from './admin.types'
 
-export type {
-  AdminAffiliate,
-  AdminAffiliateReferral,
-  AdminAffiliateReferralsResponse,
-  AdminAffiliatesListResponse,
-  AdminDashboardResponse,
-} from './admin.types'
-
 const adminApi = axios.create({
   baseURL: getApiBaseUrl(),
   timeout: 15000,
@@ -53,11 +45,6 @@ export class AdminService {
       username,
       password,
     })
-    return response.data
-  }
-
-  static async getMe(): Promise<{ username: string }> {
-    const response = await adminApi.get<{ username: string }>('/admin/me')
     return response.data
   }
 

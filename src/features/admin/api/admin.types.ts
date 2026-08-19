@@ -13,10 +13,8 @@ type AdminOrganization = {
   name: string
   plan: string
   status: string
-  storedStatus: string
   trialEndsAt: string
   subscriptionPeriodEndsAt: string | null
-  razorpayCustomerId: string | null
   razorpaySubscriptionId: string | null
   conversationLimit: number | null
   emailVerified: boolean

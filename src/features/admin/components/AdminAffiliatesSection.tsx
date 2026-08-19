@@ -2,38 +2,10 @@ import { Fragment, useCallback, useEffect, useState } from 'react'
 
 import { Alert } from '@/shared/ui/primitives/Alert'
 import { Spinner } from '@/shared/ui/primitives/Spinner'
-import {
-  AdminService,
-  type AdminAffiliate,
-  type AdminAffiliateReferral,
-} from '@/features/admin/api/admin.service'
+import { AdminService } from '@/features/admin/api/admin.service'
+import type { AdminAffiliate, AdminAffiliateReferral } from '@/features/admin/api/admin.types'
+import { AdminStatusPill, formatAdminDate } from '@/features/admin/lib/admin-ui'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
-
-function formatDate(value: string | null): string {
-  if (value === null) return '—'
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return '—'
-  return date.toLocaleDateString('en-IN', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
-}
-
-function StatusPill({ status }: { readonly status: string }) {
-  const styles =
-    status === 'active'
-      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-      : status === 'trialing'
-        ? 'bg-amber-50 text-amber-800 border-amber-200'
-        : 'bg-red-50 text-red-700 border-red-200'
-
-  return (
-    <span className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-medium capitalize ${styles}`}>
-      {status}
-    </span>
-  )
-}
 
 export function AdminAffiliatesSection() {
   const [affiliates, setAffiliates] = useState<AdminAffiliate[]>([])
@@ -288,10 +260,10 @@ export function AdminAffiliatesSection() {
                                       </td>
                                       <td className="px-3 py-2 capitalize text-ink">{referral.plan}</td>
                                       <td className="px-3 py-2">
-                                        <StatusPill status={referral.status} />
+                                        <AdminStatusPill status={referral.status} />
                                       </td>
                                       <td className="px-3 py-2 text-ink-muted">
-                                        {formatDate(referral.referredAt)}
+                                        {formatAdminDate(referral.referredAt)}
                                       </td>
                                     </tr>
                                   ))}
