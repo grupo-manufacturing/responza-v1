@@ -55,7 +55,7 @@ export function GmailComposePopout({
       aria-hidden={false}
     >
       <div
-        className="animate-step-in pointer-events-auto flex max-h-[min(560px,85dvh)] w-full max-w-[32rem] flex-col overflow-hidden rounded-t-2xl border border-border bg-white shadow-[0_8px_40px_rgb(0_0_0_/_0.18)] sm:rounded-2xl"
+        className="animate-step-in pointer-events-auto flex max-h-[min(420px,55dvh)] w-full max-w-[40rem] flex-col overflow-hidden rounded-t-2xl border border-border bg-white shadow-[0_8px_40px_rgb(0_0_0_/_0.18)] sm:rounded-2xl"
         role="dialog"
         aria-modal="false"
         aria-labelledby="gmail-compose-title"
@@ -123,8 +123,8 @@ export function GmailComposePopout({
               onChange={(event) => setBody(event.target.value)}
               disabled={sending}
               required
-              rows={8}
-              className={`${COMPOSE_FIELD_CLASS} min-h-[180px] resize-none py-3`}
+              rows={4}
+              className={`${COMPOSE_FIELD_CLASS} min-h-[96px] resize-none py-3`}
               placeholder=""
             />
           </div>

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 
-import { APP_PANEL_WITH_HEADER_HEIGHT_CLASS } from '@/layouts/app-layout.constants'
+import { APP_PANEL_HEIGHT_CLASS } from '@/layouts/app-layout.constants'
 import { GmailComposePopout } from '@/features/gmail/components/GmailComposePopout'
 import { GmailMessageList } from '@/features/gmail/components/GmailMessageList'
 import { GmailMessageView } from '@/features/gmail/components/GmailMessageView'
@@ -179,7 +179,7 @@ export function GmailPage() {
       : null
 
   return (
-    <div className={`flex flex-col ${APP_PANEL_WITH_HEADER_HEIGHT_CLASS}`}>
+    <div className={`flex min-h-0 flex-col ${APP_PANEL_HEIGHT_CLASS}`}>
       <GmailPageHeader
         subtitle={connectionQuery.data?.gmail?.email ?? 'Connected Gmail inbox'}
         action={
