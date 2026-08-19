@@ -51,7 +51,7 @@ export function GmailComposePopout({
 
   return (
     <div
-      className="animate-step-in absolute right-3 bottom-3 z-20 flex max-h-[min(340px,42dvh)] w-[min(60rem,calc(100%-1.5rem))] flex-col overflow-hidden rounded-2xl border border-border bg-white shadow-[0_8px_32px_rgb(0_0_0_/_0.16)]"
+      className="animate-step-in absolute right-3 bottom-3 z-20 flex max-h-[min(340px,42dvh)] w-[min(30rem,calc(100%-1.5rem))] flex-col overflow-hidden rounded-2xl border border-border bg-white shadow-[0_8px_32px_rgb(0_0_0_/_0.16)]"
       role="dialog"
       aria-modal="false"
       aria-labelledby="gmail-compose-title"
