@@ -23,9 +23,17 @@ type AdminOrganization = {
   instagramConnected: boolean
 }
 
+export type AdminPagination = {
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+}
+
 export type AdminDashboardResponse = {
   overview: AdminOverview
   organizations: AdminOrganization[]
+  pagination: AdminPagination
 }
 
 export type AdminAffiliate = {
@@ -52,6 +60,7 @@ export type AdminAffiliateReferral = {
 
 export type AdminAffiliatesListResponse = {
   affiliates: AdminAffiliate[]
+  pagination: AdminPagination
 }
 
 export type AdminAffiliateReferralsResponse = {

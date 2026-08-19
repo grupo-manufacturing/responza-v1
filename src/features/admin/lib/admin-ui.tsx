@@ -59,6 +59,56 @@ export function AdminSignOutButton({ onClick }: { readonly onClick: () => void }
   )
 }
 
+export type AdminPaginationMeta = {
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+}
+
+export function AdminPagination({
+  pagination,
+  onPageChange,
+  disabled = false,
+}: {
+  readonly pagination: AdminPaginationMeta
+  readonly onPageChange: (page: number) => void
+  readonly disabled?: boolean
+}) {
+  if (pagination.totalPages <= 1) {
+    return null
+  }
+
+  const canGoPrevious = pagination.page > 1
+  const canGoNext = pagination.page < pagination.totalPages
+
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-3">
+      <p className="text-sm text-ink-muted">
+        {pagination.total} total · Page {pagination.page} of {pagination.totalPages}
+      </p>
+      <div className="flex gap-2">
+        <button
+          type="button"
+          disabled={disabled || !canGoPrevious}
+          onClick={() => onPageChange(pagination.page - 1)}
+          className="inline-flex items-center justify-center rounded-[var(--radius-pill)] border border-border bg-white px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Previous
+        </button>
+        <button
+          type="button"
+          disabled={disabled || !canGoNext}
+          onClick={() => onPageChange(pagination.page + 1)}
+          className="inline-flex items-center justify-center rounded-[var(--radius-pill)] border border-border bg-white px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export function AdminDashboardQueryState<T>({
   loading,
   error,

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 
 import { AdminAffiliatesSection } from '@/features/admin/components/AdminAffiliatesSection'
@@ -8,11 +8,13 @@ import { AdminSessionStorage } from '@/features/admin/lib/adminSession'
 import {
   AdminDashboardQueryState,
   AdminMetricCard,
+  AdminPagination,
   AdminSignOutButton,
   AdminStatusPill,
   formatAdminDate,
 } from '@/features/admin/lib/admin-ui'
 import { getVercelAnalyticsUrl, getVercelSpeedInsightsUrl } from '@/shared/config/env'
+import { Spinner } from '@/shared/ui/primitives/Spinner'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
 import { BrandMark } from '@/shared/ui/brand-ui'
 
@@ -92,13 +94,26 @@ function AnalyticsTab({ data }: { readonly data: AdminDashboardResponse }) {
   )
 }
 
-function OverviewTab({ data }: { readonly data: AdminDashboardResponse }) {
+function OverviewTab({
+  data,
+  orgLoading,
+  onPageChange,
+}: {
+  readonly data: AdminDashboardResponse
+  readonly orgLoading: boolean
+  readonly onPageChange: (page: number) => void
+}) {
   return (
     <section>
       <h1 className="text-xl font-semibold tracking-tight text-ink">Overview</h1>
       <p className="mt-1 text-sm text-ink-muted">Plan, subscription status, and connected channels.</p>
 
-      <div className="mt-4 overflow-x-auto rounded-[var(--radius-card)] border border-border bg-white">
+      <div className="relative mt-4 overflow-x-auto rounded-[var(--radius-card)] border border-border bg-white">
+        {orgLoading && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70">
+            <Spinner />
+          </div>
+        )}
         <table className="min-w-full text-left text-sm">
           <thead className="border-b border-border bg-surface-muted/60 text-xs uppercase tracking-wide text-ink-muted">
             <tr>
@@ -158,6 +173,11 @@ function OverviewTab({ data }: { readonly data: AdminDashboardResponse }) {
             ))}
           </tbody>
         </table>
+        <AdminPagination
+          pagination={data.pagination}
+          onPageChange={onPageChange}
+          disabled={orgLoading}
+        />
       </div>
     </section>
   )
@@ -166,21 +186,29 @@ function OverviewTab({ data }: { readonly data: AdminDashboardResponse }) {
 export function AdminPage() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<AdminTab>('overview')
+  const [orgPage, setOrgPage] = useState(1)
   const [data, setData] = useState<AdminDashboardResponse | null>(null)
   const [loading, setLoading] = useState(true)
+  const [orgLoading, setOrgLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const username = AdminSessionStorage.getUsername()
+  const hasLoadedDashboardRef = useRef(false)
 
   useEffect(() => {
     if (!AdminSessionStorage.isAuthenticated()) return
 
     let cancelled = false
+    const isInitialLoad = !hasLoadedDashboardRef.current
 
     void (async () => {
-      setLoading(true)
+      if (isInitialLoad) {
+        setLoading(true)
+      } else {
+        setOrgLoading(true)
+      }
       setError(null)
       try {
-        const dashboard = await AdminService.getDashboard()
+        const dashboard = await AdminService.getDashboard({ page: orgPage })
         if (!cancelled) {
           setData(dashboard)
         }
@@ -190,7 +218,9 @@ export function AdminPage() {
         }
       } finally {
         if (!cancelled) {
+          hasLoadedDashboardRef.current = true
           setLoading(false)
+          setOrgLoading(false)
         }
       }
     })()
@@ -198,7 +228,7 @@ export function AdminPage() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [orgPage])
 
   if (!AdminSessionStorage.isAuthenticated()) {
     return <Navigate to="/admin/login" replace />
@@ -253,7 +283,13 @@ export function AdminPage() {
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         {activeTab === 'overview' && (
           <AdminDashboardQueryState loading={loading} error={error} data={data}>
-            {(dashboard) => <OverviewTab data={dashboard} />}
+            {(dashboard) => (
+              <OverviewTab
+                data={dashboard}
+                orgLoading={orgLoading}
+                onPageChange={setOrgPage}
+              />
+            )}
           </AdminDashboardQueryState>
         )}
 

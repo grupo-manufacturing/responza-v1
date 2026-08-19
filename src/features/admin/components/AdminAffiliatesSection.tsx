@@ -1,15 +1,19 @@
-import { Fragment, useCallback, useEffect, useState } from 'react'
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 
 import { Alert } from '@/shared/ui/primitives/Alert'
 import { Spinner } from '@/shared/ui/primitives/Spinner'
 import { AdminService } from '@/features/admin/api/admin.service'
 import type { AdminAffiliate, AdminAffiliateReferral } from '@/features/admin/api/admin.types'
-import { AdminStatusPill, formatAdminDate } from '@/features/admin/lib/admin-ui'
+import { AdminStatusPill, AdminPagination, formatAdminDate } from '@/features/admin/lib/admin-ui'
+import type { AdminPagination as AdminPaginationMeta } from '@/features/admin/api/admin.types'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
 
 export function AdminAffiliatesSection() {
+  const [affiliatePage, setAffiliatePage] = useState(1)
   const [affiliates, setAffiliates] = useState<AdminAffiliate[]>([])
+  const [pagination, setPagination] = useState<AdminPaginationMeta | null>(null)
   const [loading, setLoading] = useState(true)
+  const [listLoading, setListLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [name, setName] = useState('')
   const [code, setCode] = useState('')
@@ -20,22 +24,33 @@ export function AdminAffiliatesSection() {
   const [referralsLoadingId, setReferralsLoadingId] = useState<string | null>(null)
   const [actionBusyId, setActionBusyId] = useState<string | null>(null)
 
-  const loadAffiliates = useCallback(async () => {
-    setLoading(true)
+  const hasLoadedAffiliatesRef = useRef(false)
+
+  const loadAffiliates = useCallback(async (page: number) => {
+    const isInitialLoad = !hasLoadedAffiliatesRef.current
+    if (isInitialLoad) {
+      setLoading(true)
+    } else {
+      setListLoading(true)
+    }
     setError(null)
     try {
-      const result = await AdminService.listAffiliates()
+      const result = await AdminService.listAffiliates({ page })
       setAffiliates(result.affiliates)
+      setPagination(result.pagination)
+      hasLoadedAffiliatesRef.current = true
     } catch (err) {
       setError(getApiErrorMessage(err, 'Failed to load affiliates'))
     } finally {
       setLoading(false)
+      setListLoading(false)
     }
   }, [])
 
   useEffect(() => {
-    void loadAffiliates()
-  }, [loadAffiliates])
+    setExpandedId(null)
+    void loadAffiliates(affiliatePage)
+  }, [affiliatePage, loadAffiliates])
 
   const handleCreate = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -48,7 +63,11 @@ export function AdminAffiliatesSection() {
       })
       setName('')
       setCode('')
-      await loadAffiliates()
+      if (affiliatePage === 1) {
+        await loadAffiliates(1)
+      } else {
+        setAffiliatePage(1)
+      }
     } catch (err) {
       setCreateError(getApiErrorMessage(err, 'Failed to create affiliate'))
     } finally {
@@ -166,7 +185,12 @@ export function AdminAffiliatesSection() {
       )}
 
       {!loading && error === null && (
-        <div className="mt-4 overflow-x-auto rounded-[var(--radius-card)] border border-border bg-white">
+        <div className="relative mt-4 overflow-x-auto rounded-[var(--radius-card)] border border-border bg-white">
+          {listLoading && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70">
+              <Spinner />
+            </div>
+          )}
           <table className="min-w-full text-left text-sm">
             <thead className="border-b border-border bg-surface-muted/60 text-xs uppercase tracking-wide text-ink-muted">
               <tr>
@@ -279,6 +303,13 @@ export function AdminAffiliatesSection() {
               })}
             </tbody>
           </table>
+          {pagination !== null && (
+            <AdminPagination
+              pagination={pagination}
+              onPageChange={setAffiliatePage}
+              disabled={listLoading}
+            />
+          )}
         </div>
       )}
     </section>

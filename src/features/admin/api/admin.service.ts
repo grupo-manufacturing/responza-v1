@@ -48,13 +48,17 @@ export class AdminService {
     return response.data
   }
 
-  static async getDashboard(): Promise<AdminDashboardResponse> {
-    const response = await adminApi.get<AdminDashboardResponse>('/admin/dashboard')
+  static async getDashboard(input: { page?: number } = {}): Promise<AdminDashboardResponse> {
+    const response = await adminApi.get<AdminDashboardResponse>('/admin/dashboard', {
+      params: input.page !== undefined ? { page: input.page } : undefined,
+    })
     return response.data
   }
 
-  static async listAffiliates(): Promise<AdminAffiliatesListResponse> {
-    const response = await adminApi.get<AdminAffiliatesListResponse>('/admin/affiliates')
+  static async listAffiliates(input: { page?: number } = {}): Promise<AdminAffiliatesListResponse> {
+    const response = await adminApi.get<AdminAffiliatesListResponse>('/admin/affiliates', {
+      params: input.page !== undefined ? { page: input.page } : undefined,
+    })
     return response.data
   }
 
