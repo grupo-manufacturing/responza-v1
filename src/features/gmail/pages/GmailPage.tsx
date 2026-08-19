@@ -201,7 +201,7 @@ export function GmailPage() {
         </Alert>
       )}
 
-      <div className={`${INBOX_SHELL_CLASS} animate-step-in min-h-0 flex-1`}>
+      <div className={`${INBOX_SHELL_CLASS} relative min-h-0 flex-1 animate-step-in`}>
         <div className="flex min-h-0 flex-1">
           <div
             className={[
@@ -241,25 +241,25 @@ export function GmailPage() {
             />
           </div>
         </div>
-      </div>
 
-      <GmailComposePopout
-        open={composeOpen}
-        mode={composeState.mode}
-        initialTo={composeState.to}
-        initialSubject={composeState.subject}
-        sending={sending}
-        error={composeError}
-        onClose={() => {
-          if (!sending) {
-            setComposeOpen(false)
-            setComposeError(null)
-          }
-        }}
-        onSend={(input) => {
-          void handleSend(input)
-        }}
-      />
+        <GmailComposePopout
+          open={composeOpen}
+          mode={composeState.mode}
+          initialTo={composeState.to}
+          initialSubject={composeState.subject}
+          sending={sending}
+          error={composeError}
+          onClose={() => {
+            if (!sending) {
+              setComposeOpen(false)
+              setComposeError(null)
+            }
+          }}
+          onSend={(input) => {
+            void handleSend(input)
+          }}
+        />
+      </div>
     </div>
   )
 }
