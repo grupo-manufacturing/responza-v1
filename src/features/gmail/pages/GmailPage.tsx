@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { APP_PANEL_HEIGHT_CLASS } from '@/layouts/app-layout.constants'
@@ -21,8 +21,8 @@ import { GMAIL_LIST_COLUMN_CLASS, GMAIL_PRIMARY_BUTTON_CLASS } from '@/features/
 import { INBOX_SHELL_CLASS } from '@/features/inbox/lib/inbox-ui'
 import { SubscriptionRequired } from '@/shared/ui/gates/SubscriptionRequired'
 import { AppButton } from '@/shared/ui/app-ui'
-import { Alert } from '@/shared/ui/primitives/Alert'
 import { SpinnerSection } from '@/shared/ui/primitives/Spinner'
+import { useToast } from '@/shared/ui/toast'
 import { useSubscriptionGate } from '@/shared/hooks/useSubscriptionGate'
 import { integrationsGateKeys } from '@/shared/hooks/useIntegrationsGate'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
@@ -47,6 +47,7 @@ function GmailPageHeader({ subtitle, action }: { subtitle: string; action?: Reac
 
 export function GmailPage() {
   const queryClient = useQueryClient()
+  const toast = useToast()
   const { subscriptionRequired } = useSubscriptionGate()
   const connectionQuery = useGmailConnection(!subscriptionRequired)
   const connected = connectionQuery.data?.connected === true
@@ -60,7 +61,6 @@ export function GmailPage() {
   const [composeOpen, setComposeOpen] = useState(false)
   const [composeState, setComposeState] = useState<GmailComposeState>(EMPTY_COMPOSE_STATE)
   const [composeError, setComposeError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
 
   const messageQuery = useGmailMessage(
     selectedMessageId,
@@ -82,6 +82,24 @@ export function GmailPage() {
       handleGmailRevoked()
     }
   }, [gmailRevoked, handleGmailRevoked])
+
+  const gmailQueryErrors = useMemo(
+    () => [
+      {
+        error: messagesQuery.isError && !messagesQuery.isFetching ? messagesQuery.error : null,
+        fallbackMessage: 'Could not load Gmail messages.',
+      },
+    ],
+    [messagesQuery.error, messagesQuery.isError, messagesQuery.isFetching],
+  )
+
+  useEffect(() => {
+    for (const { error, fallbackMessage } of gmailQueryErrors) {
+      if (error !== null && !isGmailRevokedError(error)) {
+        toast.error(getApiErrorMessage(error, fallbackMessage))
+      }
+    }
+  }, [gmailQueryErrors, toast])
 
   const handleSelectMessage = useCallback((messageId: string) => {
     setSelectedMessageId(messageId)
@@ -130,10 +148,10 @@ export function GmailPage() {
             messageId: composeState.replyMessageId,
             body: input.body,
           })
-          setSuccess('Reply sent successfully.')
+          toast.success('Reply sent successfully.')
         } else {
           await sendMutation.mutateAsync(input)
-          setSuccess('Email sent successfully.')
+          toast.success('Email sent successfully.')
         }
 
         setComposeOpen(false)
@@ -148,7 +166,7 @@ export function GmailPage() {
         setComposeError(getApiErrorMessage(error, 'Could not send email. Please try again.'))
       }
     },
-    [composeState.mode, composeState.replyMessageId, handleGmailRevoked, replyMutation, sendMutation],
+    [composeState.mode, composeState.replyMessageId, handleGmailRevoked, replyMutation, sendMutation, toast],
   )
 
   if (subscriptionRequired) {
@@ -168,11 +186,6 @@ export function GmailPage() {
     )
   }
 
-  const listError =
-    messagesQuery.isError && !messagesQuery.isFetching
-      ? getApiErrorMessage(messagesQuery.error, 'Could not load Gmail messages.')
-      : null
-
   const messageError =
     messageQuery.isError && !messageQuery.isFetching
       ? getApiErrorMessage(messageQuery.error, 'Could not load this email.')
@@ -188,18 +201,6 @@ export function GmailPage() {
           </AppButton>
         }
       />
-
-      {success !== null && (
-        <Alert variant="success" className="mb-4 shrink-0">
-          {success}
-        </Alert>
-      )}
-
-      {listError !== null && (
-        <Alert variant="error" className="mb-4 shrink-0">
-          {listError}
-        </Alert>
-      )}
 
       <div className={`${INBOX_SHELL_CLASS} relative min-h-0 flex-1 animate-step-in`}>
         <div className="flex min-h-0 flex-1">
