@@ -3,7 +3,8 @@ import { useEffect, useRef } from 'react'
 import type { GmailMessageListItem } from '@/features/gmail/api/gmail.types'
 import { GmailEmptyState } from '@/features/gmail/components/GmailEmptyState'
 import { formatGmailSender, formatGmailTimestamp } from '@/features/gmail/constants'
-import { gmailListItemSelectedClass, GMAIL_SCROLL_AREA_CLASS } from '@/features/gmail/lib/gmail-ui'
+import { gmailListItemSelectedClass } from '@/features/gmail/lib/gmail-ui'
+import { INBOX_SCROLL_AREA_CLASS } from '@/features/inbox/lib/inbox-ui'
 import { Spinner } from '@/shared/ui/primitives/Spinner'
 
 type GmailMessageListProps = {
@@ -59,7 +60,7 @@ export function GmailMessageList({
   }
 
   return (
-    <div className={`min-h-0 flex-1 ${GMAIL_SCROLL_AREA_CLASS}`}>
+    <div className={`min-h-0 flex-1 ${INBOX_SCROLL_AREA_CLASS}`}>
       <ul className="divide-y divide-border">
         {messages.map((message) => {
           const isSelected = message.id === selectedMessageId

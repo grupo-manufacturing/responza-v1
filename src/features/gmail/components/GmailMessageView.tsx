@@ -1,6 +1,7 @@
 import { GmailMessageHeader } from '@/features/gmail/components/GmailMessageHeader'
 import type { GmailMessageDetail } from '@/features/gmail/api/gmail.types'
-import { GMAIL_SCROLL_AREA_CLASS } from '@/features/gmail/lib/gmail-ui'
+import { GMAIL_REPLY_BUTTON_CLASS } from '@/features/gmail/lib/gmail-ui'
+import { INBOX_SCROLL_AREA_CLASS } from '@/features/inbox/lib/inbox-ui'
 import { AppButton } from '@/shared/ui/app-ui'
 import { Spinner } from '@/shared/ui/primitives/Spinner'
 
@@ -32,7 +33,7 @@ export function GmailMessageView({
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       <GmailMessageHeader message={message} onBack={onBack} />
 
-      <div className={`min-h-0 flex-1 bg-white/70 ${GMAIL_SCROLL_AREA_CLASS}`}>
+      <div className={`min-h-0 flex-1 bg-white/70 ${INBOX_SCROLL_AREA_CLASS}`}>
         {loading && (
           <div className="flex h-full items-center justify-center py-12">
             <Spinner />
@@ -57,13 +58,13 @@ export function GmailMessageView({
         )}
 
         {!loading && error === null && message !== null && (
-          <div className="p-4 sm:p-6">
+          <div className="flex h-full min-h-0 flex-col p-4 sm:p-6">
             {onReply !== undefined && (
-              <div className="mb-4">
+              <div className="mb-4 shrink-0">
                 <AppButton
                   variant="secondary"
                   onClick={onReply}
-                  className="!border-[#C5221F]/20 !text-[#C5221F] hover:!bg-[#C5221F]/5"
+                  className={GMAIL_REPLY_BUTTON_CLASS}
                 >
                   Reply
                 </AppButton>
@@ -73,7 +74,7 @@ export function GmailMessageView({
               title={message.subject}
               sandbox=""
               srcDoc={wrapEmailHtml(message.bodyHtml)}
-              className="min-h-[420px] w-full rounded-xl border border-border bg-white"
+              className="min-h-0 w-full flex-1 rounded-xl border border-border bg-white"
             />
           </div>
         )}

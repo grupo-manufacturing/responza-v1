@@ -1,6 +1,6 @@
 import { getApiErrorCode, getApiErrorMessage } from '@/shared/utils/api-error'
 
-export const GMAIL_REVOKED_MESSAGE =
+const GMAIL_REVOKED_MESSAGE =
   'Gmail access was revoked. Reconnect Gmail in Integrations.'
 
 export function isGmailRevokedError(error: unknown): boolean {

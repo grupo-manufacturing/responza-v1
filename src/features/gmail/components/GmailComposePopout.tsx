@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 
 import type { GmailComposeMode } from '@/features/gmail/constants'
-import { AppButton, AppLabel, APP_INPUT_CLASS, APP_TEXTAREA_CLASS } from '@/shared/ui/app-ui'
+import { GMAIL_PRIMARY_BUTTON_CLASS } from '@/features/gmail/lib/gmail-ui'
+import { AppButton } from '@/shared/ui/app-ui'
 import { Alert } from '@/shared/ui/primitives/Alert'
 
-type GmailComposeModalProps = {
+type GmailComposePopoutProps = {
   open: boolean
   mode: GmailComposeMode
   initialTo: string
@@ -15,7 +16,10 @@ type GmailComposeModalProps = {
   onSend: (input: { to: string; subject: string; body: string }) => void
 }
 
-export function GmailComposeModal({
+const COMPOSE_FIELD_CLASS =
+  'w-full border-0 bg-transparent px-4 py-2.5 text-sm text-ink outline-none placeholder:text-ink-faint disabled:opacity-60'
+
+export function GmailComposePopout({
   open,
   mode,
   initialTo,
@@ -24,7 +28,7 @@ export function GmailComposeModal({
   error,
   onClose,
   onSend,
-}: GmailComposeModalProps) {
+}: GmailComposePopoutProps) {
   const [to, setTo] = useState(initialTo)
   const [subject, setSubject] = useState(initialSubject)
   const [body, setBody] = useState('')
@@ -43,28 +47,31 @@ export function GmailComposeModal({
     return null
   }
 
-  const title = mode === 'reply' ? 'Reply' : 'Compose'
+  const title = mode === 'reply' ? 'Reply' : 'New Message'
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-4 sm:items-center">
+    <div
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-end p-3 sm:inset-x-auto sm:right-4 sm:p-0"
+      aria-hidden={false}
+    >
       <div
-        className="flex max-h-[90dvh] w-full max-w-2xl flex-col overflow-hidden rounded-[var(--radius-card-lg)] border border-border bg-white shadow-card"
+        className="animate-step-in pointer-events-auto flex max-h-[min(560px,85dvh)] w-full max-w-[32rem] flex-col overflow-hidden rounded-t-2xl border border-border bg-white shadow-[0_8px_40px_rgb(0_0_0_/_0.18)] sm:rounded-2xl"
         role="dialog"
-        aria-modal="true"
+        aria-modal="false"
         aria-labelledby="gmail-compose-title"
       >
-        <div className="flex items-center justify-between border-b border-border px-5 py-4">
-          <h2 id="gmail-compose-title" className="text-lg font-semibold text-ink">
+        <div className="flex items-center justify-between bg-[#323232] px-4 py-3 text-white">
+          <h2 id="gmail-compose-title" className="text-sm font-medium">
             {title}
           </h2>
           <button
             type="button"
             onClick={onClose}
             disabled={sending}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-xl text-ink-muted transition-colors hover:bg-surface-muted hover:text-ink disabled:opacity-50"
+            className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-white/80 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-50"
             aria-label="Close compose"
           >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -77,11 +84,14 @@ export function GmailComposeModal({
             onSend({ to: to.trim(), subject: subject.trim(), body: body.trim() })
           }}
         >
-          <div className="space-y-4 overflow-y-auto px-5 py-4">
-            {error !== null && <Alert variant="error">{error}</Alert>}
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            {error !== null && (
+              <div className="px-4 pt-3">
+                <Alert variant="error">{error}</Alert>
+              </div>
+            )}
 
-            <div>
-              <AppLabel htmlFor="gmail-compose-to">To</AppLabel>
+            <div className="border-b border-border">
               <input
                 id="gmail-compose-to"
                 type="email"
@@ -89,13 +99,12 @@ export function GmailComposeModal({
                 onChange={(event) => setTo(event.target.value)}
                 disabled={sending || mode === 'reply'}
                 required
-                className={APP_INPUT_CLASS}
-                placeholder="recipient@example.com"
+                className={COMPOSE_FIELD_CLASS}
+                placeholder="Recipients"
               />
             </div>
 
-            <div>
-              <AppLabel htmlFor="gmail-compose-subject">Subject</AppLabel>
+            <div className="border-b border-border">
               <input
                 id="gmail-compose-subject"
                 type="text"
@@ -103,31 +112,28 @@ export function GmailComposeModal({
                 onChange={(event) => setSubject(event.target.value)}
                 disabled={sending || mode === 'reply'}
                 required
-                className={APP_INPUT_CLASS}
-                placeholder="Email subject"
+                className={COMPOSE_FIELD_CLASS}
+                placeholder="Subject"
               />
             </div>
 
-            <div>
-              <AppLabel htmlFor="gmail-compose-body">Message</AppLabel>
-              <textarea
-                id="gmail-compose-body"
-                value={body}
-                onChange={(event) => setBody(event.target.value)}
-                disabled={sending}
-                required
-                rows={10}
-                className={APP_TEXTAREA_CLASS}
-                placeholder="Write your message"
-              />
-            </div>
+            <textarea
+              id="gmail-compose-body"
+              value={body}
+              onChange={(event) => setBody(event.target.value)}
+              disabled={sending}
+              required
+              rows={8}
+              className={`${COMPOSE_FIELD_CLASS} min-h-[180px] resize-none py-3`}
+              placeholder=""
+            />
           </div>
 
-          <div className="flex justify-end gap-2 border-t border-border px-5 py-4">
+          <div className="flex items-center justify-end gap-2 border-t border-border px-4 py-3">
             <AppButton type="button" variant="secondary" disabled={sending} onClick={onClose}>
-              Cancel
+              Discard
             </AppButton>
-            <AppButton type="submit" disabled={sending} className="!bg-[#C5221F] hover:!bg-[#A91B1B]">
+            <AppButton type="submit" disabled={sending} className={GMAIL_PRIMARY_BUTTON_CLASS}>
               {sending ? 'Sending…' : 'Send'}
             </AppButton>
           </div>

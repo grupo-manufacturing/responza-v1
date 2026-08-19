@@ -6,9 +6,14 @@ export const gmailKeys = {
   message: (id: string) => ['gmail', 'message', id] as const,
 }
 
-export function formatGmailTimestamp(value: string): string {
+function parseGmailDate(value: string): Date | null {
   const date = new Date(value)
-  if (Number.isNaN(date.getTime())) {
+  return Number.isNaN(date.getTime()) ? null : date
+}
+
+export function formatGmailTimestamp(value: string): string {
+  const date = parseGmailDate(value)
+  if (date === null) {
     return ''
   }
 
@@ -26,8 +31,8 @@ export function formatGmailTimestamp(value: string): string {
 }
 
 export function formatGmailDetailTimestamp(value: string): string {
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) {
+  const date = parseGmailDate(value)
+  if (date === null) {
     return ''
   }
 
@@ -79,5 +84,4 @@ export type GmailComposeState = {
   replyMessageId?: string
   to: string
   subject: string
-  body: string
 }

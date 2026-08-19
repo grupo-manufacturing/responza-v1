@@ -1,3 +1,4 @@
+import { GMAIL_PRIMARY_BUTTON_CLASS } from '@/features/gmail/lib/gmail-ui'
 import { AppButtonLink } from '@/shared/ui/app-ui'
 
 export function GmailNotConnected() {
@@ -8,7 +9,7 @@ export function GmailNotConnected() {
       <p className="mt-2 max-w-md text-sm leading-relaxed text-ink-muted">
         Link your Gmail account in Integrations to read your inbox emails here.
       </p>
-      <AppButtonLink to="/integrations" className="mt-6 !bg-[#C5221F] hover:!bg-[#A91B1B]">
+      <AppButtonLink to="/integrations" className={`mt-6 ${GMAIL_PRIMARY_BUTTON_CLASS}`}>
         Go to Integrations
       </AppButtonLink>
     </div>
