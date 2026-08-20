@@ -16,7 +16,9 @@ function formatLastBuiltAt(value: string): string {
 
 export function BusinessProfilePanel() {
   const toast = useToast()
-  const lastAgentToastKey = useRef<string | null>(null)
+  const lastAgentStatusRef = useRef<string | null>(null)
+  const agentStatusInitializedRef = useRef(false)
+  const lastAgentErrorRef = useRef<string | null>(null)
   const { status: agentStatus, isLoading: agentStatusLoading, loadError: agentStatusError, refetch: refetchAgentStatus } =
     useAgentStatus()
 
@@ -59,25 +61,44 @@ export function BusinessProfilePanel() {
     }
 
     if (agentStatusError !== null) {
-      const key = `error:${agentStatusError}`
-      if (lastAgentToastKey.current !== key) {
-        lastAgentToastKey.current = key
+      if (lastAgentErrorRef.current !== agentStatusError) {
+        lastAgentErrorRef.current = agentStatusError
         toast.error(agentStatusError)
       }
       return
     }
 
+    lastAgentErrorRef.current = null
+
     if (agentStatus === null) {
       return
     }
 
-    const key = `${agentStatus.status}:${agentStatus.lastBuiltAt ?? ''}:${agentStatus.lastError ?? ''}`
-    if (lastAgentToastKey.current === key) {
+    const nextStatus = agentStatus.status
+
+    if (!agentStatusInitializedRef.current) {
+      agentStatusInitializedRef.current = true
+      lastAgentStatusRef.current = nextStatus
+      if (nextStatus === 'failed') {
+        toast.error(
+          agentStatus.lastError ?? 'Save your profile again to retry.',
+          'Agent knowledge base build failed',
+        )
+      }
       return
     }
-    lastAgentToastKey.current = key
 
-    if (agentStatus.status === 'ready') {
+    if (lastAgentStatusRef.current === nextStatus) {
+      return
+    }
+    lastAgentStatusRef.current = nextStatus
+
+    if (nextStatus === 'building') {
+      toast.info('This usually takes a few minutes.', 'Agent knowledge base is building')
+      return
+    }
+
+    if (nextStatus === 'ready') {
       toast.success(
         agentStatus.lastBuiltAt !== null
           ? `Last built ${formatLastBuiltAt(agentStatus.lastBuiltAt)}.`
@@ -87,20 +108,12 @@ export function BusinessProfilePanel() {
       return
     }
 
-    if (agentStatus.status === 'failed') {
+    if (nextStatus === 'failed') {
       toast.error(
         agentStatus.lastError ?? 'Save your profile again to retry.',
         'Agent knowledge base build failed',
       )
-      return
     }
-
-    if (agentStatus.status === 'building') {
-      toast.info('This usually takes a few minutes.', 'Agent knowledge base is building')
-      return
-    }
-
-    toast.info('Save your business profile to build it.', 'Agent knowledge base is not built yet')
   }, [agentStatus, agentStatusError, agentStatusLoading, toast])
 
   if (isLoading) {

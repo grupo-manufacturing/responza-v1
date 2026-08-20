@@ -172,9 +172,9 @@ export function GeneralSettingsPanel() {
   ]
 
   return (
-    <div className="grid items-start gap-4 lg:grid-cols-2">
-      <AppCard padding="compact">
-        <form onSubmit={handleSaveAccount} className="space-y-3">
+    <div className="grid items-stretch gap-4 lg:grid-cols-2">
+      <AppCard padding="compact" className="flex h-full flex-col">
+        <form onSubmit={handleSaveAccount} className="flex h-full flex-col gap-3">
           <Field id="account-name" label="Organization name">
             <input
               id="account-name"
@@ -217,7 +217,7 @@ export function GeneralSettingsPanel() {
             />
           </Field>
 
-          <div className="flex justify-end border-t border-border pt-3">
+          <div className="mt-auto flex justify-end border-t border-border pt-3">
             <AppButton type="submit" disabled={!canSaveAccount}>
               {isSavingAccount ? 'Saving…' : 'Save changes'}
             </AppButton>
@@ -225,11 +225,12 @@ export function GeneralSettingsPanel() {
         </form>
       </AppCard>
 
-      <AppCard padding="compact">
-        <h3 className="text-sm font-semibold text-ink">Change password</h3>
-        <p className="mt-0.5 text-sm text-ink-muted">Use a strong password you do not use elsewhere.</p>
-
-        <form onSubmit={handleChangePassword} className="mt-3 space-y-3">
+      <AppCard padding="compact" className="flex h-full flex-col">
+        <form onSubmit={handleChangePassword} className="flex h-full flex-col gap-3">
+          <div>
+            <h3 className="text-sm font-semibold text-ink">Change password</h3>
+            <p className="mt-0.5 text-sm text-ink-muted">Use a strong password you do not use elsewhere.</p>
+          </div>
           <Field id="current-password" label="Current password">
             <input
               id="current-password"
@@ -274,7 +275,7 @@ export function GeneralSettingsPanel() {
             />
           </Field>
 
-          <div className="flex justify-end border-t border-border pt-3">
+          <div className="mt-auto flex justify-end border-t border-border pt-3">
             <AppButton
               type="submit"
               variant="secondary"
