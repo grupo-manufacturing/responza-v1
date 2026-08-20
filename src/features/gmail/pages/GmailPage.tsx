@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { useSearchParams } from 'react-router-dom'
 
 import { APP_PANEL_HEIGHT_CLASS } from '@/layouts/app-layout.constants'
 import { GmailComposePopout } from '@/features/gmail/components/GmailComposePopout'
@@ -48,6 +49,8 @@ function GmailPageHeader({ subtitle, action }: { subtitle: string; action?: Reac
 export function GmailPage() {
   const queryClient = useQueryClient()
   const toast = useToast()
+  const [searchParams] = useSearchParams()
+  const messageFromUrl = searchParams.get('message')?.trim() ?? ''
   const { subscriptionRequired } = useSubscriptionGate()
   const connectionQuery = useGmailConnection(!subscriptionRequired)
   const connected = connectionQuery.data?.connected === true
@@ -56,8 +59,10 @@ export function GmailPage() {
   const messages = flattenGmailMessages(messagesQuery.data)
   const { sendMutation, replyMutation, sending } = useGmailSend()
 
-  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null)
-  const [mobileShowMessage, setMobileShowMessage] = useState(false)
+  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(
+    messageFromUrl.length > 0 ? messageFromUrl : null,
+  )
+  const [mobileShowMessage, setMobileShowMessage] = useState(messageFromUrl.length > 0)
   const [composeOpen, setComposeOpen] = useState(false)
   const [composeState, setComposeState] = useState<GmailComposeState>(EMPTY_COMPOSE_STATE)
   const [composeError, setComposeError] = useState<string | null>(null)
@@ -76,6 +81,13 @@ export function GmailPage() {
     void queryClient.invalidateQueries({ queryKey: gmailKeys.messages })
     void queryClient.invalidateQueries({ queryKey: integrationsGateKeys.all })
   }, [connectionQuery, queryClient])
+
+  useEffect(() => {
+    if (messageFromUrl.length > 0) {
+      setSelectedMessageId(messageFromUrl)
+      setMobileShowMessage(true)
+    }
+  }, [messageFromUrl])
 
   useEffect(() => {
     if (gmailRevoked) {
