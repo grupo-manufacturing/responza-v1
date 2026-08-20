@@ -14,7 +14,7 @@ const TABS = [
 type SettingsTab = (typeof TABS)[number]['id']
 
 function isSettingsTab(value: string | null): value is SettingsTab {
-  return value === 'general' || value === 'profile' || value === 'subscription'
+  return TABS.some((tab) => tab.id === value)
 }
 
 export function SettingsPage() {
@@ -27,14 +27,14 @@ export function SettingsPage() {
   }
 
   return (
-    <AppPage className="max-w-4xl">
+    <AppPage className="max-w-5xl animate-step-in">
       <AppPageHeader
         title="Settings"
         description="Manage your account, business profile, translation preferences, and subscription."
       />
 
       <nav
-        className="mb-6 flex max-w-lg rounded-[var(--radius-pill)] border border-border bg-surface-muted/80 p-1"
+        className="mb-4 flex max-w-lg rounded-[var(--radius-pill)] border border-border bg-surface-muted/80 p-1"
         aria-label="Settings sections"
       >
         {TABS.map((tab) => (

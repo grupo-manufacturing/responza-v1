@@ -19,6 +19,14 @@ export function formatPlanLabel(plan: string): string {
   return PLAN_LABELS[plan] ?? plan
 }
 
+export function formatInr(amount: number): string {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(amount)
+}
+
 export function planBillingInterval(planKey: string): BillingPlanInterval {
   return planKey === 'premium' ? 'yearly' : 'monthly'
 }

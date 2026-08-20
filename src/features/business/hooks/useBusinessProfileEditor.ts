@@ -14,8 +14,12 @@ import {
 import { BusinessService, type CatalogueFile } from '@/features/business/api/business.service'
 import { getApiErrorMessage, getApiValidationFieldErrors } from '@/shared/utils/api-error'
 
-export function useBusinessProfileEditor(options?: { onProfileMutated?: () => void }) {
+export function useBusinessProfileEditor(options?: {
+  onProfileMutated?: () => void
+  onFeedback?: (feedback: { variant: 'success' | 'error'; text: string }) => void
+}) {
   const onProfileMutated = options?.onProfileMutated
+  const onFeedback = options?.onFeedback
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [formData, setFormData] = useState<BusinessOnboardingFormData | null>(null)
@@ -25,10 +29,6 @@ export function useBusinessProfileEditor(options?: { onProfileMutated?: () => vo
   const [uploadingCatalogue, setUploadingCatalogue] = useState(false)
   const [removingCatalogueId, setRemovingCatalogueId] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
-  const [saveMessage, setSaveMessage] = useState<{
-    variant: 'success' | 'error'
-    text: string
-  } | null>(null)
 
   const loadProfile = useCallback(async () => {
     const { profile } = await BusinessService.getBusiness()
@@ -61,12 +61,11 @@ export function useBusinessProfileEditor(options?: { onProfileMutated?: () => vo
 
   const handleUploadCatalogue = async (file: File) => {
     setUploadingCatalogue(true)
-    setSaveMessage(null)
 
     try {
       const result = await BusinessService.uploadCatalogue(file)
       setCatalogueFiles(result.profile.catalogueFiles)
-      setSaveMessage({
+      onFeedback?.({
         variant: 'success',
         text: 'Catalogue file uploaded.',
       })
@@ -82,18 +81,17 @@ export function useBusinessProfileEditor(options?: { onProfileMutated?: () => vo
 
   const handleRemoveCatalogue = async (fileId: string) => {
     setRemovingCatalogueId(fileId)
-    setSaveMessage(null)
 
     try {
       const result = await BusinessService.deleteCatalogue(fileId)
       setCatalogueFiles(result.profile.catalogueFiles)
-      setSaveMessage({
+      onFeedback?.({
         variant: 'success',
         text: 'Catalogue file removed.',
       })
       onProfileMutated?.()
     } catch (err: unknown) {
-      setSaveMessage({
+      onFeedback?.({
         variant: 'error',
         text: getApiErrorMessage(err, 'We could not remove this file right now. Please try again in a moment.'),
       })
@@ -115,7 +113,6 @@ export function useBusinessProfileEditor(options?: { onProfileMutated?: () => vo
     }
 
     setIsSaving(true)
-    setSaveMessage(null)
 
     try {
       const result = await BusinessService.updateBusiness(formDataToBusinessUpdatePayload(formData))
@@ -124,7 +121,7 @@ export function useBusinessProfileEditor(options?: { onProfileMutated?: () => vo
       setSavedFormData(nextFormData)
       setCatalogueFiles(result.profile.catalogueFiles)
       setFieldErrors({})
-      setSaveMessage({
+      onFeedback?.({
         variant: 'success',
         text: 'Business profile updated.',
       })
@@ -133,9 +130,8 @@ export function useBusinessProfileEditor(options?: { onProfileMutated?: () => vo
       const apiFieldErrors = getApiValidationFieldErrors(err)
       if (apiFieldErrors !== null) {
         setFieldErrors(mapApiFieldErrorsToBusinessForm(apiFieldErrors))
-        setSaveMessage(null)
       } else {
-        setSaveMessage({
+        onFeedback?.({
           variant: 'error',
           text: getApiErrorMessage(err, 'We could not save your changes right now. Please try again in a moment.'),
         })
@@ -148,11 +144,6 @@ export function useBusinessProfileEditor(options?: { onProfileMutated?: () => vo
   const handleFormChange = (nextFormData: BusinessOnboardingFormData) => {
     setFormData(nextFormData)
     setFieldErrors(validateBusinessOnboardingForm(nextFormData))
-    setSaveMessage(null)
-  }
-
-  const handleFieldEdit = (_field: keyof BusinessOnboardingFormData) => {
-    setSaveMessage(null)
   }
 
   const isDirty =
@@ -173,9 +164,7 @@ export function useBusinessProfileEditor(options?: { onProfileMutated?: () => vo
     uploadingCatalogue,
     removingCatalogueId,
     isSaving,
-    saveMessage,
     canSave,
-    handleFieldEdit,
     handleUploadCatalogue,
     handleRemoveCatalogue,
     handleSave,

@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { Alert } from '@/shared/ui/primitives/Alert'
 import { SpinnerSection } from '@/shared/ui/primitives/Spinner'
 import {
   SubscriptionService,
@@ -12,6 +11,7 @@ import { AppButton, AppCard, AppProgressBar } from '@/shared/ui/app-ui'
 import { SectionBadge } from '@/shared/ui/brand-ui'
 import { clearSessionCache, loadSession } from '@/shared/hooks/useSession'
 import { SessionStorage } from '@/shared/session/storage'
+import { useToast } from '@/shared/ui/toast'
 import {
   subscriptionBadgeClass,
   subscriptionBadgeText,
@@ -20,28 +20,21 @@ import {
 import {
   billingIntervalSuffix,
   conversationQuotaLabel,
+  formatInr,
   formatPlanLabel,
   planBillingInterval,
 } from '@/shared/utils/billing-display'
 import { getApiErrorMessage } from '@/shared/utils/api-error'
 
-function formatInr(amount: number): string {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    maximumFractionDigits: 0,
-  }).format(amount)
-}
-
 export function SubscriptionPanel() {
+  const toast = useToast()
+  const noticedRef = useRef<Set<string>>(new Set())
   const [subscription, setSubscription] = useState<SubscriptionDetails | null>(null)
   const [plans, setPlans] = useState<BillingPlanPublic[]>([])
   const [checkoutAvailable, setCheckoutAvailable] = useState(false)
   const [razorpayMode, setRazorpayMode] = useState<'test' | 'live' | 'unknown'>('unknown')
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [actionError, setActionError] = useState<string | null>(null)
-  const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [busyPlanKey, setBusyPlanKey] = useState<string | null>(null)
   const [isCancelling, setIsCancelling] = useState(false)
 
@@ -68,7 +61,11 @@ export function SubscriptionPanel() {
 
     void reload()
       .catch(() => {
-        if (!cancelled) setError('Could not load subscription details.')
+        if (!cancelled) {
+          const message = 'Could not load subscription details.'
+          setError(message)
+          toast.error(message)
+        }
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false)
@@ -77,11 +74,47 @@ export function SubscriptionPanel() {
     return () => {
       cancelled = true
     }
-  }, [reload])
+  }, [reload, toast])
+
+  useEffect(() => {
+    if (subscription === null) {
+      return
+    }
+
+    const noticeOnce = (key: string, message: string, title?: string) => {
+      if (noticedRef.current.has(key)) {
+        return
+      }
+      noticedRef.current.add(key)
+      toast.info(message, title)
+    }
+
+    if (razorpayMode === 'test') {
+      noticeOnce(
+        'razorpay-test',
+        'Checkout uses test cards only — no real charges.',
+        'Razorpay is in test mode',
+      )
+    }
+
+    if (!subscription.isPaid && !checkoutAvailable) {
+      noticeOnce('checkout-unavailable', 'Checkout is not available yet. Please try again later.')
+    }
+
+    if (
+      subscription.conversationQuotaEnforced &&
+      subscription.conversationsRemaining !== null &&
+      subscription.conversationsRemaining <= 0
+    ) {
+      noticeOnce(
+        'quota-exhausted',
+        'Upgrade your plan to start new conversations. You can still reply in existing threads.',
+        'Conversation limit reached',
+      )
+    }
+  }, [checkoutAvailable, razorpayMode, subscription, toast])
 
   const handleSubscribe = async (plan: BillingPlanPublic) => {
-    setActionError(null)
-    setSuccessMessage(null)
     setBusyPlanKey(plan.key)
 
     try {
@@ -96,7 +129,7 @@ export function SubscriptionPanel() {
         customerEmail: organization?.email,
         onSuccess: () => {
           void (async () => {
-            setSuccessMessage('Payment successful. Your subscription is now active.')
+            toast.success('Payment successful. Your subscription is now active.')
             try {
               await SubscriptionService.syncFromRazorpay()
             } catch {
@@ -112,25 +145,23 @@ export function SubscriptionPanel() {
         },
       })
     } catch (checkoutError) {
-      setActionError(getApiErrorMessage(checkoutError, 'Could not start checkout. Please try again.'))
+      toast.error(getApiErrorMessage(checkoutError, 'Could not start checkout. Please try again.'))
     } finally {
       setBusyPlanKey(null)
     }
   }
 
   const handleCancel = async () => {
-    setActionError(null)
-    setSuccessMessage(null)
     setIsCancelling(true)
 
     try {
       await SubscriptionService.cancelSubscription(true)
-      setSuccessMessage('Subscription cancelled. You will keep access until the current period ends.')
+      toast.success('Subscription cancelled. You will keep access until the current period ends.')
       clearSessionCache()
       void loadSession()
       await reload()
     } catch (cancelError) {
-      setActionError(getApiErrorMessage(cancelError, 'Could not cancel subscription. Please try again.'))
+      toast.error(getApiErrorMessage(cancelError, 'Could not cancel subscription. Please try again.'))
     } finally {
       setIsCancelling(false)
     }
@@ -141,7 +172,7 @@ export function SubscriptionPanel() {
   }
 
   if (error !== null || subscription === null) {
-    return <Alert variant="error">{error ?? 'Subscription unavailable.'}</Alert>
+    return <p className="text-sm text-ink-muted">{error ?? 'Subscription unavailable.'}</p>
   }
 
   const planTitle = subscriptionPlanLabel(subscription.status, subscription.plan)
@@ -163,15 +194,6 @@ export function SubscriptionPanel() {
 
   return (
     <div className="max-w-3xl space-y-8">
-      {razorpayMode === 'test' && (
-        <Alert variant="warning">
-          Razorpay is in <strong>test mode</strong>. Checkout uses test cards only — no real charges.
-          Switch to live keys in your server environment when you are ready to bill customers.
-        </Alert>
-      )}
-      {actionError !== null && <Alert variant="error">{actionError}</Alert>}
-      {successMessage !== null && <Alert variant="success">{successMessage}</Alert>}
-
       <AppCard>
         <div className="flex items-start justify-between gap-4 border-b border-border pb-6">
           <div>
@@ -233,13 +255,6 @@ export function SubscriptionPanel() {
                 value={quotaPercent}
                 label={`${subscription.conversationsUsed.toLocaleString('en-IN')} / ${subscription.conversationLimit.toLocaleString('en-IN')} conversations / ${usageQuotaPeriod}`}
               />
-              {subscription.conversationsRemaining !== null &&
-                subscription.conversationsRemaining <= 0 && (
-                  <Alert variant="warning" className="mt-4">
-                    You have reached your conversation limit for this billing period. Upgrade your plan
-                    to start new conversations. You can still reply in existing threads.
-                  </Alert>
-                )}
             </div>
           )}
 
@@ -263,12 +278,6 @@ export function SubscriptionPanel() {
             All plans include the same features. Only conversation volume differs.
             {subscription.isTrialing && ' Your first payment is charged immediately when you subscribe.'}
           </p>
-
-          {!checkoutAvailable && (
-            <Alert variant="warning" className="mt-4">
-              Checkout is not available yet. Please try again later.
-            </Alert>
-          )}
 
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             {plans.map((plan) => {

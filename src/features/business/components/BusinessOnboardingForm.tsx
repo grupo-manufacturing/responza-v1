@@ -51,7 +51,7 @@ function FieldLabel({
   readonly optional?: boolean
 }) {
   return (
-    <label className="mb-1.5 block text-sm font-medium text-ink">
+    <label className="mb-1 block text-sm font-medium text-ink">
       {children}
       {required && <span className="text-red-500"> *</span>}
       {optional && <span className="ml-1 font-normal text-ink-faint">(optional)</span>}
@@ -130,48 +130,42 @@ export function BusinessOnboardingForm({
   }
 
   return (
-    <div className="space-y-6">
-      {intro !== undefined ? (
-        intro
-      ) : (
-        <p className="rounded-xl border border-accent/15 bg-accent/5 px-4 py-3 text-sm leading-relaxed text-ink-muted">
-          Please share a few details about your business. This helps our AI understand your brand,
-          products, and how you communicate — so replies and insights feel accurate and on-brand.
-          Website, catalogue, and social links are optional, but they give the AI more context.
-        </p>
-      )}
+    <div className="space-y-4">
+      {intro}
 
-      <div>
-        <FieldLabel required>What is your brand name?</FieldLabel>
-        <input
-          type="text"
-          value={formData.brandName}
-          onChange={(event) => updateField('brandName', event.target.value)}
-          placeholder="e.g., StyleHub"
-          className={fieldInputClass(fieldErrors.brandName !== undefined)}
-        />
-        <FieldError message={fieldErrors.brandName} />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <FieldLabel required>What is your brand name?</FieldLabel>
+          <input
+            type="text"
+            value={formData.brandName}
+            onChange={(event) => updateField('brandName', event.target.value)}
+            placeholder="e.g., StyleHub"
+            className={fieldInputClass(fieldErrors.brandName !== undefined)}
+          />
+          <FieldError message={fieldErrors.brandName} />
+        </div>
+
+        <div>
+          <FieldLabel optional>Your shop&apos;s website</FieldLabel>
+          <input
+            type="text"
+            inputMode="url"
+            autoComplete="url"
+            value={formData.websiteUrl}
+            onChange={(event) => updateField('websiteUrl', event.target.value)}
+            placeholder="https://yourshop.com"
+            className={fieldInputClass(fieldErrors.websiteUrl !== undefined)}
+          />
+          <FieldError message={fieldErrors.websiteUrl} />
+        </div>
       </div>
 
-      <div>
-        <FieldLabel optional>Your shop&apos;s website</FieldLabel>
-        <input
-          type="text"
-          inputMode="url"
-          autoComplete="url"
-          value={formData.websiteUrl}
-          onChange={(event) => updateField('websiteUrl', event.target.value)}
-          placeholder="https://yourshop.com"
-          className={fieldInputClass(fieldErrors.websiteUrl !== undefined)}
-        />
-        <FieldError message={fieldErrors.websiteUrl} />
-      </div>
-
-      <div>
-        <FieldLabel optional>Catalogue</FieldLabel>
-        <p className="mb-3 text-sm text-ink-muted">
-          Upload product catalogues or brochures (PDF, Word, Excel, PowerPoint, or text). Up to 5 files,
-          10 MB each.
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <FieldLabel optional>Catalogue</FieldLabel>
+        <p className="mb-2 text-xs text-ink-muted">
+          PDF, Word, Excel, PowerPoint, or text. Up to 5 files, 10 MB each.
         </p>
 
         <input
@@ -240,21 +234,21 @@ export function BusinessOnboardingForm({
         />
         <FieldError message={fieldErrors.instagramPageUrl} />
       </div>
+      </div>
 
       <div>
         <FieldLabel required>Tell us about your business in detail</FieldLabel>
-        <p className="mb-2 text-sm text-ink-muted">
-          Include what you sell, who your customers are, pricing approach, policies, and anything else
-          the AI should know when replying on your behalf.
+        <p className="mb-1.5 text-xs text-ink-muted">
+          What you sell, who you serve, pricing, policies, and anything else the AI should know.
         </p>
         <textarea
           value={formData.businessDescription}
           onChange={(event) => updateField('businessDescription', event.target.value)}
           placeholder="Describe your products, services, target customers, tone, policies, and common questions you receive..."
-          rows={6}
+          rows={4}
           className={fieldTextareaClass(fieldErrors.businessDescription !== undefined)}
         />
-        <p className="mt-1.5 text-xs text-ink-faint">
+        <p className="mt-1 text-xs text-ink-faint">
           At least {BUSINESS_DESCRIPTION_MIN_LENGTH} characters.
         </p>
         <FieldError message={fieldErrors.businessDescription} />
