@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import { ASSISTANT_QUESTION_MAX_LENGTH } from '@/features/assistant/constants'
-import { APP_TEXTAREA_CLASS, AppButton } from '@/shared/ui/app-ui'
+import { APP_TEXTAREA_CLASS } from '@/shared/ui/app-ui'
 
 type AssistantChatInputProps = {
   readonly disabled: boolean
@@ -49,20 +49,32 @@ export function AssistantChatInput({ disabled, onSubmit }: AssistantChatInputPro
 
   return (
     <form onSubmit={handleSubmit} className="border-t border-border bg-white/80 px-4 py-4 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-3xl items-end gap-3">
-        <textarea
-          value={question}
-          onChange={(event) => setQuestion(event.target.value)}
-          onKeyDown={handleKeyDown}
-          disabled={disabled}
-          maxLength={ASSISTANT_QUESTION_MAX_LENGTH}
-          rows={1}
-          placeholder="Ask about your conversations and integrations…"
-          className={`${APP_TEXTAREA_CLASS} min-h-[44px] max-h-32 flex-1 py-3`}
-        />
-        <AppButton type="submit" disabled={!canSubmit} className="!px-3.5 !py-3">
-          <SendIcon />
-        </AppButton>
+      <div className="flex w-full items-end">
+        <div className="relative flex-1">
+          <textarea
+            value={question}
+            onChange={(event) => setQuestion(event.target.value)}
+            onKeyDown={handleKeyDown}
+            disabled={disabled}
+            maxLength={ASSISTANT_QUESTION_MAX_LENGTH}
+            rows={1}
+            placeholder="Ask about your conversations and integrations…"
+            className={`${APP_TEXTAREA_CLASS} min-h-[44px] max-h-32 py-3 pr-12`}
+          />
+          <button
+            type="submit"
+            disabled={!canSubmit}
+            aria-label="Send message"
+            className={[
+              'absolute right-2 top-1/2 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center',
+              'rounded-xl bg-ink text-on-dark shadow-soft',
+              'hover:bg-ink/90',
+              'disabled:cursor-not-allowed disabled:opacity-50',
+            ].join(' ')}
+          >
+            <SendIcon />
+          </button>
+        </div>
       </div>
     </form>
   )

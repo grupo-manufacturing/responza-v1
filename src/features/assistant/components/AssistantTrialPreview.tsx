@@ -11,7 +11,7 @@ export function AssistantTrialPreview() {
       />
 
       <ProLockedSection className="min-h-[70vh]">
-        <AssistantChat />
+        <AssistantChat className="h-[70vh]" />
       </ProLockedSection>
     </AppPage>
   )

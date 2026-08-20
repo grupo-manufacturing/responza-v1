@@ -10,9 +10,9 @@ import {
   getAssistantAskErrorMessage,
   useAssistantAsk,
 } from '@/features/assistant/hooks/useAssistantAsk'
+import { ASSISTANT_CHAT_PANEL_HEIGHT_CLASS } from '@/features/assistant/constants'
 import { Alert } from '@/shared/ui/primitives/Alert'
 import { SpinnerSection } from '@/shared/ui/primitives/Spinner'
-import { APP_PANEL_HEIGHT_CLASS } from '@/layouts/app-layout.constants'
 
 function createMessageId(): string {
   return crypto.randomUUID()
@@ -57,13 +57,16 @@ export function AssistantChat({ className = '' }: AssistantChatProps) {
   return (
     <div
       className={[
-        'flex flex-col overflow-hidden rounded-[var(--radius-card-lg)] border border-border bg-surface/40 shadow-card',
-        APP_PANEL_HEIGHT_CLASS,
+        'flex flex-col min-h-0 overflow-hidden rounded-[var(--radius-card-lg)] border border-border bg-surface/40 shadow-card animate-step-in',
+        ASSISTANT_CHAT_PANEL_HEIGHT_CLASS,
         className,
       ].join(' ')}
     >
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-6">
-        <div className="mx-auto flex min-h-full max-w-3xl flex-col">
+      <div
+        ref={scrollRef}
+        className="flex-1 min-h-0 overflow-y-auto px-4 py-6 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+      >
+        <div className="mx-auto flex min-h-0 max-w-3xl flex-col">
           {showEmptyState && (
             <div className="my-auto space-y-6 py-8 text-center">
               <div>
