@@ -12,7 +12,7 @@ import {
   useAssistantAsk,
 } from '@/features/assistant/hooks/useAssistantAsk'
 import { ASSISTANT_CHAT_PANEL_HEIGHT_CLASS } from '@/features/assistant/constants'
-import { Alert } from '@/shared/ui/primitives/Alert'
+import { useToast } from '@/shared/ui/toast'
 
 function createMessageId(): string {
   return crypto.randomUUID()
@@ -37,9 +37,9 @@ type AssistantChatProps = {
 
 export function AssistantChat({ className = '' }: AssistantChatProps) {
   const [messages, setMessages] = useState<AssistantChatMessage[]>([])
-  const [error, setError] = useState<string | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const askMutation = useAssistantAsk()
+  const toast = useToast()
 
   const isLoading = askMutation.isPending
 
@@ -48,7 +48,6 @@ export function AssistantChat({ className = '' }: AssistantChatProps) {
   }, [messages, isLoading])
 
   async function handleAsk(question: string) {
-    setError(null)
     setMessages((current) => [
       ...current,
       { id: createMessageId(), role: 'user', content: question },
@@ -61,7 +60,7 @@ export function AssistantChat({ className = '' }: AssistantChatProps) {
         { id: createMessageId(), role: 'assistant', content: result.answer },
       ])
     } catch (nextError) {
-      setError(getAssistantAskErrorMessage(nextError))
+      toast.error(getAssistantAskErrorMessage(nextError))
     }
   }
 
@@ -120,12 +119,6 @@ export function AssistantChat({ className = '' }: AssistantChatProps) {
           {isLoading && (
             <div className="mt-4">
               <AssistantTypingIndicator />
-            </div>
-          )}
-
-          {error !== null && (
-            <div className="mt-4">
-              <Alert variant="error">{error}</Alert>
             </div>
           )}
         </div>
