@@ -9,7 +9,7 @@ export const ASSISTANT_QUESTION_MAX_LENGTH = 2000
 
 /**
  * Chat needs its own viewport height because `DashboardPage` has `AppPageHeader` above it.
- * Avoids body scrollbars + keeps only the message list scrollable.
+ * Subtracts shell padding + title/description so the panel fits without a page scrollbar.
  */
 export const ASSISTANT_CHAT_PANEL_HEIGHT_CLASS =
-  'h-[calc(100dvh-11rem)] lg:h-[calc(100dvh-6rem)]'
+  'h-[calc(100dvh-12.5rem)] lg:h-[calc(100dvh-8rem)]'

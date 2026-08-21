@@ -12,10 +12,28 @@ type AssistantMessageListProps = {
   readonly messages: AssistantChatMessage[]
 }
 
+function AssistantAvatar() {
+  return (
+    <div
+      className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-accent/20 to-accent-soft/30 text-accent ring-1 ring-accent/15"
+      aria-hidden
+    >
+      <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={1.75}
+          d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"
+        />
+      </svg>
+    </div>
+  )
+}
+
 function UserBubble({ content }: { readonly content: string }) {
   return (
     <div className="flex justify-end animate-message-in">
-      <div className="max-w-[85%] rounded-2xl rounded-br-md bg-ink px-4 py-2.5 text-sm leading-relaxed text-on-dark shadow-soft">
+      <div className="max-w-[92%] rounded-2xl rounded-br-md bg-ink px-3.5 py-2.5 text-sm leading-relaxed text-on-dark shadow-soft">
         {content}
       </div>
     </div>
@@ -70,9 +88,9 @@ function renderAssistantBlocks(content: string): ReactNode[] {
       }
 
       blocks.push(
-        <ol key={`ol-${i}`} className="list-decimal space-y-1 pl-5">
+        <ol key={`ol-${i}`} className="list-decimal space-y-1.5 pl-5">
           {items.map((item, idx) => (
-            <li key={`li-${idx}`} className="leading-relaxed">
+            <li key={`li-${idx}`} className="leading-relaxed marker:text-accent">
               {renderInline(item)}
             </li>
           ))}
@@ -94,9 +112,9 @@ function renderAssistantBlocks(content: string): ReactNode[] {
       }
 
       blocks.push(
-        <ul key={`ul-${i}`} className="list-disc space-y-1 pl-5">
+        <ul key={`ul-${i}`} className="list-disc space-y-1.5 pl-5">
           {items.map((item, idx) => (
-            <li key={`bli-${idx}`} className="leading-relaxed">
+            <li key={`bli-${idx}`} className="leading-relaxed marker:text-accent">
               {renderInline(item)}
             </li>
           ))}
@@ -136,9 +154,10 @@ function renderAssistantBlocks(content: string): ReactNode[] {
 
 function AssistantBubble({ content }: { readonly content: string }) {
   return (
-    <div className="flex justify-start animate-message-in">
-      <div className="max-w-[85%] rounded-2xl rounded-bl-md border border-border bg-white/95 px-4 py-2.5 text-sm leading-relaxed text-ink shadow-card">
-        <div className="space-y-2">{renderAssistantBlocks(content)}</div>
+    <div className="flex items-start gap-2.5 animate-message-in">
+      <AssistantAvatar />
+      <div className="max-w-[92%] rounded-2xl rounded-bl-md border border-border/70 bg-gradient-to-br from-white via-white to-surface-muted/80 px-3.5 py-2.5 text-sm leading-relaxed text-ink shadow-soft">
+        <div className="space-y-2.5">{renderAssistantBlocks(content)}</div>
       </div>
     </div>
   )
