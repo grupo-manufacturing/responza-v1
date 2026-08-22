@@ -1,8 +1,7 @@
 import { IntegrationRow } from '@/features/integrations/components/IntegrationRow'
 import { useIntegrations } from '@/features/integrations/hooks/useIntegrations'
-import { useAgentStatus } from '@/features/knowledge/hooks/useAgentStatus'
 import { AppButton } from '@/shared/ui/app-ui'
-import { Spinner, SpinnerSection } from '@/shared/ui/primitives/Spinner'
+import { SpinnerSection } from '@/shared/ui/primitives/Spinner'
 
 const ONBOARDING_CHANNEL_PLATFORMS = ['whatsapp', 'instagram'] as const
 
@@ -20,7 +19,6 @@ export function BusinessConnectChannelsStep({ onContinue }: BusinessConnectChann
     handleConnect,
     handleDisconnect,
   } = useIntegrations()
-  const { status: agentStatus } = useAgentStatus()
 
   const channelIntegrations = integrations.filter((integration) =>
     ONBOARDING_CHANNEL_PLATFORMS.includes(
@@ -29,21 +27,12 @@ export function BusinessConnectChannelsStep({ onContinue }: BusinessConnectChann
   )
 
   const hasConnectedChannel = channelIntegrations.some((integration) => integration.status === 'connected')
-  const isAgentBuilding = agentStatus?.status === 'building'
 
   return (
     <div>
-      <div className="mb-4 text-center">
-        <p className="text-sm text-ink-muted">
-          Link WhatsApp or Instagram to receive messages in your inbox. Optional — skip anytime.
-        </p>
-        {isAgentBuilding && (
-          <p className="mt-3 inline-flex items-center gap-2 rounded-full border border-border bg-surface-muted/60 px-3 py-1.5 text-xs font-medium text-ink-muted">
-            <Spinner size="sm" variant="muted" />
-            AI agent building your knowledge base in the background
-          </p>
-        )}
-      </div>
+      <p className="mb-4 text-center text-sm text-ink-muted">
+        Link WhatsApp or Instagram to receive messages in your inbox. Optional — skip anytime.
+      </p>
 
       {loading ? (
         <SpinnerSection minHeightClassName="min-h-[12rem]" />
