@@ -23,6 +23,7 @@ type IntegrationRowProps = {
   gmailDetails: GmailConnectSummary | null
   onConnect: (platform: IntegrationPlatform) => void
   onDisconnect: (platform: IntegrationPlatform) => void
+  showDisconnect?: boolean
 }
 
 export function IntegrationRow({
@@ -34,6 +35,7 @@ export function IntegrationRow({
   gmailDetails,
   onConnect,
   onDisconnect,
+  showDisconnect = true,
 }: IntegrationRowProps) {
   const isConnected = status === 'connected'
   const connectLabel =
@@ -80,14 +82,16 @@ export function IntegrationRow({
               {connectLabel}
             </AppButton>
           )}
-          <AppButton
-            variant="secondary"
-            disabled={busy || !isConnected}
-            onClick={() => onDisconnect(platform)}
-            className="!px-4 !py-2"
-          >
-            {busy && isConnected ? 'Disconnecting…' : 'Disconnect'}
-          </AppButton>
+          {showDisconnect && (
+            <AppButton
+              variant="secondary"
+              disabled={busy || !isConnected}
+              onClick={() => onDisconnect(platform)}
+              className="!px-4 !py-2"
+            >
+              {busy && isConnected ? 'Disconnecting…' : 'Disconnect'}
+            </AppButton>
+          )}
         </>
       }
     />

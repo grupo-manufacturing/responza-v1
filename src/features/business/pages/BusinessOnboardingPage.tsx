@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from 'react-router-dom'
 
 import { Alert } from '@/shared/ui/primitives/Alert'
 import { SpinnerOverlay } from '@/shared/ui/primitives/Spinner'
+import { BusinessConnectChannelsStep } from '@/features/business/components/BusinessConnectChannelsStep'
 import { BusinessOnboardingWizard } from '@/features/business/components/BusinessOnboardingWizard'
 import {
   EMPTY_BUSINESS_ONBOARDING_FORM,
@@ -22,8 +23,11 @@ import { SessionStorage } from '@/shared/session/storage'
 import { getApiErrorMessage, getApiValidationFieldErrors } from '@/shared/utils/api-error'
 import { resolveDefaultAppPath } from '@/shared/utils/subscription-access'
 
+type OnboardingPhase = 'profile' | 'connect'
+
 export function BusinessOnboardingPage() {
   const navigate = useNavigate()
+  const [phase, setPhase] = useState<OnboardingPhase>('profile')
   const [isLoading, setIsLoading] = useState(false)
   const [isHydrating, setIsHydrating] = useState(true)
   const [alreadyCompleted, setAlreadyCompleted] = useState(false)
@@ -43,6 +47,11 @@ export function BusinessOnboardingPage() {
         if (cancelled) return
 
         if (profile.completed) {
+          if (SessionStorage.isPostOnboardingConnectPending()) {
+            setPhase('connect')
+            return
+          }
+
           setAlreadyCompleted(true)
           return
         }
@@ -93,6 +102,11 @@ export function BusinessOnboardingPage() {
     }
   }
 
+  const enterApp = () => {
+    SessionStorage.clearPostOnboardingConnectPending()
+    navigate(resolveDefaultAppPath(SessionStorage.getStoredSubscription()), { replace: true })
+  }
+
   const handleSave = async () => {
     const nextFieldErrors = validateBusinessOnboardingForm(formData)
     setFieldErrors(nextFieldErrors)
@@ -108,7 +122,8 @@ export function BusinessOnboardingPage() {
     try {
       await BusinessService.completeBusiness(formDataToBusinessPayload(formData))
       SessionStorage.setBusinessDetailsCompleted(true)
-      navigate(resolveDefaultAppPath(SessionStorage.getStoredSubscription()), { replace: true })
+      SessionStorage.setPostOnboardingConnectPending(true)
+      setPhase('connect')
     } catch (err: unknown) {
       const apiFieldErrors = getApiValidationFieldErrors(err)
       if (apiFieldErrors !== null) {
@@ -158,31 +173,43 @@ export function BusinessOnboardingPage() {
             <LandingLogo variant="light" />
           </div>
           <h1 className="text-xl font-semibold tracking-tight text-ink sm:text-2xl">
-            Set up your <span className="text-accent-gradient">business profile</span>
+            {phase === 'connect' ? (
+              <>
+                Connect your <span className="text-accent-gradient">channels</span>
+              </>
+            ) : (
+              <>
+                Set up your <span className="text-accent-gradient">business profile</span>
+              </>
+            )}
           </h1>
         </header>
 
         <AppCard padding="compact" className="overflow-hidden">
-          {error !== null && (
+          {error !== null && phase === 'profile' && (
             <div className="mb-3">
               <Alert variant="error">{error}</Alert>
             </div>
           )}
 
-          <BusinessOnboardingWizard
-            formData={formData}
-            catalogueFiles={catalogueFiles}
-            uploadingCatalogue={uploadingCatalogue}
-            removingCatalogueId={removingCatalogueId}
-            fieldErrors={fieldErrors}
-            initialStepIndex={stepIndex}
-            isSaving={isLoading}
-            onChange={setFormData}
-            onFieldEdit={handleFieldEdit}
-            onUploadCatalogue={handleUploadCatalogue}
-            onRemoveCatalogue={handleRemoveCatalogue}
-            onComplete={() => void handleSave()}
-          />
+          {phase === 'connect' ? (
+            <BusinessConnectChannelsStep onContinue={enterApp} />
+          ) : (
+            <BusinessOnboardingWizard
+              formData={formData}
+              catalogueFiles={catalogueFiles}
+              uploadingCatalogue={uploadingCatalogue}
+              removingCatalogueId={removingCatalogueId}
+              fieldErrors={fieldErrors}
+              initialStepIndex={stepIndex}
+              isSaving={isLoading}
+              onChange={setFormData}
+              onFieldEdit={handleFieldEdit}
+              onUploadCatalogue={handleUploadCatalogue}
+              onRemoveCatalogue={handleRemoveCatalogue}
+              onComplete={() => void handleSave()}
+            />
+          )}
         </AppCard>
       </div>
     </AppFlowLayout>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 
 import { SubscriptionRequired } from '@/shared/ui/gates/SubscriptionRequired'
 import { PageSuspense, SpinnerOverlay } from '@/shared/ui/primitives/Spinner'
@@ -70,10 +70,6 @@ export function AppLayout() {
       cancelled = true
     }
   }, [navigate])
-
-  if (!SessionStorage.isBusinessDetailsCompleted()) {
-    return <Navigate to="/business" replace />
-  }
 
   if (!isReady || sessionLoading) {
     return <SpinnerOverlay />

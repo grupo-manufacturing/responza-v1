@@ -3,6 +3,7 @@ import type { SubscriptionDetails } from '@/features/settings/api/subscription.s
 const ORGANIZATION_STORAGE_KEY = 'organization'
 const SUBSCRIPTION_STORAGE_KEY = 'subscription'
 const BUSINESS_DETAILS_COMPLETED_KEY = 'businessDetailsCompleted'
+const POST_ONBOARDING_CONNECT_PENDING_KEY = 'postOnboardingConnectPending'
 
 export type TranslationLanguage =
   | 'hindi'
@@ -54,6 +55,18 @@ export class SessionStorage {
     localStorage.setItem(BUSINESS_DETAILS_COMPLETED_KEY, String(completed))
   }
 
+  static isPostOnboardingConnectPending(): boolean {
+    return localStorage.getItem(POST_ONBOARDING_CONNECT_PENDING_KEY) === 'true'
+  }
+
+  static setPostOnboardingConnectPending(pending: boolean): void {
+    localStorage.setItem(POST_ONBOARDING_CONNECT_PENDING_KEY, String(pending))
+  }
+
+  static clearPostOnboardingConnectPending(): void {
+    localStorage.removeItem(POST_ONBOARDING_CONNECT_PENDING_KEY)
+  }
+
   static getStoredOrganization(): StoredOrganization | null {
     const raw = localStorage.getItem(ORGANIZATION_STORAGE_KEY)
     if (!raw) return null
@@ -80,6 +93,7 @@ export class SessionStorage {
     localStorage.removeItem(ORGANIZATION_STORAGE_KEY)
     localStorage.removeItem(SUBSCRIPTION_STORAGE_KEY)
     localStorage.removeItem(BUSINESS_DETAILS_COMPLETED_KEY)
+    localStorage.removeItem(POST_ONBOARDING_CONNECT_PENDING_KEY)
   }
 
   static isAuthenticated(): boolean {

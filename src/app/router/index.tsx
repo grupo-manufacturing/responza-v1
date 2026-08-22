@@ -95,10 +95,6 @@ export const router = createBrowserRouter([
             element: suspense(<BusinessOnboardingPage />),
           },
           {
-            path: '/business-details',
-            element: <Navigate to="/business" replace />,
-          },
-          {
             element: <AppLayout />,
             children: [
               { path: '/dashboard', element: <DashboardPage /> },
