@@ -120,6 +120,9 @@ export function LandingClosing() {
             <div className="flex gap-10 text-sm sm:gap-12">
               <div className="space-y-2">
                 <p className="font-medium text-on-dark">Product</p>
+                <a href="#watch" className="block text-on-dark-muted transition-colors hover:text-accent-soft">
+                  Watch
+                </a>
                 <a href="#features" className="block text-on-dark-muted transition-colors hover:text-accent-soft">
                   Features
                 </a>

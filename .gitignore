@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Large media — host on YouTube/CDN, do not commit
+*.mp4
+*.mov
+*.webm
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -9,6 +9,7 @@ import { LandingClosing } from '../components/LandingClosing'
 import { LandingFeatures } from '../components/LandingFeatures'
 import { LandingHero } from '../components/LandingHero'
 import { LandingPricing } from '../components/LandingPricing'
+import { LandingWatch } from '../components/LandingWatch'
 
 export function LandingPage() {
   const location = useLocation()
@@ -23,6 +24,7 @@ export function LandingPage() {
   return (
     <div className="min-h-screen bg-surface-light">
       <LandingHero />
+      <LandingWatch />
       <LandingFeatures />
       <LandingPricing />
       <LandingAffiliate />

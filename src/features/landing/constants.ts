@@ -182,7 +182,16 @@ export const LANDING_FAQS = [
   },
 ] as const
 
+/** YouTube Shorts video about Responza (https://youtube.com/shorts/7d52P3l-Cfc). */
+export const LANDING_YOUTUBE_SHORT_ID = '7d52P3l-Cfc'
+
+export const LANDING_YOUTUBE_SHORT_URL = `https://www.youtube.com/shorts/${LANDING_YOUTUBE_SHORT_ID}`
+
+export const LANDING_YOUTUBE_SHORT_EMBED_URL =
+  `https://www.youtube-nocookie.com/embed/${LANDING_YOUTUBE_SHORT_ID}?rel=0&modestbranding=1&playsinline=1`
+
 const NAV_LINKS = [
+  { href: '#watch', label: 'Watch' },
   { href: '#features', label: 'Features' },
   { href: '#pricing', label: 'Pricing' },
   { href: '#affiliate', label: 'Affiliate' },
