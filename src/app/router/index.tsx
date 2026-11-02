@@ -1,6 +1,7 @@
 import { Navigate, createBrowserRouter } from 'react-router-dom'
 
 import { ProtectedRoute } from '@/app/guards/ProtectedRoute'
+import { publicRoutes } from '@/app/router/publicRoutes'
 import { RouteErrorElement } from '@/app/router/RouteErrorElement'
 import { PageSuspense } from '@/shared/ui/primitives/Spinner'
 import { AppLayout } from '@/layouts/AppLayout'
@@ -10,15 +11,6 @@ import { ChannelInboxView } from '@/features/inbox/components/ChannelInboxView'
 import { WHATSAPP_PLATFORM } from '@/features/whatsapp/constants'
 import { INSTAGRAM_PLATFORM } from '@/features/instagram/constants'
 
-const LandingPage = lazyWithRetry(() =>
-  import('@/features/landing/pages/LandingPage').then((m) => ({ default: m.LandingPage })),
-)
-const PrivacyPolicyPage = lazyWithRetry(() =>
-  import('@/features/landing/pages/PrivacyPolicyPage').then((m) => ({ default: m.PrivacyPolicyPage })),
-)
-const TermsPage = lazyWithRetry(() =>
-  import('@/features/landing/pages/TermsPage').then((m) => ({ default: m.TermsPage })),
-)
 const AuthPage = lazyWithRetry(() =>
   import('@/features/auth/pages/AuthPage').then((m) => ({ default: m.AuthPage })),
 )
@@ -70,7 +62,7 @@ export const router = createBrowserRouter([
   {
     errorElement: <RouteErrorElement />,
     children: [
-      { path: '/', element: suspense(<LandingPage />) },
+      ...publicRoutes,
       { path: '/auth', element: suspense(<AuthPage />) },
       { path: '/auth/verify', element: suspense(<OtpVerificationPage />) },
       { path: '/auth/google/callback', element: suspense(<GoogleOAuthCallbackPage />) },
@@ -79,8 +71,6 @@ export const router = createBrowserRouter([
       { path: '/subscription', element: <Navigate to="/settings?tab=subscription" replace /> },
       { path: '/oauth/instagram/callback', element: suspense(<InstagramOAuthCallbackPage />) },
       { path: '/oauth/gmail/callback', element: suspense(<GmailOAuthCallbackPage />) },
-      { path: '/privacy-policy', element: suspense(<PrivacyPolicyPage />) },
-      { path: '/terms-conditions', element: suspense(<TermsPage />) },
       { path: '/privacy', element: <Navigate to="/privacy-policy" replace /> },
       { path: '/terms', element: <Navigate to="/terms-conditions" replace /> },
       { path: '/pricing', element: <Navigate to={{ pathname: '/', hash: 'pricing' }} replace /> },

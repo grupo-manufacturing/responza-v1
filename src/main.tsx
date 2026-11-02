@@ -1,11 +1,29 @@
 import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
+import { createRoot, hydrateRoot } from 'react-dom/client'
+import { RouterProvider } from 'react-router-dom'
 
 import '@/styles/tailwind.css'
-import { App } from './App'
+import { AppProviders } from './App'
+import { router } from '@/app/router'
 
-createRoot(document.getElementById('root')!).render(
+const container = document.getElementById('root')!
+
+const app = (
   <StrictMode>
-    <App />
-  </StrictMode>,
+    <AppProviders>
+      <RouterProvider router={router} />
+    </AppProviders>
+  </StrictMode>
 )
+
+function normalizePath(path: string): string {
+  return path.length > 1 ? path.replace(/\/+$/, '') : path
+}
+
+const prerenderedPath = container.dataset.prerendered
+if (prerenderedPath !== undefined && normalizePath(prerenderedPath) === normalizePath(window.location.pathname)) {
+  hydrateRoot(container, app)
+} else {
+  container.replaceChildren()
+  createRoot(container).render(app)
+}

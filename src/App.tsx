@@ -1,9 +1,8 @@
+import type { ReactNode } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/react'
-import { RouterProvider } from 'react-router-dom'
 
-import { router } from '@/app/router'
 import { ToastProvider } from '@/shared/ui/toast'
 
 const queryClient = new QueryClient({
@@ -14,12 +13,11 @@ const queryClient = new QueryClient({
   },
 })
 
-export function App() {
+/** Shared by the browser entry and the build-time prerender, so both produce the same tree for hydration. */
+export function AppProviders({ children }: { readonly children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <ToastProvider>
-        <RouterProvider router={router} />
-      </ToastProvider>
+      <ToastProvider>{children}</ToastProvider>
       <Analytics />
       <SpeedInsights />
     </QueryClientProvider>

@@ -1,8 +1,9 @@
 {
+  "cleanUrls": true,
   "rewrites": [
     {
       "source": "/((?!assets/).*)",
-      "destination": "/index.html"
+      "destination": "/spa.html"
     }
   ]
 }
