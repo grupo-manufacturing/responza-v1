@@ -27,14 +27,14 @@ const LANDING_PLATFORM_LABELS: Record<LandingPlatform, string> = {
   shopify: 'Shopify',
 }
 
-const LANDING_PLATFORM_LOGOS: Record<LandingPlatform, string> = {
-  whatsapp: '/whatsapp.png',
-  instagram: '/instagram.png',
-  indiamart: '/indiamart.png',
-  gmail: '/gmail.png',
-  tally: '/tally.png',
-  tiktok: '/tiktok.png',
-  shopify: '/shopify.png',
+const LANDING_PLATFORM_LOGOS: Record<LandingPlatform, { src: string; width: number; height: number }> = {
+  whatsapp: { src: '/whatsapp.webp', width: 128, height: 128 },
+  instagram: { src: '/instagram.webp', width: 128, height: 128 },
+  indiamart: { src: '/indiamart.webp', width: 199, height: 128 },
+  gmail: { src: '/gmail.webp', width: 177, height: 128 },
+  tally: { src: '/tally.webp', width: 295, height: 128 },
+  tiktok: { src: '/tiktok.webp', width: 128, height: 128 },
+  shopify: { src: '/shopify.webp', width: 128, height: 128 },
 }
 
 export const LANDING_PLATFORMS = LANDING_INTEGRATION_PLATFORMS.map((platform) => ({

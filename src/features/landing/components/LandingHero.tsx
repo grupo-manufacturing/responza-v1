@@ -168,9 +168,17 @@ function moduleLabel(module: HeroMessagingModule): string {
 }
 
 function PlatformGlyph({ platform }: { readonly platform: HeroMessagingModule }) {
-  const src = platform === 'whatsapp' ? '/whatsapp.png' : '/instagram.png'
+  const src = platform === 'whatsapp' ? '/whatsapp.webp' : '/instagram.webp'
   const label = platform === 'whatsapp' ? 'WhatsApp' : 'Instagram'
-  return <img src={src} alt={`${label} logo`} className="h-3.5 w-3.5 object-contain" />
+  return (
+    <img
+      src={src}
+      alt={`${label} logo`}
+      width={14}
+      height={14}
+      className="h-3.5 w-3.5 object-contain"
+    />
+  )
 }
 
 function SendIcon() {
@@ -347,8 +355,10 @@ function HeroVisual() {
         <div className="flex flex-col gap-3 px-3 pt-3 pb-2.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-4 sm:pt-4 sm:pb-3 lg:px-5">
           <div className="flex min-w-0 items-center gap-2">
             <img
-              src={activeModule === 'whatsapp' ? '/whatsapp.png' : '/instagram.png'}
+              src={activeModule === 'whatsapp' ? '/whatsapp.webp' : '/instagram.webp'}
               alt={`${moduleLabel(activeModule)} logo`}
+              width={20}
+              height={20}
               className="h-5 w-5 shrink-0 object-contain"
             />
             <p className="truncate text-sm font-semibold tracking-tight text-ink">
@@ -491,7 +501,14 @@ function HeroVisual() {
 function MetaVerifiedBadge() {
   return (
     <div className="mb-4 inline-flex items-center gap-2 rounded-[var(--radius-pill)] border border-[#0081FB]/20 bg-white/90 px-3 py-1.5 shadow-soft backdrop-blur-sm sm:mb-5 md:mb-6">
-      <img src="/meta.png" alt="Meta logo" className="h-4 w-4 shrink-0 object-contain" aria-hidden />
+      <img
+        src="/meta-icon.webp"
+        alt="Meta logo"
+        width={16}
+        height={16}
+        className="h-4 w-4 shrink-0 object-contain"
+        aria-hidden
+      />
       <span className="text-[11px] font-semibold tracking-wide text-[#0081FB]">Meta Verified</span>
     </div>
   )
@@ -578,8 +595,12 @@ export function LandingHero() {
                       >
                         <div className="flex h-9 w-9 items-center justify-center sm:h-10 sm:w-10 md:h-11 md:w-11">
                           <img
-                            src={logo}
+                            src={logo.src}
                             alt={`${label} logo`}
+                            width={36}
+                            height={36}
+                            loading="lazy"
+                            decoding="async"
                             className={landingPlatformLogoClass(platform)}
                             style={{ height: 36, width: 36 }}
                           />
@@ -614,8 +635,12 @@ export function LandingHero() {
                     >
                       <div className="flex h-9 w-9 items-center justify-center opacity-80 sm:h-10 sm:w-10 md:h-11 md:w-11">
                         <img
-                          src={logo}
+                          src={logo.src}
                           alt={`${label} logo`}
+                          width={logo.width}
+                          height={logo.height}
+                          loading="lazy"
+                          decoding="async"
                           className={landingPlatformLogoClass(platform)}
                           style={
                             platform === 'indiamart' || platform === 'tally' || platform === 'shopify'

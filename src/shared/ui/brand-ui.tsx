@@ -168,13 +168,24 @@ export function ProfilePhoto({
   src,
   alt,
   size = 'md',
+  loading = 'eager',
 }: {
   readonly src: string
   readonly alt: string
   readonly size?: 'sm' | 'md'
+  readonly loading?: 'eager' | 'lazy'
 }) {
   const sizeClass = size === 'sm' ? 'h-6 w-6' : 'h-8 w-8'
+  const pixels = size === 'sm' ? 24 : 32
   return (
-    <img src={src} alt={alt} className={`${sizeClass} shrink-0 rounded-full object-cover ring-2 ring-white`} />
+    <img
+      src={src}
+      alt={alt}
+      width={pixels}
+      height={pixels}
+      loading={loading}
+      decoding="async"
+      className={`${sizeClass} shrink-0 rounded-full object-cover ring-2 ring-white`}
+    />
   )
 }

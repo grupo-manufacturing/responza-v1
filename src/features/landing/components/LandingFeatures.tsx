@@ -24,7 +24,15 @@ function InboxVisual() {
     <MockupShellDark>
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <img src="/whatsapp.png" alt="WhatsApp logo" className="h-4 w-4 object-contain" />
+          <img
+            src="/whatsapp.webp"
+            alt="WhatsApp logo"
+            width={16}
+            height={16}
+            loading="lazy"
+            decoding="async"
+            className="h-4 w-4 object-contain"
+          />
           <p className="text-sm font-medium text-on-dark">WhatsApp</p>
         </div>
         <div className="flex gap-1.5">
@@ -66,11 +74,15 @@ function InboxVisual() {
             ].join(' ')}
           >
             <div className="relative shrink-0">
-              <ProfilePhoto src={row.avatar} alt={row.name} />
+              <ProfilePhoto src={row.avatar} alt={row.name} loading="lazy" />
               <span className="absolute -right-0.5 -bottom-0.5 rounded-full bg-surface-dark p-px">
                 <img
                   src={INTEGRATION_PLATFORM_LOGOS[row.platform]}
                   alt={`${INTEGRATION_PLATFORM_LABELS[row.platform]} logo`}
+                  width={12}
+                  height={12}
+                  loading="lazy"
+                  decoding="async"
                   className="h-3 w-3 object-contain"
                 />
               </span>
@@ -91,7 +103,7 @@ function RepliesVisual() {
   return (
     <MockupShellDark>
       <div className="flex items-start gap-3">
-        <ProfilePhoto src={LANDING_AVATARS.priya} alt="Priya Sharma" />
+        <ProfilePhoto src={LANDING_AVATARS.priya} alt="Priya Sharma" loading="lazy" />
         <div className="min-w-0 flex-1 rounded-2xl rounded-tl-md border border-border-dark bg-white/5 px-3.5 py-2.5">
           <p className="text-sm leading-relaxed text-on-dark">
             Hi! Can I get a quote for your premium plan?

@@ -25,21 +25,21 @@ export const SIDEBAR_NAVIGATION: SidebarNavItem[] = [
     name: 'WhatsApp',
     href: '/whatsapp',
     icon: (
-      <img src="/whatsapp.png" alt="" className="h-5 w-5 object-contain" />
+      <img src="/whatsapp.webp" alt="" className="h-5 w-5 object-contain" />
     ),
   },
   {
     name: 'Instagram',
     href: '/instagram',
     icon: (
-      <img src="/instagram.png" alt="" className="h-5 w-5 object-contain" />
+      <img src="/instagram.webp" alt="" className="h-5 w-5 object-contain" />
     ),
   },
   {
     name: 'Gmail',
     href: '/gmail',
     icon: (
-      <img src="/gmail.png" alt="" className="h-5 w-5 object-contain" />
+      <img src="/gmail.webp" alt="" className="h-5 w-5 object-contain" />
     ),
   },
   {

@@ -10,9 +10,9 @@ export const INTEGRATION_PLATFORM_LABELS: Record<IntegrationPlatform, string> = 
 }
 
 export const INTEGRATION_PLATFORM_LOGOS: Record<IntegrationPlatform, string> = {
-  whatsapp: '/whatsapp.png',
-  instagram: '/instagram.png',
-  gmail: '/gmail.png',
+  whatsapp: '/whatsapp.webp',
+  instagram: '/instagram.webp',
+  gmail: '/gmail.webp',
 }
 
 export function integrationPlatformLogoClass(_platform: IntegrationPlatform): string {
@@ -42,22 +42,22 @@ export const COMING_SOON_INTEGRATIONS: ComingSoonIntegration[] = [
   {
     platform: 'indiamart',
     label: 'IndiaMART',
-    logo: '/indiamart.png',
+    logo: '/indiamart.webp',
   },
   {
     platform: 'tally',
     label: 'Tally',
-    logo: '/tally.png',
+    logo: '/tally.webp',
   },
   {
     platform: 'tiktok',
     label: 'TikTok',
-    logo: '/tiktok.png',
+    logo: '/tiktok.webp',
   },
   {
     platform: 'shopify',
     label: 'Shopify',
-    logo: '/shopify.png',
+    logo: '/shopify.webp',
   },
 ]
 
