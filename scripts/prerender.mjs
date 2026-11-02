@@ -1,5 +1,6 @@
 // Runs after `vite build` + `vite build --ssr`. Writes static HTML for the public pages into dist/
-// so crawlers get real content; every other route falls back to the untouched SPA shell (spa.html).
+// so crawlers get real content; every other route falls back to the untouched SPA shell (spa.html,
+// addressed as /spa in vercel.json because `cleanUrls` strips the extension).
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
