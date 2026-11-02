@@ -75,7 +75,12 @@ export function usePageMeta({ title, description, path, noindex = false }: PageM
     if (url !== undefined) {
       restores.push(setHeadTag('meta', { property: 'og:url' }, 'content', url))
     }
-    restores.push(setHeadTag('link', { rel: 'canonical' }, 'href', noindex || url === undefined ? null : url))
+    const indexableUrl = noindex || url === undefined ? null : url
+    restores.push(
+      setHeadTag('link', { rel: 'canonical' }, 'href', indexableUrl),
+      setHeadTag('link', { rel: 'alternate', hreflang: 'en-IN' }, 'href', indexableUrl),
+      setHeadTag('link', { rel: 'alternate', hreflang: 'x-default' }, 'href', indexableUrl),
+    )
 
     return () => {
       document.title = previousTitle

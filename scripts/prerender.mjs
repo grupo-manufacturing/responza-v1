@@ -62,10 +62,16 @@ function applyHead(html, page, extraHeadTags) {
   result = setMetaContent(result, 'property', 'og:url', url)
   result = setMetaContent(result, 'name', 'twitter:title', page.title)
   result = setMetaContent(result, 'name', 'twitter:description', page.description)
-  const indexingTag = page.noindex ? NOINDEX_TAG : `<link rel="canonical" href="${escapeHtml(url)}" />`
+  const indexingTags = page.noindex
+    ? [NOINDEX_TAG]
+    : [
+        `<link rel="canonical" href="${escapeHtml(url)}" />`,
+        `<link rel="alternate" hreflang="en-IN" href="${escapeHtml(url)}" />`,
+        `<link rel="alternate" hreflang="x-default" href="${escapeHtml(url)}" />`,
+      ]
   const structuredData = getStructuredData(page.path)
   const structuredDataTags = structuredData === null ? [] : [jsonLdTag(structuredData)]
-  return appendToHead(result, [indexingTag, ...structuredDataTags, ...extraHeadTags])
+  return appendToHead(result, [...indexingTags, ...structuredDataTags, ...extraHeadTags])
 }
 
 // `<` is escaped so text inside the JSON can never close the <script> element.

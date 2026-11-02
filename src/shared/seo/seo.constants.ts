@@ -1,7 +1,7 @@
 export const SITE_URL = 'https://www.responza.in'
 
 const SITE_DESCRIPTION =
-  'One intelligent inbox for WhatsApp and Instagram. Respond faster with AI suggestions, translation, and analytics in one place.'
+  'AI-powered WhatsApp & Instagram inbox for Indian businesses. AI draft replies, translation and analytics in one workspace. Plans from ₹499/month.'
 
 type SeoPage = {
   readonly path: string
@@ -13,7 +13,7 @@ type SeoPage = {
 export const SEO_PAGES = {
   home: {
     path: '/',
-    title: 'Responza AI — Unified inbox for WhatsApp & Instagram',
+    title: 'AI-powered WhatsApp & Instagram inbox — Responza AI',
     description: SITE_DESCRIPTION,
   },
   privacy: {

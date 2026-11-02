@@ -169,6 +169,10 @@ export const LANDING_FAQS = [
     a: 'Go to Integrations after signing up and follow the guided OAuth or Embedded Signup flow. Most teams are connected in under two minutes.',
   },
   {
+    q: 'Does Responza AI work with IndiaMART or Tally?',
+    a: 'IndiaMART and Tally integrations are coming soon, so IndiaMART buyer enquiries can land in the same workspace as your WhatsApp and Instagram chats. Today, Responza supports WhatsApp and Instagram.',
+  },
+  {
     q: 'What are your pricing plans?',
     a: 'Basic is ₹499/month with 1,000 conversations per month. Responza Annual is ₹4,999/year with 30,000 conversations per year. All plans include the same features — only conversation volume differs. GST inclusive.',
   },

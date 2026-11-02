@@ -2,6 +2,7 @@ import { LANDING_FAQS, PRICING_PLANS } from '@/features/landing/constants'
 import { SEO_PAGES, SITE_URL } from '@/shared/seo/seo.constants'
 
 const ORGANIZATION_ID = `${SITE_URL}/#organization`
+const INDIA = { '@type': 'Country', name: 'India' } as const
 
 type JsonLd = Record<string, unknown>
 
@@ -14,6 +15,7 @@ function organization(): JsonLd {
     url: `${SITE_URL}/`,
     logo: `${SITE_URL}/logo.png`,
     email: 'contact@responza.in',
+    areaServed: INDIA,
   }
 }
 
@@ -32,6 +34,7 @@ function softwareApplication(): JsonLd {
       description: plan.description,
       price: plan.amountInr.toFixed(2),
       priceCurrency: 'INR',
+      eligibleRegion: INDIA,
       url: `${SITE_URL}/#pricing`,
       priceSpecification: {
         '@type': 'UnitPriceSpecification',
