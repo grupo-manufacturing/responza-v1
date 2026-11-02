@@ -6,8 +6,9 @@ import { AppProviders } from './App'
 import { publicRoutes } from '@/app/router/publicRoutes'
 import { RouteErrorElement } from '@/app/router/RouteErrorElement'
 import { SEO_PAGES, SITE_URL } from '@/shared/seo/seo.constants'
+import { getStructuredData } from '@/shared/seo/structuredData'
 
-export { SITE_URL }
+export { SITE_URL, getStructuredData }
 export const PRERENDER_PAGES = Object.values(SEO_PAGES)
 
 const routes: RouteObject[] = [{ errorElement: <RouteErrorElement />, children: publicRoutes }]

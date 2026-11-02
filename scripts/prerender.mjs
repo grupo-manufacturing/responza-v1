@@ -11,7 +11,7 @@ const serverDir = path.join(rootDir, 'dist-ssr')
 
 const ROOT_PLACEHOLDER = '<div id="root"></div>'
 
-const { render, PRERENDER_PAGES, SITE_URL } = await import(
+const { render, getStructuredData, PRERENDER_PAGES, SITE_URL } = await import(
   pathToFileURL(path.join(serverDir, 'entry-server.js')).href
 )
 
@@ -63,7 +63,14 @@ function applyHead(html, page, extraHeadTags) {
   result = setMetaContent(result, 'name', 'twitter:title', page.title)
   result = setMetaContent(result, 'name', 'twitter:description', page.description)
   const indexingTag = page.noindex ? NOINDEX_TAG : `<link rel="canonical" href="${escapeHtml(url)}" />`
-  return appendToHead(result, [indexingTag, ...extraHeadTags])
+  const structuredData = getStructuredData(page.path)
+  const structuredDataTags = structuredData === null ? [] : [jsonLdTag(structuredData)]
+  return appendToHead(result, [indexingTag, ...structuredDataTags, ...extraHeadTags])
+}
+
+// `<` is escaped so text inside the JSON can never close the <script> element.
+function jsonLdTag(data) {
+  return `<script type="application/ld+json">${JSON.stringify(data).replaceAll('<', '\\u003c')}</script>`
 }
 
 // The SPA shell only serves private app routes (auth, dashboard, inboxes, admin…), none of which should be indexed.
