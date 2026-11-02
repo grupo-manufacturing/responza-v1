@@ -170,7 +170,7 @@ function moduleLabel(module: HeroMessagingModule): string {
 function PlatformGlyph({ platform }: { readonly platform: HeroMessagingModule }) {
   const src = platform === 'whatsapp' ? '/whatsapp.png' : '/instagram.png'
   const label = platform === 'whatsapp' ? 'WhatsApp' : 'Instagram'
-  return <img src={src} alt={label} className="h-3.5 w-3.5 object-contain" />
+  return <img src={src} alt={`${label} logo`} className="h-3.5 w-3.5 object-contain" />
 }
 
 function SendIcon() {
@@ -348,7 +348,7 @@ function HeroVisual() {
           <div className="flex min-w-0 items-center gap-2">
             <img
               src={activeModule === 'whatsapp' ? '/whatsapp.png' : '/instagram.png'}
-              alt=""
+              alt={`${moduleLabel(activeModule)} logo`}
               className="h-5 w-5 shrink-0 object-contain"
             />
             <p className="truncate text-sm font-semibold tracking-tight text-ink">
@@ -391,7 +391,7 @@ function HeroVisual() {
                   isSelected ? 'bg-ink text-on-dark' : 'bg-surface-muted/70 text-ink',
                 ].join(' ')}
               >
-                <ProfilePhoto src={conversation.avatar} alt="" size="sm" />
+                <ProfilePhoto src={conversation.avatar} alt={conversation.name} size="sm" />
                 <span className="text-[11px] font-medium">{conversation.name.split(' ')[0]}</span>
                 <PlatformGlyph platform={conversation.platform} />
               </button>
@@ -415,7 +415,7 @@ function HeroVisual() {
                   ].join(' ')}
                 >
                   <div className="relative shrink-0">
-                    <ProfilePhoto src={conversation.avatar} alt="" />
+                    <ProfilePhoto src={conversation.avatar} alt={conversation.name} />
                     <span className="absolute -right-0.5 -bottom-0.5 rounded-full bg-white p-px shadow-soft">
                       <PlatformGlyph platform={conversation.platform} />
                     </span>
@@ -432,7 +432,7 @@ function HeroVisual() {
           <div className="flex min-w-0 flex-1 flex-col">
             <div className="flex items-center gap-2.5 px-3 py-2.5 sm:gap-3 sm:px-4 sm:py-3">
               <div className="relative shrink-0">
-                <ProfilePhoto src={selected.avatar} alt="" />
+                <ProfilePhoto src={selected.avatar} alt={selected.name} />
                 <span className="absolute -right-0.5 -bottom-0.5 rounded-full bg-white p-px shadow-soft">
                   <PlatformGlyph platform={selected.platform} />
                 </span>
@@ -491,7 +491,7 @@ function HeroVisual() {
 function MetaVerifiedBadge() {
   return (
     <div className="mb-4 inline-flex items-center gap-2 rounded-[var(--radius-pill)] border border-[#0081FB]/20 bg-white/90 px-3 py-1.5 shadow-soft backdrop-blur-sm sm:mb-5 md:mb-6">
-      <img src="/meta.png" alt="" className="h-4 w-4 shrink-0 object-contain" aria-hidden />
+      <img src="/meta.png" alt="Meta logo" className="h-4 w-4 shrink-0 object-contain" aria-hidden />
       <span className="text-[11px] font-semibold tracking-wide text-[#0081FB]">Meta Verified</span>
     </div>
   )
@@ -579,7 +579,7 @@ export function LandingHero() {
                         <div className="flex h-9 w-9 items-center justify-center sm:h-10 sm:w-10 md:h-11 md:w-11">
                           <img
                             src={logo}
-                            alt={label}
+                            alt={`${label} logo`}
                             className={landingPlatformLogoClass(platform)}
                             style={{ height: 36, width: 36 }}
                           />
@@ -615,7 +615,7 @@ export function LandingHero() {
                       <div className="flex h-9 w-9 items-center justify-center opacity-80 sm:h-10 sm:w-10 md:h-11 md:w-11">
                         <img
                           src={logo}
-                          alt={label}
+                          alt={`${label} logo`}
                           className={landingPlatformLogoClass(platform)}
                           style={
                             platform === 'indiamart' || platform === 'tally' || platform === 'shopify'

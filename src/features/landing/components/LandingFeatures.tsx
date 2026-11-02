@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-import { INTEGRATION_PLATFORM_LOGOS } from '@/features/integrations/constants'
+import { INTEGRATION_PLATFORM_LABELS, INTEGRATION_PLATFORM_LOGOS } from '@/features/integrations/constants'
 import { LANDING_AVATARS, LANDING_FEATURES } from '@/features/landing/constants'
 import { ProfilePhoto, Reveal, SectionDivider } from '@/shared/ui/brand-ui'
 
@@ -24,7 +24,7 @@ function InboxVisual() {
     <MockupShellDark>
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <img src="/whatsapp.png" alt="" className="h-4 w-4 object-contain" />
+          <img src="/whatsapp.png" alt="WhatsApp logo" className="h-4 w-4 object-contain" />
           <p className="text-sm font-medium text-on-dark">WhatsApp</p>
         </div>
         <div className="flex gap-1.5">
@@ -70,7 +70,7 @@ function InboxVisual() {
               <span className="absolute -right-0.5 -bottom-0.5 rounded-full bg-surface-dark p-px">
                 <img
                   src={INTEGRATION_PLATFORM_LOGOS[row.platform]}
-                  alt=""
+                  alt={`${INTEGRATION_PLATFORM_LABELS[row.platform]} logo`}
                   className="h-3 w-3 object-contain"
                 />
               </span>
