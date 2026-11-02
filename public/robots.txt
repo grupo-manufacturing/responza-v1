@@ -1,4 +1,14 @@
 User-agent: *
 Allow: /
+Disallow: /auth
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /whatsapp
+Disallow: /instagram
+Disallow: /gmail
+Disallow: /settings
+Disallow: /integrations
+Disallow: /business
+Disallow: /oauth/
 
 Sitemap: https://www.responza.in/sitemap.xml

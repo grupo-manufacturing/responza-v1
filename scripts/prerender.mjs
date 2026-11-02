@@ -1,6 +1,6 @@
 // Runs after `vite build` + `vite build --ssr`. Writes static HTML for the public pages into dist/
-// so crawlers get real content; every other route falls back to the untouched SPA shell (spa.html,
-// addressed as /spa in vercel.json because `cleanUrls` strips the extension).
+// so crawlers get real content. App routes listed in vercel.json are rewritten to the noindex SPA shell
+// (spa.html, addressed as /spa because `cleanUrls` strips the extension); any other URL gets 404.html.
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
@@ -45,6 +45,14 @@ function splitLeadingResourceHints(appHtml) {
   return { hints: match[0].match(/<link\b[^>]*\/?>/g), body: appHtml.slice(match[0].length) }
 }
 
+const NOINDEX_TAG = '<meta name="robots" content="noindex" />'
+
+function appendToHead(html, tags) {
+  return replaceOrThrow(html, /\n(\s*)<\/head>/, (_, indent) => {
+    return `\n${tags.map((tag) => `${indent}  ${tag}\n`).join('')}${indent}</head>`
+  }, '</head>')
+}
+
 function applyHead(html, page, extraHeadTags) {
   const url = new URL(page.path, SITE_URL).href
   let result = replaceOrThrow(html, /<title>[^<]*<\/title>/, `<title>${escapeHtml(page.title)}</title>`, '<title>')
@@ -54,13 +62,12 @@ function applyHead(html, page, extraHeadTags) {
   result = setMetaContent(result, 'property', 'og:url', url)
   result = setMetaContent(result, 'name', 'twitter:title', page.title)
   result = setMetaContent(result, 'name', 'twitter:description', page.description)
-  const headTags = [`<link rel="canonical" href="${escapeHtml(url)}" />`, ...extraHeadTags]
-  return replaceOrThrow(result, /\n(\s*)<\/head>/, (_, indent) => {
-    return `\n${headTags.map((tag) => `${indent}  ${tag}\n`).join('')}${indent}</head>`
-  }, '</head>')
+  const indexingTag = page.noindex ? NOINDEX_TAG : `<link rel="canonical" href="${escapeHtml(url)}" />`
+  return appendToHead(result, [indexingTag, ...extraHeadTags])
 }
 
-await writeFile(path.join(distDir, 'spa.html'), template)
+// The SPA shell only serves private app routes (auth, dashboard, inboxes, admin…), none of which should be indexed.
+await writeFile(path.join(distDir, 'spa.html'), appendToHead(template, [NOINDEX_TAG]))
 
 for (const page of PRERENDER_PAGES) {
   const appHtml = await render(page.path)

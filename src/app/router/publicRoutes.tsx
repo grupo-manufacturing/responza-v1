@@ -1,5 +1,6 @@
 import type { RouteObject } from 'react-router-dom'
 
+import { NotFoundPage } from '@/features/landing/pages/NotFoundPage'
 import { SEO_PAGES } from '@/shared/seo/seo.constants'
 import { PageSuspense } from '@/shared/ui/primitives/Spinner'
 import { lazyWithRetry } from '@/shared/utils/lazyWithRetry'
@@ -40,4 +41,5 @@ export const publicRoutes: RouteObject[] = [
       </PageSuspense>
     ),
   },
+  { path: '*', element: <NotFoundPage /> },
 ]
