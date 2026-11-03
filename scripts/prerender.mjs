@@ -1,5 +1,5 @@
 // Runs after `vite build` + `vite build --ssr`. Writes static HTML for the public pages into dist/
-// so crawlers get real content. App routes listed in vercel.json are rewritten to the noindex SPA shell
+// so crawlers get real content, plus sitemap.xml for the indexable ones. App routes listed in vercel.json are rewritten to the noindex SPA shell
 // (spa.html, addressed as /spa because `cleanUrls` strips the extension); any other URL gets 404.html.
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
@@ -57,6 +57,7 @@ function applyHead(html, page, extraHeadTags) {
   const url = new URL(page.path, SITE_URL).href
   let result = replaceOrThrow(html, /<title>[^<]*<\/title>/, `<title>${escapeHtml(page.title)}</title>`, '<title>')
   result = setMetaContent(result, 'name', 'description', page.description)
+  result = setMetaContent(result, 'property', 'og:type', page.ogType ?? 'website')
   result = setMetaContent(result, 'property', 'og:title', page.title)
   result = setMetaContent(result, 'property', 'og:description', page.description)
   result = setMetaContent(result, 'property', 'og:url', url)
@@ -97,5 +98,21 @@ for (const page of PRERENDER_PAGES) {
   await writeFile(outFile, html)
   console.log(`Prerendered ${page.path} (${Math.round(appHtml.length / 1024)} kB)`)
 }
+
+function buildSitemap(pages) {
+  const entries = pages
+    .filter((page) => !page.noindex)
+    .map((page) => {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(page.lastModified ?? '')) {
+        throw new Error(`Prerender: ${page.path} needs lastModified (YYYY-MM-DD) for sitemap.xml`)
+      }
+      const loc = escapeHtml(new URL(page.path, SITE_URL).href)
+      return `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${page.lastModified}</lastmod>\n  </url>\n`
+    })
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join('')}</urlset>\n`
+}
+
+await writeFile(path.join(distDir, 'sitemap.xml'), buildSitemap(PRERENDER_PAGES))
+console.log('Wrote sitemap.xml')
 
 await rm(serverDir, { recursive: true, force: true })

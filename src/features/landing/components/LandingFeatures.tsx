@@ -54,7 +54,7 @@ function InboxVisual() {
           {
             name: 'Priya Sharma',
             platform: 'whatsapp' as const,
-            preview: 'Thanks for the quote — can we discuss…',
+            preview: 'Thanks for the quote, can we discuss…',
             avatar: LANDING_AVATARS.priya,
             active: true,
           },
@@ -115,7 +115,7 @@ function RepliesVisual() {
       </p>
       <div className="mt-2.5 space-y-2">
         {[
-          'Of course — Premium is ₹4,999/year with 30k conversations.',
+          'Of course! Premium is ₹4,999/year with 30k conversations.',
           'Happy to send a detailed quote today. Want a call too?',
         ].map((suggestion) => (
           <div
@@ -128,7 +128,7 @@ function RepliesVisual() {
       </div>
       <div className="mt-4 flex items-center gap-2 border-t border-border-dark pt-3">
         <div className="min-w-0 flex-1 rounded-full border border-border-dark bg-white/5 px-3.5 py-2">
-          <p className="truncate text-xs text-on-dark-muted">Of course — Premium is ₹4,999/year…</p>
+          <p className="truncate text-xs text-on-dark-muted">Of course! Premium is ₹4,999/year…</p>
         </div>
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-violet text-white">
           <svg className="h-4 w-4 rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
@@ -286,7 +286,7 @@ export function LandingFeatures() {
         </Reveal>
       </div>
 
-      {/* Mobile: feature cards — UI mockups are desktop */}
+      {/* Mobile: feature cards; UI mockups are desktop */}
       <div className="relative mx-auto mt-12 grid max-w-xl gap-3 px-4 sm:mt-14 sm:gap-4 sm:px-6 lg:hidden">
         {LANDING_FEATURES.map((feature, index) => (
           <Reveal key={feature.id} delay={index * 60}>

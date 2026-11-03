@@ -14,7 +14,7 @@ const AFFILIATE_STEPS = [
   {
     step: '03',
     title: 'Earn every month',
-    description: '₹50 for each referred business that keeps an active paid subscription — paid monthly.',
+    description: '₹50 for each referred business that keeps an active paid subscription, paid monthly.',
   },
 ] as const
 
@@ -41,7 +41,7 @@ export function LandingAffiliate() {
           </h2>
           <p className="mt-4 text-base leading-relaxed text-on-dark-muted">
             Built for creators and influencers. Share your referral code, help businesses unify WhatsApp
-            and Instagram — and earn ₹50 every month for each active paid signup.
+            and Instagram, and earn ₹50 every month for each active paid signup.
           </p>
         </Reveal>
 
@@ -59,7 +59,7 @@ export function LandingAffiliate() {
 
         <Reveal delay={200} className="mx-auto mt-12 max-w-2xl text-center sm:mt-14">
           <p className="text-sm text-on-dark-muted">
-            Payouts are for <span className="text-on-dark">active paid subscriptions</span> only — trials
+            Payouts are for <span className="text-on-dark">active paid subscriptions</span> only. Trials
             don’t count. Interested in joining?
           </p>
           <a

@@ -5,11 +5,12 @@ import { StaticRouterProvider, createStaticHandler, createStaticRouter, type Rou
 import { AppProviders } from './App'
 import { publicRoutes } from '@/app/router/publicRoutes'
 import { RouteErrorElement } from '@/app/router/RouteErrorElement'
-import { SEO_PAGES, SITE_URL } from '@/shared/seo/seo.constants'
+import { BLOG_INDEX_SEO, BLOG_POSTS, blogPostSeo } from '@/features/blog/blog.posts'
+import { SEO_PAGES, SITE_URL, type SeoPage } from '@/shared/seo/seo.constants'
 import { getStructuredData } from '@/shared/seo/structuredData'
 
 export { SITE_URL, getStructuredData }
-export const PRERENDER_PAGES = Object.values(SEO_PAGES)
+export const PRERENDER_PAGES: SeoPage[] = [...Object.values(SEO_PAGES), BLOG_INDEX_SEO, ...BLOG_POSTS.map(blogPostSeo)]
 
 const routes: RouteObject[] = [{ errorElement: <RouteErrorElement />, children: publicRoutes }]
 

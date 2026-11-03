@@ -112,8 +112,8 @@ export function LandingPricing() {
             Two simple plans. Every feature included.
           </h2>
           <p className="mt-4 text-base text-ink-muted">
-            Start with a 3-day free trial, then choose Basic monthly or Responza Annual. Same powerful
-            inbox and AI tools — only conversation volume changes.
+            Start with a 3-day free trial, then choose Basic monthly or Responza Annual. Every plan gets
+            the full inbox, AI draft replies and translation. Only conversation volume changes.
           </p>
         </Reveal>
 

@@ -22,7 +22,7 @@ export function LandingWatch() {
             <span className="text-accent-gradient">action.</span>
           </h2>
           <p className="mt-4 text-base leading-relaxed text-ink-muted">
-            A quick look at how teams manage WhatsApp and Instagram in one workspace — with AI drafts
+            A quick look at how teams manage WhatsApp and Instagram in one workspace, with AI drafts
             that stay under your control.
           </p>
         </Reveal>
@@ -32,7 +32,7 @@ export function LandingWatch() {
             <div className="rounded-[2rem] border border-border bg-ink p-2 shadow-card ring-1 ring-accent/15 sm:rounded-[2.25rem] sm:p-2.5">
               <div className="relative aspect-[9/16] overflow-hidden rounded-[1.5rem] bg-surface-dark sm:rounded-[1.75rem]">
                 <iframe
-                  title="About Responza — YouTube Short"
+                  title="About Responza: YouTube Short"
                   src={LANDING_YOUTUBE_SHORT_EMBED_URL}
                   className="absolute inset-0 h-full w-full border-0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

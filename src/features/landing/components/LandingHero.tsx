@@ -56,7 +56,7 @@ const HERO_CONVERSATIONS: readonly HeroMockConversation[] = [
       {
         id: 'p2',
         direction: 'outbound',
-        content: 'Of course — Premium is ₹4,999/year with 30k conversations.',
+        content: 'Of course! Premium is ₹4,999/year with 30k conversations.',
         time: '10:43',
       },
       {
@@ -83,7 +83,7 @@ const HERO_CONVERSATIONS: readonly HeroMockConversation[] = [
       {
         id: 'a1',
         direction: 'inbound',
-        content: 'Loved your reel — do you ship internationally?',
+        content: 'Loved your reel! Do you ship internationally?',
         time: '10:20',
       },
       {
@@ -95,13 +95,13 @@ const HERO_CONVERSATIONS: readonly HeroMockConversation[] = [
       {
         id: 'a3',
         direction: 'inbound',
-        content: 'Perfect — I’m in Singapore.',
+        content: 'Perfect, I’m in Singapore.',
         time: '10:28',
       },
       {
         id: 'a4',
         direction: 'outbound',
-        content: 'Yes — we ship worldwide. Share your city?',
+        content: 'Yes, we ship worldwide. Share your city?',
         time: '10:28',
       },
     ],
@@ -122,7 +122,7 @@ const HERO_CONVERSATIONS: readonly HeroMockConversation[] = [
       {
         id: 'm2',
         direction: 'outbound',
-        content: 'Great — I can walk you through WhatsApp and Instagram in Responza.',
+        content: 'Great, I can walk you through WhatsApp and Instagram in Responza.',
         time: '10:01',
       },
       {
@@ -155,7 +155,7 @@ const HERO_CONVERSATIONS: readonly HeroMockConversation[] = [
       {
         id: 'n2',
         direction: 'outbound',
-        content: 'Sure — Basic starts at ₹499/month.',
+        content: 'Sure, Basic starts at ₹499/month.',
         time: '9:40',
       },
     ],
@@ -523,16 +523,14 @@ export function LandingHero() {
           <Reveal className="flex min-w-0 flex-col items-center text-center lg:items-start lg:text-left">
             <MetaVerifiedBadge />
             <h1 className="text-[1.75rem] leading-tight font-semibold tracking-tight text-ink sm:text-4xl md:text-5xl lg:text-[3.25rem]">
-              AI-powered <span className="text-accent-gradient">WhatsApp &amp; Instagram inbox</span> for
-              businesses
+              One workspace, <span className="text-accent-gradient">every channel.</span>
             </h1>
             <p className="mt-3 text-base font-medium tracking-tight text-ink sm:mt-4 sm:text-lg md:text-xl">
-              One workspace, <span className="text-accent-gradient">every channel.</span>
+              The WhatsApp &amp; Instagram inbox for Indian businesses.
             </p>
             <p className="mt-3 max-w-lg text-sm leading-relaxed text-ink-muted sm:mt-4 sm:text-base md:text-lg">
-              Built for Indian businesses — manage WhatsApp and Instagram from dedicated modules
-              in Responza, with AI draft replies in your composer, instant translation, and a
-              dashboard that shows what needs attention.
+              Manage WhatsApp and Instagram from dedicated modules in Responza, with AI draft replies
+              in your composer, instant translation, and a dashboard that shows what needs attention.
             </p>
             <div className="mt-6 flex w-full max-w-sm flex-col gap-3 sm:mt-8 sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:justify-center lg:justify-start">
               <LandingButton to="/auth?mode=register" variant="primary" showChevron className="w-full sm:w-auto">
@@ -570,7 +568,7 @@ export function LandingHero() {
               Connect the channels your customers already use.
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-ink-muted sm:text-base">
-              WhatsApp and Instagram each have their own module — IndiaMART, Tally, Gmail and more
+              WhatsApp and Instagram each have their own module. IndiaMART, Tally, Gmail and more
               are on the way.
             </p>
           </Reveal>

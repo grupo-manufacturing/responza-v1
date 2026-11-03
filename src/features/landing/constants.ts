@@ -97,7 +97,7 @@ export const PRICING_PLANS = [
     interval: 'yearly' as const,
     highlight: true,
     freeTrial: false,
-    description: 'Best value — full year of Pro access with a higher conversation quota.',
+    description: 'Best value. A full year of Pro access with a higher conversation quota.',
   },
 ] as const
 
@@ -116,7 +116,7 @@ export const LANDING_FEATURES = [
     title: 'Every channel',
     titleAccent: 'in its own space.',
     description:
-      'WhatsApp and Instagram each get a dedicated module with conversations sorted by latest activity — switch channels without losing context.',
+      'WhatsApp and Instagram each get a dedicated module with conversations sorted by latest activity, so you can switch channels without losing context.',
   },
   {
     id: 'replies',
@@ -134,7 +134,7 @@ export const LANDING_FEATURES = [
     title: "Speak your",
     titleAccent: "customer's language.",
     description:
-      'Incoming messages are translated instantly so your team can reply confidently — no copy-pasting into external tools.',
+      'Incoming messages are translated instantly so your team can reply confidently, with no copy-pasting into external tools.',
   },
   {
     id: 'analytics',
@@ -150,11 +150,11 @@ export const LANDING_FEATURES = [
 export const LANDING_FAQS = [
   {
     q: 'How is Responza AI different from using WhatsApp and Instagram separately?',
-    a: 'Responza gives each channel its own module inside one workspace — with AI draft replies, translation, analytics, and a dashboard that shows what needs attention across channels.',
+    a: 'Responza gives each channel its own module inside one workspace, with AI draft replies, translation, analytics, and a dashboard that shows what needs attention across channels.',
   },
   {
     q: 'How do AI draft replies work?',
-    a: 'When a customer messages you on WhatsApp or Instagram, Responza drafts a reply in the composer from your business knowledge. You review and send it yourself — nothing goes out automatically.',
+    a: 'When a customer messages you on WhatsApp or Instagram, Responza drafts a reply in the composer from your business knowledge. You review and send it yourself. Nothing goes out automatically.',
   },
   {
     q: 'Can I still message customers outside of Responza AI?',
@@ -174,7 +174,7 @@ export const LANDING_FAQS = [
   },
   {
     q: 'What are your pricing plans?',
-    a: 'Basic is ₹499/month with 1,000 conversations per month. Responza Annual is ₹4,999/year with 30,000 conversations per year. All plans include the same features — only conversation volume differs. GST inclusive.',
+    a: 'Basic is ₹499/month with 1,000 conversations per month. Responza Annual is ₹4,999/year with 30,000 conversations per year. All plans include the same features. Only conversation volume differs. GST inclusive.',
   },
   {
     q: 'Is there a free trial?',
@@ -195,7 +195,6 @@ export const LANDING_YOUTUBE_SHORT_EMBED_URL =
   `https://www.youtube-nocookie.com/embed/${LANDING_YOUTUBE_SHORT_ID}?rel=0&modestbranding=1&playsinline=1`
 
 const NAV_LINKS = [
-  { href: '#watch', label: 'Watch' },
   { href: '#features', label: 'Features' },
   { href: '#pricing', label: 'Pricing' },
   { href: '#affiliate', label: 'Affiliate' },
