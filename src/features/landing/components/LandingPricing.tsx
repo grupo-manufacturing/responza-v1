@@ -1,13 +1,26 @@
-import { Link } from 'react-router-dom'
-
 import { PLAN_FEATURES, PRICING_PLANS } from '@/features/landing/constants'
 import { Reveal } from '@/shared/ui/brand-ui'
-import {
-  billingIntervalSuffix,
-  conversationQuotaLabel,
-  formatInr,
-  type BillingPlanInterval,
-} from '@/shared/utils/billing-display'
+
+type BillingPlanInterval = 'monthly' | 'yearly'
+
+const CONTACT_SALES_HREF = 'mailto:contact@responza.in?subject=Responza%20pricing'
+
+function billingIntervalSuffix(interval: BillingPlanInterval): string {
+  return interval === 'yearly' ? '/year' : '/month'
+}
+
+function conversationQuotaLabel(interval: BillingPlanInterval, limit: number): string {
+  const period = interval === 'yearly' ? 'year' : 'month'
+  return `${limit.toLocaleString('en-IN')} conversations / ${period}`
+}
+
+function formatInr(amount: number): string {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(amount)
+}
 
 function CheckIcon({ className }: { readonly className: string }) {
   return (
@@ -90,15 +103,15 @@ function PricingCard({
           </li>
         ))}
       </ul>
-      <Link
-        to="/auth?mode=register"
+      <a
+        href={CONTACT_SALES_HREF}
         className={[
           'mt-6 inline-flex h-11 items-center justify-center rounded-[var(--radius-pill)] text-sm font-medium transition-colors',
           highlight ? 'bg-on-dark text-ink hover:bg-on-dark/90' : 'bg-ink text-on-dark hover:bg-ink/90',
         ].join(' ')}
       >
-        {freeTrial ? 'Start free trial' : 'Get started'}
-      </Link>
+        Contact us
+      </a>
     </article>
   )
 }

@@ -19,8 +19,6 @@ import {
 import { BlogLayout } from '@/features/blog/components/BlogLayout'
 import { NotFoundPage } from '@/features/landing/pages/NotFoundPage'
 import { usePageMeta } from '@/shared/seo/usePageMeta'
-import { LandingButton } from '@/shared/ui/brand-ui'
-
 /** Imported eagerly: a nested lazy() here would make the prerender emit the body out of order behind a script. */
 const ARTICLE_BODIES: Record<BlogSlug, ComponentType> = {
   'manage-whatsapp-instagram-messages-one-place': ManageWhatsappInstagramOnePlace,
@@ -88,9 +86,6 @@ function BlogPostContent({ post }: { readonly post: BlogPost }) {
             AI draft replies you approve, in-chat translation and a dashboard that shows who is waiting. Try
             Responza free for 3 days, no credit card needed.
           </p>
-          <LandingButton to="/auth?mode=register" variant="secondary" showChevron className="mt-6">
-            Start free trial
-          </LandingButton>
         </aside>
       </article>
 

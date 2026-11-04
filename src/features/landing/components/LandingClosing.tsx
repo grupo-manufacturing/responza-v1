@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 import { LEGAL_FOOTER_LINKS } from '../legal.constants'
 import { LANDING_FAQS } from '@/features/landing/constants'
-import { LandingButton, LandingLogo, Reveal, SectionDivider } from '@/shared/ui/brand-ui'
+import { LandingLogo, Reveal, SectionDivider } from '@/shared/ui/brand-ui'
 
 export function LandingClosing() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
@@ -93,14 +93,6 @@ export function LandingClosing() {
             <p className="mt-4 text-base text-on-dark-muted">
               Join businesses using Responza AI to respond faster and convert more customers.
             </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <LandingButton to="/auth?mode=register" variant="secondary" showChevron className="w-full sm:w-auto">
-                Start free trial
-              </LandingButton>
-              <LandingButton to="/auth?mode=login" variant="ghost" className="w-full sm:w-auto">
-                Sign in
-              </LandingButton>
-            </div>
             <p className="mt-4 text-xs text-on-dark-muted">
               No credit card required · 3-day free trial · Plans from ₹499/month
             </p>
@@ -134,15 +126,6 @@ export function LandingClosing() {
                 </a>
                 <Link to="/blog" className="block text-on-dark-muted transition-colors hover:text-accent-soft">
                   Blog
-                </Link>
-              </div>
-              <div className="space-y-2">
-                <p className="font-medium text-on-dark">Account</p>
-                <Link to="/auth?mode=login" className="block text-on-dark-muted transition-colors hover:text-accent-soft">
-                  Sign in
-                </Link>
-                <Link to="/auth?mode=register" className="block text-on-dark-muted transition-colors hover:text-accent-soft">
-                  Get started
                 </Link>
               </div>
               <div className="space-y-2">

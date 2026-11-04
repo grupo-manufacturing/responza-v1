@@ -1,6 +1,5 @@
 // Runs after `vite build` + `vite build --ssr`. Writes static HTML for the public pages into dist/
-// so crawlers get real content, plus sitemap.xml for the indexable ones. App routes listed in vercel.json are rewritten to the noindex SPA shell
-// (spa.html, addressed as /spa because `cleanUrls` strips the extension); any other URL gets 404.html.
+// so crawlers get real content, plus sitemap.xml for the indexable ones. Any other URL gets 404.html.
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
@@ -79,9 +78,6 @@ function applyHead(html, page, extraHeadTags) {
 function jsonLdTag(data) {
   return `<script type="application/ld+json">${JSON.stringify(data).replaceAll('<', '\\u003c')}</script>`
 }
-
-// The SPA shell only serves private app routes (auth, dashboard, inboxes, admin…), none of which should be indexed.
-await writeFile(path.join(distDir, 'spa.html'), appendToHead(template, [NOINDEX_TAG]))
 
 for (const page of PRERENDER_PAGES) {
   const appHtml = await render(page.path)

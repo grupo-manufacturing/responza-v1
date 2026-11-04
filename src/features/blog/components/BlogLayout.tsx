@@ -20,7 +20,7 @@ export function BlogLayout({ children }: { readonly children: React.ReactNode })
             <Link to="/" className="hidden text-sm font-medium text-ink-muted transition-colors hover:text-ink sm:inline">
               Home
             </Link>
-            <LandingButton to="/auth?mode=register" variant="primary" className="px-4">
+            <LandingButton to="/#pricing" variant="primary" className="px-4">
               Try free
             </LandingButton>
           </nav>

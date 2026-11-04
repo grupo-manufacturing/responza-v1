@@ -9,17 +9,17 @@ import {
   landingPlatformLogoClass,
 } from '@/features/landing/constants'
 import {
-  composerSendButtonClass,
-  inboundBubbleClass,
-  inboxThreadBackgroundClass,
-  listItemSelectedClass,
-  outboundBubbleClass,
-  platformTabActiveClass,
-} from '@/features/inbox/lib/inbox-ui'
-import type { MessagingPlatform } from '@/features/inbox/constants'
+  heroInboundBubbleClass,
+  heroListItemClass,
+  heroOutboundBubbleClass,
+  heroSendButtonClass,
+  heroTabClass,
+  heroThreadBackgroundClass,
+  type HeroPlatform,
+} from '@/features/landing/hero-ui'
 import { LandingButton, LandingLogo, ProfilePhoto, Reveal, SectionBadge } from '@/shared/ui/brand-ui'
 
-type HeroMessagingModule = MessagingPlatform
+type HeroMessagingModule = HeroPlatform
 
 type HeroMockMessage = {
   readonly id: string
@@ -248,20 +248,7 @@ function LandingNavbar({ variant = 'dark' }: { readonly variant?: 'light' | 'dar
           </nav>
 
           <div className="hidden shrink-0 items-center gap-2 lg:flex">
-            {variant === 'light' ? (
-              <LandingButton
-                to="/auth?mode=login"
-                variant="ghost"
-                className="!text-ink-muted hover:!text-ink px-4"
-              >
-                Sign in
-              </LandingButton>
-            ) : (
-              <LandingButton to="/auth?mode=login" variant="secondary" className="px-4">
-                Sign in
-              </LandingButton>
-            )}
-            <LandingButton to="/auth?mode=register" variant="primary" showChevron className="px-4">
+            <LandingButton to="/#pricing" variant="primary" showChevron className="px-4">
               Get started
             </LandingButton>
           </div>
@@ -299,16 +286,8 @@ function LandingNavbar({ variant = 'dark' }: { readonly variant?: 'light' | 'dar
               ))}
             </nav>
             <div className={`mt-3 flex flex-col gap-2 border-t pt-3 ${menuBorderClass}`}>
-              <LandingButton to="/auth?mode=register" variant="primary" showChevron className="w-full" onClick={closeMenu}>
+              <LandingButton to="/#pricing" variant="primary" showChevron className="w-full" onClick={closeMenu}>
                 Get started
-              </LandingButton>
-              <LandingButton
-                to="/auth?mode=login"
-                variant="ghost"
-                className={`w-full ${variant === 'light' ? '!text-ink-muted' : ''}`}
-                onClick={closeMenu}
-              >
-                Sign in
               </LandingButton>
             </div>
           </div>
@@ -377,7 +356,7 @@ function HeroVisual() {
                   onClick={() => setActiveModule(module)}
                   className={[
                     'shrink-0 rounded-[var(--radius-pill)] px-2.5 py-1 text-[11px] font-medium whitespace-nowrap transition-all duration-200',
-                    platformTabActiveClass(module, isActive),
+                    heroTabClass(module, isActive),
                   ].join(' ')}
                 >
                   {moduleLabel(module)}
@@ -421,7 +400,7 @@ function HeroVisual() {
                   onClick={() => setSelectedId(conversation.id)}
                   className={[
                     'flex w-full items-center gap-2.5 px-3 py-2.5 text-left transition-colors lg:gap-3 lg:px-3.5 lg:py-3',
-                    listItemSelectedClass(conversation.platform, isSelected),
+                    heroListItemClass(conversation.platform, isSelected),
                   ].join(' ')}
                 >
                   <div className="relative shrink-0">
@@ -455,7 +434,7 @@ function HeroVisual() {
             </div>
 
             <div
-              className={`flex flex-1 flex-col justify-end gap-2.5 overflow-hidden px-3 py-3 sm:gap-3 sm:px-4 sm:py-4 ${inboxThreadBackgroundClass(selected.platform)}`}
+              className={`flex flex-1 flex-col justify-end gap-2.5 overflow-hidden px-3 py-3 sm:gap-3 sm:px-4 sm:py-4 ${heroThreadBackgroundClass(selected.platform)}`}
             >
               {threadMessages.map((message) => {
                 const isOutbound = message.direction === 'outbound'
@@ -468,8 +447,8 @@ function HeroVisual() {
                       className={[
                         'max-w-[88%] rounded-2xl px-3 py-2 text-xs leading-relaxed sm:max-w-[80%] sm:px-3.5 sm:py-2.5 sm:text-[13px]',
                         isOutbound
-                          ? `${outboundBubbleClass(selected.platform)} rounded-br-md`
-                          : `${inboundBubbleClass()} rounded-bl-md`,
+                          ? `${heroOutboundBubbleClass(selected.platform)} rounded-br-md`
+                          : `${heroInboundBubbleClass()} rounded-bl-md`,
                       ].join(' ')}
                     >
                       {message.content}
@@ -485,7 +464,7 @@ function HeroVisual() {
                   <p className="truncate text-xs text-ink-faint sm:text-sm">Type a message…</p>
                 </div>
                 <div
-                  className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full sm:h-10 sm:w-10 ${composerSendButtonClass(true, selected.platform)}`}
+                  className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full sm:h-10 sm:w-10 ${heroSendButtonClass(selected.platform)}`}
                 >
                   <SendIcon />
                 </div>
@@ -532,18 +511,6 @@ export function LandingHero() {
               Manage WhatsApp and Instagram from dedicated modules in Responza, with AI draft replies
               in your composer, instant translation, and a dashboard that shows what needs attention.
             </p>
-            <div className="mt-6 flex w-full max-w-sm flex-col gap-3 sm:mt-8 sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:justify-center lg:justify-start">
-              <LandingButton to="/auth?mode=register" variant="primary" showChevron className="w-full sm:w-auto">
-                Start free trial
-              </LandingButton>
-              <LandingButton
-                to="/auth?mode=login"
-                variant="ghost"
-                className="!text-ink-muted hover:!text-ink w-full sm:w-auto"
-              >
-                Sign in
-              </LandingButton>
-            </div>
             <p className="mt-4 text-xs text-ink-faint">
               No credit card required · 3-day free trial · Plans from ₹499/month
             </p>

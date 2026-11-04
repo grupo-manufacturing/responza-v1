@@ -4,15 +4,5 @@
     { "source": "/pricing", "destination": "/#pricing", "statusCode": 301 },
     { "source": "/privacy", "destination": "/privacy-policy", "statusCode": 301 },
     { "source": "/terms", "destination": "/terms-conditions", "statusCode": 301 }
-  ],
-  "rewrites": [
-    {
-      "source": "/:route(auth|login|register|subscription|oauth|admin|business|dashboard|whatsapp|instagram|gmail|leads|integrations|settings)",
-      "destination": "/spa"
-    },
-    {
-      "source": "/:route(auth|login|register|subscription|oauth|admin|business|dashboard|whatsapp|instagram|gmail|leads|integrations|settings)/:path*",
-      "destination": "/spa"
-    }
   ]
 }

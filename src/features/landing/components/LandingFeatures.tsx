@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 
-import { INTEGRATION_PLATFORM_LABELS, INTEGRATION_PLATFORM_LOGOS } from '@/features/integrations/constants'
 import { LANDING_AVATARS, LANDING_FEATURES } from '@/features/landing/constants'
 import { ProfilePhoto, Reveal, SectionDivider } from '@/shared/ui/brand-ui'
 
@@ -53,14 +52,12 @@ function InboxVisual() {
         {[
           {
             name: 'Priya Sharma',
-            platform: 'whatsapp' as const,
             preview: 'Thanks for the quote, can we discuss…',
             avatar: LANDING_AVATARS.priya,
             active: true,
           },
           {
             name: 'Maya Patel',
-            platform: 'whatsapp' as const,
             preview: 'Interested in a demo for our team…',
             avatar: LANDING_AVATARS.maya,
             active: false,
@@ -77,8 +74,8 @@ function InboxVisual() {
               <ProfilePhoto src={row.avatar} alt={row.name} loading="lazy" />
               <span className="absolute -right-0.5 -bottom-0.5 rounded-full bg-surface-dark p-px">
                 <img
-                  src={INTEGRATION_PLATFORM_LOGOS[row.platform]}
-                  alt={`${INTEGRATION_PLATFORM_LABELS[row.platform]} logo`}
+                  src="/whatsapp.webp"
+                  alt="WhatsApp logo"
                   width={12}
                   height={12}
                   loading="lazy"
