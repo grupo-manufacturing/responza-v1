@@ -78,8 +78,7 @@ export const LANDING_AVATARS = {
   natasha: '/avatars/notification.jpg',
 } as const
 
-export const WAITLIST_HREF =
-  'mailto:contact@responza.in?subject=Join%20the%20Responza%20waitlist&body=Hi%20Responza%20team%2C%0A%0APlease%20add%20me%20to%20the%20waitlist.%0A%0AName%3A%20%0ABusiness%3A%20%0APhone%20(optional)%3A%20'
+export const WAITLIST_HREF = '/#waitlist'
 
 export const PRICING_PLANS = [
   {
@@ -159,7 +158,7 @@ export const LANDING_FAQS = [
   },
   {
     q: 'How do I join the waitlist?',
-    a: 'Tap "Join the waitlist" anywhere on this page. It opens an email to contact@responza.in. Send it and we will add you to the list and share early access updates.',
+    a: 'Enter your email in the waitlist form at the bottom of this page. We will add you to the list and share early access updates.',
   },
   {
     q: 'How do AI draft replies work?',

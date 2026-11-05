@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom'
 
 import { LEGAL_FOOTER_LINKS } from '../legal.constants'
 import { LANDING_FAQS, WAITLIST_HREF } from '@/features/landing/constants'
-import { LandingButton, LandingLogo, Reveal, SectionDivider } from '@/shared/ui/brand-ui'
+import { LandingLogo, Reveal, SectionDivider } from '@/shared/ui/brand-ui'
+
+import { WaitlistForm } from './WaitlistForm'
 
 export function LandingClosing() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
@@ -79,7 +81,7 @@ export function LandingClosing() {
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-grid-dark py-20 sm:py-28">
+      <section id="waitlist" className="relative scroll-mt-20 overflow-hidden bg-grid-dark py-20 sm:py-28">
         <div
           className="pointer-events-none absolute top-1/2 left-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-accent/15 to-accent-violet/10 blur-3xl"
           aria-hidden
@@ -93,10 +95,8 @@ export function LandingClosing() {
             <p className="mt-4 text-base text-on-dark-muted">
               Join the waitlist and we&apos;ll let you know the moment Responza is ready to download.
             </p>
-            <div className="mt-8 flex justify-center">
-              <LandingButton to={WAITLIST_HREF} variant="secondary" showChevron className="w-full py-2.5 sm:w-auto">
-                Join the waitlist
-              </LandingButton>
+            <div className="mt-8">
+              <WaitlistForm />
             </div>
             <p className="mt-4 text-xs text-on-dark-muted">
               Coming soon · No spam, just launch updates
