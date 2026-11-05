@@ -4,7 +4,6 @@ import { useLocation } from 'react-router-dom'
 import { SEO_PAGES } from '@/shared/seo/seo.constants'
 import { usePageMeta } from '@/shared/seo/usePageMeta'
 
-import { LandingAffiliate } from '../components/LandingAffiliate'
 import { LandingClosing } from '../components/LandingClosing'
 import { LandingFeatures } from '../components/LandingFeatures'
 import { LandingHero } from '../components/LandingHero'
@@ -27,7 +26,6 @@ export function LandingPage() {
       <LandingWatch />
       <LandingFeatures />
       <LandingPricing />
-      <LandingAffiliate />
       <LandingClosing />
     </div>
   )

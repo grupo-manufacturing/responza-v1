@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { LEGAL_FOOTER_LINKS } from '../legal.constants'
-import { LANDING_FAQS } from '@/features/landing/constants'
-import { LandingLogo, Reveal, SectionDivider } from '@/shared/ui/brand-ui'
+import { LANDING_FAQS, WAITLIST_HREF } from '@/features/landing/constants'
+import { LandingButton, LandingLogo, Reveal, SectionDivider } from '@/shared/ui/brand-ui'
 
 export function LandingClosing() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
@@ -22,7 +22,7 @@ export function LandingClosing() {
               Frequently asked questions
             </h2>
             <p className="mt-4 text-center text-base text-on-dark-muted">
-              Everything you need to know about Responza AI from setup to billing.
+              Everything you need to know about the Responza app and its launch.
             </p>
           </Reveal>
           <div className="mt-10 divide-y divide-border-dark border-y border-border-dark sm:mt-12">
@@ -87,14 +87,19 @@ export function LandingClosing() {
         <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
           <Reveal>
             <h2 className="text-2xl font-semibold tracking-tight text-on-dark sm:text-4xl">
-              Stop juggling apps. Start{' '}
-              <span className="text-accent-gradient-dark">closing conversations.</span>
+              Stop juggling apps. Be first to{' '}
+              <span className="text-accent-gradient-dark">try Responza.</span>
             </h2>
             <p className="mt-4 text-base text-on-dark-muted">
-              Join businesses using Responza AI to respond faster and convert more customers.
+              Join the waitlist and we&apos;ll let you know the moment Responza is ready to download.
             </p>
+            <div className="mt-8 flex justify-center">
+              <LandingButton to={WAITLIST_HREF} variant="secondary" showChevron className="w-full py-2.5 sm:w-auto">
+                Join the waitlist
+              </LandingButton>
+            </div>
             <p className="mt-4 text-xs text-on-dark-muted">
-              No credit card required · 3-day free trial · Plans from ₹499/month
+              Coming soon · No spam, just launch updates
             </p>
           </Reveal>
         </div>
@@ -106,7 +111,7 @@ export function LandingClosing() {
             <div>
               <LandingLogo variant="dark" />
               <p className="mt-3 max-w-xs text-sm leading-relaxed text-on-dark-muted">
-                Dedicated modules for WhatsApp and Instagram conversations.
+                WhatsApp and Instagram business chats in one mobile app. Coming soon.
               </p>
             </div>
             <div className="flex gap-10 text-sm sm:gap-12">
@@ -121,8 +126,8 @@ export function LandingClosing() {
                 <a href="#pricing" className="block text-on-dark-muted transition-colors hover:text-accent-soft">
                   Pricing
                 </a>
-                <a href="#affiliate" className="block text-on-dark-muted transition-colors hover:text-accent-soft">
-                  Affiliate
+                <a href={WAITLIST_HREF} className="block text-on-dark-muted transition-colors hover:text-accent-soft">
+                  Join waitlist
                 </a>
                 <Link to="/blog" className="block text-on-dark-muted transition-colors hover:text-accent-soft">
                   Blog

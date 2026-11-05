@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 
 import { BLOG_INDEX_SEO } from '@/features/blog/blog.posts'
+import { WAITLIST_HREF } from '@/features/landing/constants'
 import { LEGAL_FOOTER_LINKS } from '@/features/landing/legal.constants'
 import { LandingButton, LandingLogo } from '@/shared/ui/brand-ui'
 
@@ -20,8 +21,8 @@ export function BlogLayout({ children }: { readonly children: React.ReactNode })
             <Link to="/" className="hidden text-sm font-medium text-ink-muted transition-colors hover:text-ink sm:inline">
               Home
             </Link>
-            <LandingButton to="/#pricing" variant="primary" className="px-4">
-              Try free
+            <LandingButton to={WAITLIST_HREF} variant="primary" className="px-4">
+              Join waitlist
             </LandingButton>
           </nav>
         </div>

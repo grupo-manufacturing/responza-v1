@@ -6,7 +6,7 @@ import {
   type BlogFaq,
   type BlogPost,
 } from '@/features/blog/blog.posts'
-import { LANDING_FAQS, PRICING_PLANS } from '@/features/landing/constants'
+import { LANDING_FAQS } from '@/features/landing/constants'
 import { SEO_PAGES, SITE_URL } from '@/shared/seo/seo.constants'
 
 const ORGANIZATION_ID = `${SITE_URL}/#organization`
@@ -37,26 +37,9 @@ function softwareApplication(): JsonLd {
     '@type': 'SoftwareApplication',
     name: 'Responza AI',
     applicationCategory: 'BusinessApplication',
-    operatingSystem: 'Web',
     url: `${SITE_URL}/`,
     description: SEO_PAGES.home.description,
     publisher: { '@id': ORGANIZATION_ID },
-    offers: PRICING_PLANS.map((plan) => ({
-      '@type': 'Offer',
-      name: plan.label,
-      description: plan.description,
-      price: plan.amountInr.toFixed(2),
-      priceCurrency: 'INR',
-      eligibleRegion: INDIA,
-      url: `${SITE_URL}/#pricing`,
-      priceSpecification: {
-        '@type': 'UnitPriceSpecification',
-        price: plan.amountInr.toFixed(2),
-        priceCurrency: 'INR',
-        billingDuration: plan.interval === 'monthly' ? 'P1M' : 'P1Y',
-        valueAddedTaxIncluded: true,
-      },
-    })),
   }
 }
 

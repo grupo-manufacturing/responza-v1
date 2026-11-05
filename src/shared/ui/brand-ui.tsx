@@ -122,23 +122,29 @@ export function LandingButton({
 }) {
   const base =
     'inline-flex items-center justify-center gap-1.5 rounded-[var(--radius-pill)] px-5 py-2 text-sm font-medium transition-all duration-200'
-
-  if (variant === 'ghost') {
-    return (
-      <Link to={to} onClick={onClick} className={`${base} ${BUTTON_VARIANT_CLASS.ghost} ${className}`}>
-        {children}
-      </Link>
-    )
-  }
-
-  return (
-    <Link to={to} onClick={onClick} className={`${base} ${BUTTON_VARIANT_CLASS[variant]} ${className}`}>
+  const buttonClass = `${base} ${BUTTON_VARIANT_CLASS[variant]} ${className}`
+  const content = (
+    <>
       {children}
-      {showChevron && (
+      {showChevron && variant !== 'ghost' && (
         <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
       )}
+    </>
+  )
+
+  if (/^(mailto:|https?:)/.test(to)) {
+    return (
+      <a href={to} onClick={onClick} className={buttonClass}>
+        {content}
+      </a>
+    )
+  }
+
+  return (
+    <Link to={to} onClick={onClick} className={buttonClass}>
+      {content}
     </Link>
   )
 }

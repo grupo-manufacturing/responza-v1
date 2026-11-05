@@ -1,9 +1,7 @@
-import { PLAN_FEATURES, PRICING_PLANS } from '@/features/landing/constants'
-import { Reveal } from '@/shared/ui/brand-ui'
+import { PLAN_FEATURES, PRICING_PLANS, WAITLIST_HREF } from '@/features/landing/constants'
+import { Reveal, SectionBadge } from '@/shared/ui/brand-ui'
 
 type BillingPlanInterval = 'monthly' | 'yearly'
-
-const CONTACT_SALES_HREF = 'mailto:contact@responza.in?subject=Responza%20pricing'
 
 function billingIntervalSuffix(interval: BillingPlanInterval): string {
   return interval === 'yearly' ? '/year' : '/month'
@@ -37,7 +35,6 @@ function PricingCard({
   conversationLimit,
   interval,
   highlight = false,
-  freeTrial = false,
 }: {
   readonly label: string
   readonly description: string
@@ -45,7 +42,6 @@ function PricingCard({
   readonly conversationLimit: number
   readonly interval: BillingPlanInterval
   readonly highlight?: boolean
-  readonly freeTrial?: boolean
 }) {
   const mutedClass = highlight ? 'text-on-dark-muted' : 'text-ink-muted'
   const faintClass = highlight ? 'text-on-dark-muted' : 'text-ink-faint'
@@ -66,21 +62,14 @@ function PricingCard({
           Best value
         </span>
       )}
-      <div className="flex items-start justify-between gap-2">
-        <p className={`text-sm font-semibold tracking-wide uppercase ${mutedClass}`}>{label}</p>
-        {freeTrial && (
-          <span className="shrink-0 rounded-[var(--radius-pill)] border border-accent/25 bg-accent/10 px-2 py-0.5 text-[10px] font-medium text-accent">
-            3-day trial
-          </span>
-        )}
-      </div>
+      <p className={`text-sm font-semibold tracking-wide uppercase ${mutedClass}`}>{label}</p>
       <p className={`mt-2 text-sm leading-relaxed ${mutedClass}`}>{description}</p>
       <div className="mt-4">
         <p className="text-3xl font-semibold tracking-tight sm:text-4xl">
           {formatInr(amountInr)}
           <span className={`text-sm font-normal ${faintClass}`}>{billingIntervalSuffix(interval)}</span>
         </p>
-        <p className={`mt-1 text-xs ${faintClass}`}>GST inclusive</p>
+        <p className={`mt-1 text-xs ${faintClass}`}>GST inclusive · planned price</p>
       </div>
       <div
         className={[
@@ -104,13 +93,13 @@ function PricingCard({
         ))}
       </ul>
       <a
-        href={CONTACT_SALES_HREF}
+        href={WAITLIST_HREF}
         className={[
           'mt-6 inline-flex h-11 items-center justify-center rounded-[var(--radius-pill)] text-sm font-medium transition-colors',
           highlight ? 'bg-on-dark text-ink hover:bg-on-dark/90' : 'bg-ink text-on-dark hover:bg-ink/90',
         ].join(' ')}
       >
-        Contact us
+        Join the waitlist
       </a>
     </article>
   )
@@ -121,23 +110,18 @@ export function LandingPricing() {
     <section id="pricing" className="bg-surface-muted py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <Reveal className="mx-auto max-w-2xl text-center">
-          <h2 className="text-2xl font-semibold tracking-tight text-ink sm:text-4xl">
+          <SectionBadge variant="light" tone="teal">
+            Planned launch pricing
+          </SectionBadge>
+          <h2 className="mt-4 text-2xl font-semibold tracking-tight text-ink sm:text-4xl">
             Two simple plans. Every feature included.
           </h2>
           <p className="mt-4 text-base text-ink-muted">
-            Start with a 3-day free trial, then choose Basic monthly or Responza Annual. Every plan gets
-            the full inbox, AI draft replies and translation. Only conversation volume changes.
+            Here is what we plan to charge when Responza launches. Every plan gets the full
+            inbox, AI draft replies and translation. Only conversation volume changes. Pricing may
+            change before launch.
           </p>
         </Reveal>
-
-        <div className="mx-auto mt-6 flex max-w-3xl flex-wrap items-center justify-center gap-3 text-center text-sm text-ink-muted">
-          <span className="rounded-[var(--radius-pill)] border border-border bg-white px-3 py-1.5 shadow-soft">
-            Basic · {formatInr(499)}/month · 1,000 conversations
-          </span>
-          <span className="rounded-[var(--radius-pill)] border border-accent/20 bg-accent/5 px-3 py-1.5 text-ink">
-            Responza Annual · {formatInr(4_999)}/year · 30,000 conversations / year
-          </span>
-        </div>
 
         <div className="mt-12 grid items-stretch gap-5 sm:mt-16 sm:grid-cols-2 sm:gap-6 lg:mx-auto lg:max-w-4xl">
           {PRICING_PLANS.map((plan, index) => (
@@ -149,7 +133,6 @@ export function LandingPricing() {
                 conversationLimit={plan.conversationLimit}
                 interval={plan.interval}
                 highlight={plan.highlight}
-                freeTrial={plan.freeTrial}
               />
             </Reveal>
           ))}

@@ -136,7 +136,7 @@ export function TermsPage() {
       <LegalSectionBlock title="5. Subscription Plans and Billing">
         <LegalList
           items={[
-            'Responza offers subscription-based pricing plans. Current pricing is available at www.responza.in/pricing and may be updated from time to time.',
+            'Responza offers subscription-based pricing plans. Current pricing is available at responza.in/#pricing and may be updated from time to time.',
             'Subscriptions are billed monthly or annually as selected. Payments are due in advance.',
             'All prices are in Indian Rupees (INR) unless otherwise stated. Applicable GST will be added to all invoices.',
             'Responza will notify Business Users at least 30 days before implementing any price changes.',

@@ -7,13 +7,14 @@ type FeatureId = (typeof LANDING_FEATURES)[number]['id']
 
 function MockupShellDark({ children }: { readonly children: React.ReactNode }) {
   return (
-    <div className="glass-dark rounded-[var(--radius-card-lg)] bg-gradient-to-br from-white/6 to-accent/5 p-4 shadow-card sm:p-5">
-      <div className="mb-4 flex gap-2">
-        <div className="h-2 w-2 rounded-full bg-red-400/70" />
-        <div className="h-2 w-2 rounded-full bg-amber-400/70" />
-        <div className="h-2 w-2 rounded-full bg-emerald-400/70" />
+    <div className="glass-dark mx-auto max-w-sm rounded-[2.5rem] bg-gradient-to-br from-white/6 to-accent/5 p-4 pb-3 shadow-card sm:p-5 sm:pb-3">
+      <div className="mb-5 flex justify-center">
+        <div className="h-4 w-20 rounded-full bg-black/40" />
       </div>
       {children}
+      <div className="mt-5 flex justify-center">
+        <div className="h-1 w-20 rounded-full bg-white/30" />
+      </div>
     </div>
   )
 }
@@ -277,8 +278,8 @@ export function LandingFeatures() {
             <span className="text-accent-gradient-dark">clarity and speed.</span>
           </h2>
           <p className="mt-6 text-base leading-relaxed text-on-dark-muted">
-            Dedicated WhatsApp and Instagram modules, plus AI that drafts replies in your
-            composer, translates messages, and surfaces what matters.
+            WhatsApp and Instagram in one app, plus AI that drafts replies, translates messages and
+            surfaces what matters, wherever you are.
           </p>
         </Reveal>
       </div>

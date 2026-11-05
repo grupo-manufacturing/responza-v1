@@ -152,12 +152,12 @@ export function Article() {
       </BlogList>
 
       <BlogH2>Where Responza fits</BlogH2>
-      <BlogP>Responza is a dedicated inbox for Indian businesses that sell and support customers on WhatsApp and Instagram.</BlogP>
+      <BlogP>
+        Responza is an upcoming mobile app: a dedicated inbox for Indian businesses that sell and support customers on
+        WhatsApp and Instagram.
+      </BlogP>
       <BlogList>
-        <li>
-          WhatsApp and Instagram each get their own module inside one workspace, with a dashboard that shows what needs
-          attention.
-        </li>
+        <li>WhatsApp and Instagram chats sit together in one mobile inbox, with what needs attention at the top.</li>
         <li>
           AI drafts replies in the composer from the business knowledge you add. You review and send every message
           yourself.
@@ -174,8 +174,8 @@ export function Article() {
         </li>
       </BlogList>
       <BlogCallout>
-        Every account starts with a 3-day free trial and no credit card, so you can test it with your actual customers.{' '}
-        <BlogLink to="/#pricing">Compare plans</BlogLink>.
+        Responza is launching soon as a mobile app. Join the waitlist to be among the first to try it with your
+        actual customers. <BlogLink to="/#pricing">Compare planned plans</BlogLink>.
       </BlogCallout>
 
       <BlogH2>The short answer</BlogH2>

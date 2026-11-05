@@ -169,9 +169,9 @@ export function Article() {
       <BlogH2>How Responza handles it</BlogH2>
       <BlogP>We built Responza for exactly this problem, so here's how it works in short.</BlogP>
       <BlogP>
-        You connect your WhatsApp Business number and your Instagram professional account from the Integrations page.
-        Most people are done in a couple of minutes. Each channel gets its own module inside one workspace, and a
-        dashboard shows which conversations need attention across both.
+        Responza is a mobile app, launching soon. You connect your WhatsApp Business number and your
+        Instagram professional account, and both channels' conversations appear in one inbox on your phone, with the
+        chats that need attention right at the top.
       </BlogP>
       <BlogP>
         When a customer messages you, Responza drafts a reply in the composer using the business information you've
@@ -187,8 +187,8 @@ export function Article() {
         . And when you reply from your phone, those messages sync back into Responza, so the history stays complete.
       </BlogP>
       <BlogCallout>
-        Plans start at ₹499 a month with GST included, and every new account gets a 3-day free trial with no credit
-        card. <BlogLink to="/#pricing">See pricing</BlogLink>.
+        Responza is coming soon as a mobile app, with planned pricing from ₹499 a month including GST.{' '}
+        <BlogLink to="/#pricing">See planned pricing</BlogLink>.
       </BlogCallout>
 
       <BlogH2>A simple routine you can start this week</BlogH2>

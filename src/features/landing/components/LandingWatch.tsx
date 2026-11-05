@@ -18,12 +18,12 @@ export function LandingWatch() {
             Watch
           </SectionBadge>
           <h2 className="mt-4 text-2xl font-semibold tracking-tight text-ink sm:text-4xl">
-            See Responza in{' '}
-            <span className="text-accent-gradient">action.</span>
+            Meet{' '}
+            <span className="text-accent-gradient">Responza.</span>
           </h2>
           <p className="mt-4 text-base leading-relaxed text-ink-muted">
-            A quick look at how teams manage WhatsApp and Instagram in one workspace, with AI drafts
-            that stay under your control.
+            A quick look at how Responza brings WhatsApp and Instagram together, with AI drafts that
+            stay under your control.
           </p>
         </Reveal>
 

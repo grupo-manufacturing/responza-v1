@@ -78,6 +78,9 @@ export const LANDING_AVATARS = {
   natasha: '/avatars/notification.jpg',
 } as const
 
+export const WAITLIST_HREF =
+  'mailto:contact@responza.in?subject=Join%20the%20Responza%20waitlist&body=Hi%20Responza%20team%2C%0A%0APlease%20add%20me%20to%20the%20waitlist.%0A%0AName%3A%20%0ABusiness%3A%20%0APhone%20(optional)%3A%20'
+
 export const PRICING_PLANS = [
   {
     key: 'basic',
@@ -86,8 +89,7 @@ export const PRICING_PLANS = [
     conversationLimit: 1_000,
     interval: 'monthly' as const,
     highlight: false,
-    freeTrial: true,
-    description: 'For teams getting started with WhatsApp and Instagram.',
+    description: 'For businesses getting started with WhatsApp and Instagram on the go.',
   },
   {
     key: 'premium',
@@ -96,36 +98,35 @@ export const PRICING_PLANS = [
     conversationLimit: 30_000,
     interval: 'yearly' as const,
     highlight: true,
-    freeTrial: false,
-    description: 'Best value. A full year of Pro access with a higher conversation quota.',
+    description: 'Best value. A full year of Responza with a higher conversation quota.',
   },
 ] as const
 
 export const PLAN_FEATURES = [
-  'WhatsApp & Instagram modules',
-  'AI replies & translation',
-  'Conversation analytics',
-  'Dashboard attention queues',
+  'WhatsApp & Instagram in one app',
+  'AI draft replies & translation',
+  'Conversation summaries',
+  'Instant push notifications',
 ] as const
 
 export const LANDING_FEATURES = [
   {
     id: 'inbox',
-    label: 'Channel modules',
+    label: 'One inbox',
     tone: 'teal' as const,
-    title: 'Every channel',
-    titleAccent: 'in its own space.',
+    title: 'Every chat',
+    titleAccent: 'in your pocket.',
     description:
-      'WhatsApp and Instagram each get a dedicated module with conversations sorted by latest activity, so you can switch channels without losing context.',
+      'WhatsApp and Instagram conversations live side by side in one app, sorted by latest activity, so you can switch channels without losing context.',
   },
   {
     id: 'replies',
     label: 'AI replies',
     tone: 'violet' as const,
-    title: 'Respond faster with',
+    title: 'Reply in seconds with',
     titleAccent: 'AI draft replies.',
     description:
-      'Responza AI drafts replies from your business knowledge in the composer. Review, edit, and send when you are ready.',
+      'Responza AI drafts replies from your business knowledge right in the composer. Review, edit and tap send when you are ready.',
   },
   {
     id: 'translation',
@@ -134,55 +135,51 @@ export const LANDING_FEATURES = [
     title: "Speak your",
     titleAccent: "customer's language.",
     description:
-      'Incoming messages are translated instantly so your team can reply confidently, with no copy-pasting into external tools.',
+      'Incoming messages are translated instantly so you can reply confidently, with no copy-pasting into other apps.',
   },
   {
     id: 'analytics',
-    label: 'Analytics',
+    label: 'Summaries',
     tone: 'teal' as const,
-    title: 'Understand what customers',
-    titleAccent: 'really want.',
+    title: 'Know what customers want',
+    titleAccent: 'at a glance.',
     description:
-      'AI-generated summaries and topic labels help you spot patterns, prioritize urgent threads, and prepare before you reply.',
+      'AI-generated summaries and topic labels help you spot urgent chats and prepare before you reply, even between meetings.',
   },
 ] as const
 
 export const LANDING_FAQS = [
   {
-    q: 'How is Responza AI different from using WhatsApp and Instagram separately?',
-    a: 'Responza gives each channel its own module inside one workspace, with AI draft replies, translation, analytics, and a dashboard that shows what needs attention across channels.',
+    q: 'What is Responza AI?',
+    a: 'Responza is an upcoming mobile app that brings your WhatsApp and Instagram business chats into one inbox, with AI draft replies, instant translation and conversation summaries.',
+  },
+  {
+    q: 'When does the app launch?',
+    a: 'Responza is coming soon. Join the waitlist and we will email you as soon as it is available to download.',
+  },
+  {
+    q: 'How do I join the waitlist?',
+    a: 'Tap "Join the waitlist" anywhere on this page. It opens an email to contact@responza.in. Send it and we will add you to the list and share early access updates.',
   },
   {
     q: 'How do AI draft replies work?',
     a: 'When a customer messages you on WhatsApp or Instagram, Responza drafts a reply in the composer from your business knowledge. You review and send it yourself. Nothing goes out automatically.',
   },
   {
-    q: 'Can I still message customers outside of Responza AI?',
-    a: 'Yes. Messages sent from WhatsApp or Instagram directly still sync into the matching Responza module when that channel is connected.',
+    q: 'Can I still reply from WhatsApp or Instagram directly?',
+    a: 'Yes. Messages you send from WhatsApp or Instagram directly will sync into Responza, so your conversation history stays complete.',
   },
   {
     q: 'Is my data private and secure?',
-    a: 'Your conversations are stored securely and scoped to your organization. We use industry-standard encryption and never sell your data.',
+    a: 'Your conversations are stored securely and scoped to your business. We use industry-standard encryption and never sell your data.',
   },
   {
-    q: 'How do I connect WhatsApp or Instagram?',
-    a: 'Go to Integrations after signing up and follow the guided OAuth or Embedded Signup flow. Most teams are connected in under two minutes.',
+    q: 'How much will Responza cost?',
+    a: 'Planned launch pricing is ₹499/month for 1,000 conversations, or ₹4,999/year for 30,000 conversations. Both include every feature and GST. Pricing may change before launch.',
   },
   {
-    q: 'Does Responza AI work with IndiaMART or Tally?',
-    a: 'IndiaMART and Tally integrations are coming soon, so IndiaMART buyer enquiries can land in the same workspace as your WhatsApp and Instagram chats. Today, Responza supports WhatsApp and Instagram.',
-  },
-  {
-    q: 'What are your pricing plans?',
-    a: 'Basic is ₹499/month with 1,000 conversations per month. Responza Annual is ₹4,999/year with 30,000 conversations per year. All plans include the same features. Only conversation volume differs. GST inclusive.',
-  },
-  {
-    q: 'Is there a free trial?',
-    a: 'Yes. Every new account gets a 3-day free trial with full access to core features. No credit card required to start.',
-  },
-  {
-    q: 'Do you have an affiliate program?',
-    a: 'Yes. Creators and influencers can get a unique referral code. You earn ₹50 per month for each referred business that keeps an active paid subscription. Trials don’t count. Apply via contact@responza.in.',
+    q: 'Will Responza work with IndiaMART or Tally?',
+    a: 'WhatsApp and Instagram are supported at launch. IndiaMART, Tally, Gmail and more are on our roadmap.',
   },
 ] as const
 
@@ -197,7 +194,6 @@ export const LANDING_YOUTUBE_SHORT_EMBED_URL =
 const NAV_LINKS = [
   { href: '#features', label: 'Features' },
   { href: '#pricing', label: 'Pricing' },
-  { href: '#affiliate', label: 'Affiliate' },
   { href: '#faqs', label: 'FAQs' },
 ] as const
 

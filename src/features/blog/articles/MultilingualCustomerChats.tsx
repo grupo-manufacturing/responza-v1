@@ -153,8 +153,8 @@ export function Article() {
         well as anyone else.
       </BlogP>
       <BlogP>
-        If you'd like to try in-chat translation together with AI draft replies for WhatsApp and Instagram, Responza
-        has a 3-day free trial with no credit card required. <BlogLink to="/#pricing">See plans and pricing</BlogLink>.
+        If you'd like in-chat translation together with AI draft replies for WhatsApp and Instagram, Responza is
+        launching soon as a mobile app. <BlogLink to="/#pricing">See planned pricing</BlogLink> and join the waitlist.
       </BlogP>
     </>
   )

@@ -29,7 +29,7 @@ export const BLOG_POSTS = [
     title: "Switching Between WhatsApp and Instagram All Day? Here's What It's Costing Your Business",
     metaTitle: 'Manage WhatsApp and Instagram Messages in One Place',
     description:
-      'Indian business owners lose sales jumping between WhatsApp and Instagram to reply to customers. See what app switching really costs and how to manage both inboxes in one place.',
+      'Jumping between WhatsApp and Instagram costs Indian businesses sales. See what app switching really costs and how to manage both inboxes in one place.',
     excerpt:
       'Two inboxes, two sets of unread chats, and the same questions all day. Here is what juggling WhatsApp and Instagram really costs a small business, and what to do about it.',
     publishedAt: '2026-11-02',
@@ -38,7 +38,7 @@ export const BLOG_POSTS = [
     faqs: [
       {
         q: 'Can I manage WhatsApp and Instagram messages from one app?',
-        a: 'Not with the official apps alone. WhatsApp Business and Instagram each have their own inbox. To see both together you need a tool that connects to both, such as Responza, which gives WhatsApp and Instagram their own modules inside one workspace.',
+        a: 'Not with the official apps alone. WhatsApp Business and Instagram each have their own inbox. To see both together you need a tool that connects to both, such as Responza, an upcoming mobile app that brings WhatsApp and Instagram chats into one inbox.',
       },
       {
         q: 'Will I still be able to reply from my phone?',
@@ -50,7 +50,7 @@ export const BLOG_POSTS = [
       },
       {
         q: 'How much does a WhatsApp and Instagram inbox tool cost in India?',
-        a: 'It varies a lot between providers. Responza starts at ₹499 per month for 1,000 conversations with GST included, and every new account gets a 3-day free trial without a credit card.',
+        a: 'It varies a lot between providers. Responza, launching soon as a mobile app, plans to start at ₹499 per month for 1,000 conversations with GST included.',
       },
     ],
   },
@@ -59,7 +59,7 @@ export const BLOG_POSTS = [
     title: 'WhatsApp Business App vs a Dedicated Inbox: When the Free App Stops Being Enough',
     metaTitle: 'WhatsApp Business App vs a Dedicated Inbox',
     description:
-      'The free WhatsApp Business app is great until it is not. Learn what it does well, where it falls short for growing Indian businesses, and the signs it is time for a dedicated inbox.',
+      'The free WhatsApp Business app is great until it is not. Where it falls short for growing Indian businesses, and signs it is time for a dedicated inbox.',
     excerpt:
       'The free app does a lot. But missed chats, repeated questions and a separate Instagram inbox add up. Here are the signs you have outgrown it.',
     publishedAt: '2026-11-02',
@@ -76,7 +76,7 @@ export const BLOG_POSTS = [
       },
       {
         q: 'Can I use WhatsApp Business and Instagram together in one inbox?',
-        a: 'Not in the official apps. You need a tool that connects to both. Responza gives WhatsApp and Instagram their own modules in a single workspace, with a dashboard that shows what needs a reply.',
+        a: 'Not in the official apps. You need a tool that connects to both. Responza, launching soon, brings WhatsApp and Instagram into one mobile inbox that shows what needs a reply.',
       },
       {
         q: 'When should a small business move beyond the WhatsApp Business app?',
@@ -89,7 +89,7 @@ export const BLOG_POSTS = [
     title: 'How Fast Should a Business Reply on WhatsApp and Instagram? (And How to Actually Do It)',
     metaTitle: 'How Fast Should a Business Reply on WhatsApp and Instagram?',
     description:
-      'A practical reply time target for Indian small businesses on WhatsApp and Instagram, why slow replies lose customers, and simple ways to answer faster without hiring anyone.',
+      'A practical reply time target for Indian businesses on WhatsApp and Instagram, why slow replies lose customers, and simple ways to answer faster.',
     excerpt:
       'Customers on chat apps expect chat speed. Here is a realistic reply time target for a small team, and the habits and tools that help you hit it.',
     publishedAt: '2026-11-02',
@@ -119,7 +119,7 @@ export const BLOG_POSTS = [
     title: 'Customers Messaging in Hindi, Tamil or Telugu? How to Handle Multilingual Chats on WhatsApp and Instagram',
     metaTitle: 'Handling Customer Messages in Indian Languages',
     description:
-      'Practical ways for Indian businesses to handle WhatsApp and Instagram messages in Hindi, Tamil, Telugu, Bengali and other languages, including in-chat translation.',
+      'How Indian businesses can handle WhatsApp and Instagram messages in Hindi, Tamil, Telugu, Bengali and other languages, including in-chat translation.',
     excerpt:
       'Your customers write the way they talk. Here is how to understand and answer messages in Hindi, Tamil, Telugu and more without slowing down.',
     publishedAt: '2026-11-02',
@@ -157,7 +157,7 @@ export const BLOG_INDEX_SEO = {
   path: '/blog',
   title: 'WhatsApp and Instagram Tips for Indian Businesses | Responza Blog',
   description:
-    'Practical guides for Indian business owners on replying to customers faster on WhatsApp and Instagram, managing both inboxes, and handling messages in Indian languages.',
+      'Practical guides for Indian businesses on replying faster on WhatsApp and Instagram, managing both inboxes and handling chats in Indian languages.',
   lastModified: BLOG_POSTS.map((post) => post.updatedAt).sort().at(-1),
 } satisfies SeoPage
 

@@ -17,8 +17,10 @@ import {
   type BlogSlug,
 } from '@/features/blog/blog.posts'
 import { BlogLayout } from '@/features/blog/components/BlogLayout'
+import { WAITLIST_HREF } from '@/features/landing/constants'
 import { NotFoundPage } from '@/features/landing/pages/NotFoundPage'
 import { usePageMeta } from '@/shared/seo/usePageMeta'
+import { LandingButton } from '@/shared/ui/brand-ui'
 /** Imported eagerly: a nested lazy() here would make the prerender emit the body out of order behind a script. */
 const ARTICLE_BODIES: Record<BlogSlug, ComponentType> = {
   'manage-whatsapp-instagram-messages-one-place': ManageWhatsappInstagramOnePlace,
@@ -81,11 +83,14 @@ function BlogPostContent({ post }: { readonly post: BlogPost }) {
         </section>
 
         <aside className="mt-14 rounded-2xl bg-surface-dark px-6 py-8 text-center sm:px-10">
-          <p className="text-xl font-semibold text-on-dark">WhatsApp and Instagram, in one workspace</p>
+          <p className="text-xl font-semibold text-on-dark">WhatsApp and Instagram, in one app</p>
           <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-on-dark-muted">
-            AI draft replies you approve, in-chat translation and a dashboard that shows who is waiting. Try
-            Responza free for 3 days, no credit card needed.
+            AI draft replies you approve and in-chat translation, all in one mobile app. Responza is coming
+            soon.
           </p>
+          <LandingButton to={WAITLIST_HREF} variant="secondary" showChevron className="mt-6">
+            Join the waitlist
+          </LandingButton>
         </aside>
       </article>
 

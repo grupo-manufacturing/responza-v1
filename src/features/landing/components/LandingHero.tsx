@@ -1,198 +1,14 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import {
-  LANDING_AVATARS,
   LANDING_PLATFORMS,
   NAV_LINKS,
   PLATFORM_GLOW,
   PLATFORM_RING,
+  WAITLIST_HREF,
   landingPlatformLogoClass,
 } from '@/features/landing/constants'
-import {
-  heroInboundBubbleClass,
-  heroListItemClass,
-  heroOutboundBubbleClass,
-  heroSendButtonClass,
-  heroTabClass,
-  heroThreadBackgroundClass,
-  type HeroPlatform,
-} from '@/features/landing/hero-ui'
-import { LandingButton, LandingLogo, ProfilePhoto, Reveal, SectionBadge } from '@/shared/ui/brand-ui'
-
-type HeroMessagingModule = HeroPlatform
-
-type HeroMockMessage = {
-  readonly id: string
-  readonly direction: 'inbound' | 'outbound'
-  readonly content: string
-  readonly time: string
-}
-
-type HeroMockConversation = {
-  readonly id: string
-  readonly name: string
-  readonly avatar: string
-  readonly platform: HeroMessagingModule
-  readonly preview: string
-  readonly messages: readonly HeroMockMessage[]
-}
-
-const HERO_MODULES: readonly HeroMessagingModule[] = ['whatsapp', 'instagram']
-
-const HERO_CONVERSATIONS: readonly HeroMockConversation[] = [
-  {
-    id: 'priya',
-    name: 'Priya Sharma',
-    avatar: LANDING_AVATARS.priya,
-    platform: 'whatsapp',
-    preview: 'Thanks for the quote…',
-    messages: [
-      {
-        id: 'p1',
-        direction: 'inbound',
-        content: 'Hi! Can I get a quote for your premium plan?',
-        time: '10:42',
-      },
-      {
-        id: 'p2',
-        direction: 'outbound',
-        content: 'Of course! Premium is ₹4,999/year with 30k conversations.',
-        time: '10:43',
-      },
-      {
-        id: 'p3',
-        direction: 'inbound',
-        content: 'Thanks for the quote… that works for us.',
-        time: '10:45',
-      },
-      {
-        id: 'p4',
-        direction: 'outbound',
-        content: 'Happy to send the proposal today.',
-        time: '10:45',
-      },
-    ],
-  },
-  {
-    id: 'alex',
-    name: 'Alex Chen',
-    avatar: LANDING_AVATARS.alex,
-    platform: 'instagram',
-    preview: 'Do you ship internationally?',
-    messages: [
-      {
-        id: 'a1',
-        direction: 'inbound',
-        content: 'Loved your reel! Do you ship internationally?',
-        time: '10:20',
-      },
-      {
-        id: 'a2',
-        direction: 'outbound',
-        content: 'Thanks! Yes, we ship to most countries.',
-        time: '10:22',
-      },
-      {
-        id: 'a3',
-        direction: 'inbound',
-        content: 'Perfect, I’m in Singapore.',
-        time: '10:28',
-      },
-      {
-        id: 'a4',
-        direction: 'outbound',
-        content: 'Yes, we ship worldwide. Share your city?',
-        time: '10:28',
-      },
-    ],
-  },
-  {
-    id: 'maya',
-    name: 'Maya Patel',
-    avatar: LANDING_AVATARS.maya,
-    platform: 'whatsapp',
-    preview: 'Interested in a demo…',
-    messages: [
-      {
-        id: 'm1',
-        direction: 'inbound',
-        content: 'Interested in your service for our support team.',
-        time: '9:58',
-      },
-      {
-        id: 'm2',
-        direction: 'outbound',
-        content: 'Great, I can walk you through WhatsApp and Instagram in Responza.',
-        time: '10:01',
-      },
-      {
-        id: 'm3',
-        direction: 'inbound',
-        content: 'Interested in a demo for our team.',
-        time: '10:04',
-      },
-      {
-        id: 'm4',
-        direction: 'outbound',
-        content: 'Happy to walk you through a quick demo.',
-        time: '10:04',
-      },
-    ],
-  },
-  {
-    id: 'natasha',
-    name: 'Natasha Roy',
-    avatar: LANDING_AVATARS.natasha,
-    platform: 'instagram',
-    preview: 'Can you help with pricing?',
-    messages: [
-      {
-        id: 'n1',
-        direction: 'inbound',
-        content: 'Can you help with pricing for a small team?',
-        time: '9:40',
-      },
-      {
-        id: 'n2',
-        direction: 'outbound',
-        content: 'Sure, Basic starts at ₹499/month.',
-        time: '9:40',
-      },
-    ],
-  },
-]
-
-function moduleLabel(module: HeroMessagingModule): string {
-  if (module === 'whatsapp') return 'WhatsApp'
-  return 'Instagram'
-}
-
-function PlatformGlyph({ platform }: { readonly platform: HeroMessagingModule }) {
-  const src = platform === 'whatsapp' ? '/whatsapp.webp' : '/instagram.webp'
-  const label = platform === 'whatsapp' ? 'WhatsApp' : 'Instagram'
-  return (
-    <img
-      src={src}
-      alt={`${label} logo`}
-      width={14}
-      height={14}
-      className="h-3.5 w-3.5 object-contain"
-    />
-  )
-}
-
-function SendIcon() {
-  return (
-    <svg className="h-4 w-4 rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.75}
-        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-      />
-    </svg>
-  )
-}
+import { LandingButton, LandingLogo, Reveal, SectionBadge } from '@/shared/ui/brand-ui'
 
 function LandingNavbar({ variant = 'dark' }: { readonly variant?: 'light' | 'dark' }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -248,8 +64,8 @@ function LandingNavbar({ variant = 'dark' }: { readonly variant?: 'light' | 'dar
           </nav>
 
           <div className="hidden shrink-0 items-center gap-2 lg:flex">
-            <LandingButton to="/#pricing" variant="primary" showChevron className="px-4">
-              Get started
+            <LandingButton to={WAITLIST_HREF} variant="primary" showChevron className="px-4">
+              Join waitlist
             </LandingButton>
           </div>
 
@@ -286,194 +102,14 @@ function LandingNavbar({ variant = 'dark' }: { readonly variant?: 'light' | 'dar
               ))}
             </nav>
             <div className={`mt-3 flex flex-col gap-2 border-t pt-3 ${menuBorderClass}`}>
-              <LandingButton to="/#pricing" variant="primary" showChevron className="w-full" onClick={closeMenu}>
-                Get started
+              <LandingButton to={WAITLIST_HREF} variant="primary" showChevron className="w-full" onClick={closeMenu}>
+                Join waitlist
               </LandingButton>
             </div>
           </div>
         )}
       </div>
     </header>
-  )
-}
-
-function HeroVisual() {
-  const [activeModule, setActiveModule] = useState<HeroMessagingModule>('whatsapp')
-  const [selectedId, setSelectedId] = useState(HERO_CONVERSATIONS[0].id)
-
-  const visibleConversations = useMemo(
-    () => HERO_CONVERSATIONS.filter((conversation) => conversation.platform === activeModule),
-    [activeModule],
-  )
-
-  useEffect(() => {
-    if (visibleConversations.some((conversation) => conversation.id === selectedId)) return
-    const next = visibleConversations[0]
-    if (next) setSelectedId(next.id)
-  }, [selectedId, visibleConversations])
-
-  const selected =
-    visibleConversations.find((conversation) => conversation.id === selectedId) ??
-    visibleConversations[0] ??
-    HERO_CONVERSATIONS.find((conversation) => conversation.platform === activeModule) ??
-    HERO_CONVERSATIONS[0]
-
-  const threadMessages = selected.messages.slice(-3)
-
-  return (
-    <div className="relative mx-auto w-full min-w-0 max-w-md sm:max-w-xl lg:max-w-none">
-      <div
-        className="pointer-events-none absolute -inset-3 rounded-[1.75rem] bg-[radial-gradient(ellipse_at_center,rgb(91_138_133/0.16),transparent_65%)] blur-2xl sm:-inset-6 sm:rounded-[2rem] lg:-inset-8"
-        aria-hidden
-      />
-
-      <div
-        className="relative overflow-hidden rounded-2xl border border-border/80 bg-white/95 shadow-[0_24px_60px_-28px_rgb(15_23_42/0.35)] backdrop-blur-sm sm:rounded-[1.5rem]"
-        aria-hidden
-      >
-        <div className="flex flex-col gap-3 px-3 pt-3 pb-2.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-4 sm:pt-4 sm:pb-3 lg:px-5">
-          <div className="flex min-w-0 items-center gap-2">
-            <img
-              src={activeModule === 'whatsapp' ? '/whatsapp.webp' : '/instagram.webp'}
-              alt={`${moduleLabel(activeModule)} logo`}
-              width={20}
-              height={20}
-              className="h-5 w-5 shrink-0 object-contain"
-            />
-            <p className="truncate text-sm font-semibold tracking-tight text-ink">
-              {moduleLabel(activeModule)}
-            </p>
-          </div>
-          <div className="flex min-w-0 gap-1.5 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {HERO_MODULES.map((module) => {
-              const isActive = activeModule === module
-              return (
-                <button
-                  key={module}
-                  type="button"
-                  tabIndex={-1}
-                  aria-pressed={isActive}
-                  onClick={() => setActiveModule(module)}
-                  className={[
-                    'shrink-0 rounded-[var(--radius-pill)] px-2.5 py-1 text-[11px] font-medium whitespace-nowrap transition-all duration-200',
-                    heroTabClass(module, isActive),
-                  ].join(' ')}
-                >
-                  {moduleLabel(module)}
-                </button>
-              )
-            })}
-          </div>
-        </div>
-
-        <div className="flex gap-2 overflow-x-auto px-3 pb-2.5 [-ms-overflow-style:none] [scrollbar-width:none] md:hidden [&::-webkit-scrollbar]:hidden sm:px-4">
-          {visibleConversations.map((conversation) => {
-            const isSelected = conversation.id === selected.id
-            return (
-              <button
-                key={conversation.id}
-                type="button"
-                tabIndex={-1}
-                onClick={() => setSelectedId(conversation.id)}
-                className={[
-                  'flex shrink-0 items-center gap-2 rounded-2xl px-2.5 py-2 transition-colors',
-                  isSelected ? 'bg-ink text-on-dark' : 'bg-surface-muted/70 text-ink',
-                ].join(' ')}
-              >
-                <ProfilePhoto src={conversation.avatar} alt={conversation.name} size="sm" />
-                <span className="text-[11px] font-medium">{conversation.name.split(' ')[0]}</span>
-                <PlatformGlyph platform={conversation.platform} />
-              </button>
-            )
-          })}
-        </div>
-
-        <div className="flex min-h-[17.5rem] border-t border-border/70 sm:min-h-[20rem] md:min-h-[22rem]">
-          <div className="hidden w-40 shrink-0 flex-col border-r border-border/70 bg-surface-muted/30 md:flex lg:w-48 xl:w-52">
-            {visibleConversations.map((conversation) => {
-              const isSelected = conversation.id === selected.id
-              return (
-                <button
-                  key={conversation.id}
-                  type="button"
-                  tabIndex={-1}
-                  onClick={() => setSelectedId(conversation.id)}
-                  className={[
-                    'flex w-full items-center gap-2.5 px-3 py-2.5 text-left transition-colors lg:gap-3 lg:px-3.5 lg:py-3',
-                    heroListItemClass(conversation.platform, isSelected),
-                  ].join(' ')}
-                >
-                  <div className="relative shrink-0">
-                    <ProfilePhoto src={conversation.avatar} alt={conversation.name} />
-                    <span className="absolute -right-0.5 -bottom-0.5 rounded-full bg-white p-px shadow-soft">
-                      <PlatformGlyph platform={conversation.platform} />
-                    </span>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-medium text-ink">{conversation.name}</p>
-                    <p className="mt-0.5 truncate text-[11px] text-ink-muted">{conversation.preview}</p>
-                  </div>
-                </button>
-              )
-            })}
-          </div>
-
-          <div className="flex min-w-0 flex-1 flex-col">
-            <div className="flex items-center gap-2.5 px-3 py-2.5 sm:gap-3 sm:px-4 sm:py-3">
-              <div className="relative shrink-0">
-                <ProfilePhoto src={selected.avatar} alt={selected.name} />
-                <span className="absolute -right-0.5 -bottom-0.5 rounded-full bg-white p-px shadow-soft">
-                  <PlatformGlyph platform={selected.platform} />
-                </span>
-              </div>
-              <p className="min-w-0 flex-1 truncate text-sm font-medium text-ink">{selected.name}</p>
-              <span className="flex shrink-0 items-center gap-1.5 rounded-[var(--radius-pill)] bg-ink/95 px-2 py-0.5 text-[10px] text-on-dark">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse-soft" />
-                Live
-              </span>
-            </div>
-
-            <div
-              className={`flex flex-1 flex-col justify-end gap-2.5 overflow-hidden px-3 py-3 sm:gap-3 sm:px-4 sm:py-4 ${heroThreadBackgroundClass(selected.platform)}`}
-            >
-              {threadMessages.map((message) => {
-                const isOutbound = message.direction === 'outbound'
-                return (
-                  <div
-                    key={message.id}
-                    className={`flex ${isOutbound ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div
-                      className={[
-                        'max-w-[88%] rounded-2xl px-3 py-2 text-xs leading-relaxed sm:max-w-[80%] sm:px-3.5 sm:py-2.5 sm:text-[13px]',
-                        isOutbound
-                          ? `${heroOutboundBubbleClass(selected.platform)} rounded-br-md`
-                          : `${heroInboundBubbleClass()} rounded-bl-md`,
-                      ].join(' ')}
-                    >
-                      {message.content}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-
-            <div className="space-y-2 border-t border-border/70 bg-white/90 px-3 py-2.5 backdrop-blur-sm sm:space-y-2.5 sm:px-4 sm:py-3">
-              <div className="flex items-center gap-2 sm:gap-2.5">
-                <div className="min-w-0 flex-1 rounded-full border border-border bg-surface-muted/40 px-3 py-2 sm:px-4 sm:py-2.5">
-                  <p className="truncate text-xs text-ink-faint sm:text-sm">Type a message…</p>
-                </div>
-                <div
-                  className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full sm:h-10 sm:w-10 ${heroSendButtonClass(selected.platform)}`}
-                >
-                  <SendIcon />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
   )
 }
 
@@ -493,30 +129,42 @@ function MetaVerifiedBadge() {
   )
 }
 
+function ComingSoonBadge() {
+  return (
+    <div className="mb-4 inline-flex items-center gap-2 rounded-[var(--radius-pill)] border border-accent/25 bg-white/90 px-3 py-1.5 shadow-soft backdrop-blur-sm sm:mb-5 md:mb-6">
+      <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse-soft" aria-hidden />
+      <span className="text-[11px] font-semibold tracking-wide text-accent">Coming soon</span>
+    </div>
+  )
+}
+
 export function LandingHero() {
   return (
     <>
-      <section className="bg-hero-gradient bg-grid-light relative overflow-x-hidden pt-24 pb-14 sm:pt-28 sm:pb-16 md:min-h-[100svh] md:pb-20 lg:pt-32">
+      <section className="bg-hero-gradient bg-grid-light relative flex items-center overflow-x-hidden pt-28 pb-20 sm:pt-32 sm:pb-24 md:min-h-[100svh]">
         <LandingNavbar variant="light" />
-        <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 sm:gap-10 sm:px-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.15fr)] lg:gap-12 lg:px-8">
-          <Reveal className="flex min-w-0 flex-col items-center text-center lg:items-start lg:text-left">
-            <MetaVerifiedBadge />
-            <h1 className="text-[1.75rem] leading-tight font-semibold tracking-tight text-ink sm:text-4xl md:text-5xl lg:text-[3.25rem]">
-              One workspace, <span className="text-accent-gradient">every channel.</span>
+        <div className="mx-auto w-full max-w-4xl px-4 sm:px-6 lg:px-8">
+          <Reveal className="flex min-w-0 flex-col items-center text-center">
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <MetaVerifiedBadge />
+              <ComingSoonBadge />
+            </div>
+            <h1 className="text-[2rem] leading-tight font-semibold tracking-tight text-ink sm:text-5xl md:text-6xl lg:text-[4rem]">
+              Every customer chat, <span className="text-accent-gradient">in your pocket.</span>
             </h1>
-            <p className="mt-3 text-base font-medium tracking-tight text-ink sm:mt-4 sm:text-lg md:text-xl">
-              The WhatsApp &amp; Instagram inbox for Indian businesses.
+            <p className="mt-4 text-base font-medium tracking-tight text-ink sm:mt-5 sm:text-lg md:text-xl">
+              The WhatsApp &amp; Instagram inbox app for Indian businesses.
             </p>
-            <p className="mt-3 max-w-lg text-sm leading-relaxed text-ink-muted sm:mt-4 sm:text-base md:text-lg">
-              Manage WhatsApp and Instagram from dedicated modules in Responza, with AI draft replies
-              in your composer, instant translation, and a dashboard that shows what needs attention.
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-muted sm:mt-4 sm:text-base md:text-lg">
+              Responza brings WhatsApp and Instagram into one mobile app, with AI draft replies,
+              instant translation and chat summaries, so you can answer customers from anywhere.
             </p>
-            <p className="mt-4 text-xs text-ink-faint">
-              No credit card required · 3-day free trial · Plans from ₹499/month
-            </p>
-          </Reveal>
-          <Reveal delay={150} className="mx-auto w-full min-w-0 max-w-md sm:max-w-xl lg:max-w-none">
-            <HeroVisual />
+            <div className="mt-8 flex w-full max-w-sm flex-col gap-3 sm:mt-10 sm:max-w-none sm:flex-row sm:items-center sm:justify-center">
+              <LandingButton to={WAITLIST_HREF} variant="primary" showChevron className="w-full py-2.5 sm:w-auto">
+                Join the waitlist
+              </LandingButton>
+            </div>
+            <p className="mt-4 text-xs text-ink-faint">Coming soon · Be the first to know</p>
           </Reveal>
         </div>
       </section>
@@ -535,15 +183,15 @@ export function LandingHero() {
               Connect the channels your customers already use.
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-ink-muted sm:text-base">
-              WhatsApp and Instagram each have their own module. IndiaMART, Tally, Gmail and more
-              are on the way.
+              WhatsApp and Instagram are supported from day one. IndiaMART, Tally, Gmail and more
+              are on the roadmap.
             </p>
           </Reveal>
 
           <div className="mt-10 sm:mt-12 md:mt-14">
             <Reveal>
               <p className="text-center text-[10px] font-medium tracking-widest text-ink-faint uppercase">
-                Available now
+                At launch
               </p>
               <div className="mt-5 flex flex-wrap items-center justify-center gap-3 sm:gap-4 md:gap-5">
                 {LANDING_PLATFORMS.filter(({ platform }) => platform === 'whatsapp' || platform === 'instagram').map(
@@ -582,7 +230,7 @@ export function LandingHero() {
               <div className="mx-auto flex max-w-xl items-center gap-3">
                 <div className="h-px flex-1 bg-border" />
                 <p className="shrink-0 text-[10px] font-medium tracking-widest text-ink-faint uppercase">
-                  Coming soon
+                  On the roadmap
                 </p>
                 <div className="h-px flex-1 bg-border" />
               </div>

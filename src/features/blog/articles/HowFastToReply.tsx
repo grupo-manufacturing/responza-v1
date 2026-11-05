@@ -134,8 +134,8 @@ export function Article() {
 
       <BlogH2>How Responza helps you reply faster</BlogH2>
       <BlogP>
-        Responza puts your WhatsApp and Instagram conversations in one workspace, with a dashboard that shows which
-        ones need attention. When a customer messages you, it drafts a reply in the composer from the business
+        Responza, an upcoming mobile app, puts your WhatsApp and Instagram conversations in one inbox on your phone,
+        with the ones that need attention at the top. When a customer messages you, it drafts a reply in the composer from the business
         knowledge you've added. You review it, edit if you like, and send.
       </BlogP>
       <BlogP>

@@ -1,7 +1,7 @@
-export const SITE_URL = 'https://www.responza.in'
+export const SITE_URL = 'https://responza.in'
 
 const SITE_DESCRIPTION =
-  'One workspace, every channel. Manage WhatsApp and Instagram for your Indian business, with AI draft replies, translation and analytics. Plans from ₹499/month.'
+  'Responza is the upcoming mobile app that puts your WhatsApp and Instagram business chats in one inbox, with AI replies and translation. Join the waitlist.'
 
 export type SeoPage = {
   readonly path: string
@@ -16,20 +16,22 @@ export type SeoPage = {
 export const SEO_PAGES = {
   home: {
     path: '/',
-    title: 'WhatsApp & Instagram in One Workspace | Responza AI',
+    title: 'WhatsApp & Instagram Inbox App, Coming Soon | Responza AI',
     description: SITE_DESCRIPTION,
-    lastModified: '2026-11-02',
+    lastModified: '2026-11-04',
   },
   privacy: {
     path: '/privacy-policy',
     title: 'Privacy Policy | Responza AI',
-    description: 'Privacy Policy for Responza AI, operated by Grupo Technologies Private Limited.',
+    description:
+      'How Responza AI, operated by Grupo Technologies Private Limited, collects, uses and protects your personal data and business conversations.',
     lastModified: '2026-07-15',
   },
   terms: {
     path: '/terms-conditions',
     title: 'Terms & Conditions | Responza AI',
-    description: 'Terms and Conditions for using the Responza AI messaging platform.',
+    description:
+      'The terms and conditions that govern your use of Responza AI, including accounts, subscriptions, acceptable use and data handling.',
     lastModified: '2026-07-15',
   },
   /** Prerendered to dist/404.html, which Vercel serves with a 404 status for unknown URLs. */

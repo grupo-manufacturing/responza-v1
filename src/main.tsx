@@ -5,6 +5,9 @@ import { RouterProvider } from 'react-router-dom'
 import '@/styles/tailwind.css'
 import { AppProviders } from './App'
 import { router } from '@/app/router'
+import { initGoogleAnalytics } from '@/shared/analytics/googleAnalytics'
+
+initGoogleAnalytics()
 
 const container = document.getElementById('root')!
 
