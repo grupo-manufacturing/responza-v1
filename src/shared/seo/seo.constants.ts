@@ -34,6 +34,12 @@ export const SEO_PAGES = {
       'The terms and conditions that govern your use of Responza AI, including accounts, subscriptions, acceptable use and data handling.',
     lastModified: '2026-07-15',
   },
+  deleteAccount: {
+    path: '/delete-account',
+    title: 'Delete Your Account | Responza AI',
+    description: 'How to request deletion of your Responza AI account and associated data by contacting contact@responza.in.',
+    lastModified: '2026-11-13',
+  },
   /** Prerendered to dist/404.html, which Vercel serves with a 404 status for unknown URLs. */
   notFound: {
     path: '/404',
