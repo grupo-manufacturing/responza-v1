@@ -3,309 +3,278 @@ import {
   LegalPageLayout,
   LegalSectionBlock,
   LegalSubsection,
-  LegalSubsubsection,
 } from '@/features/landing/components/LegalPageLayout'
 import { SEO_PAGES } from '@/shared/seo/seo.constants'
 import { usePageMeta } from '@/shared/seo/usePageMeta'
+
+const CONTACT_EMAIL = 'contact@responza.in'
+
+function MailLink({ children = CONTACT_EMAIL }: { readonly children?: string }) {
+  return (
+    <a
+      href={`mailto:${CONTACT_EMAIL}`}
+      className="font-medium text-ink underline underline-offset-2 hover:text-accent"
+    >
+      {children}
+    </a>
+  )
+}
 
 export function TermsPage() {
   usePageMeta(SEO_PAGES.terms)
 
   return (
-    <LegalPageLayout title="Terms & Conditions" lastUpdated="May 22, 2026" dateLabel="Effective Date">
+    <LegalPageLayout title="Terms & Conditions" lastUpdated="November 16, 2026" dateLabel="Effective Date">
       <div className="space-y-3 text-sm leading-relaxed text-ink-muted">
         <p>
-          These Terms and Conditions (&quot;Terms&quot;) constitute a legally binding agreement between
-          you (&quot;Business User&quot;) and Responza, operated by Grupo.in (&quot;Responza&quot;, &quot;we&quot;,
-          &quot;us&quot;), governing your access to and use of the Responza platform, APIs, dashboard, and
-          related services (collectively, the &quot;Platform&quot;).
+          These Terms &amp; Conditions (&quot;Terms&quot;) are a legal agreement between you
+          (&quot;Business User&quot;, &quot;you&quot;) and Grupo Technologies Private Limited
+          (&quot;Company&quot;, &quot;Responza&quot;, &quot;we&quot;, &quot;us&quot;) for use of the
+          Responza mobile application, website, APIs, and related services (the &quot;Service&quot;).
         </p>
         <p>
-          By creating an account or using the Platform, you confirm that you have read, understood,
-          and agree to these Terms. If you are registering on behalf of a company or business, you
-          represent that you have authority to bind that entity.
+          By creating an Account or using the Service, you agree to these Terms and to our Privacy
+          Policy at{' '}
+          <a
+            href="https://responza.in/privacy-policy"
+            className="font-medium text-ink underline underline-offset-2 hover:text-accent"
+          >
+            https://responza.in/privacy-policy
+          </a>
+          .
+        </p>
+        <p>
+          If you use the Service on behalf of a business, you confirm you have authority to bind that
+          business.
         </p>
       </div>
 
-      <LegalSectionBlock title="1. About Responza">
-        <p>
-          Responza is a unified AI-powered messaging and customer intelligence platform that connects
-          to your business accounts on WhatsApp (via Meta&apos;s Business API), Instagram (via Meta&apos;s
-          Graph API), and IndiaMart. Responza provides:
-        </p>
+      <LegalSectionBlock title="1. About the Service">
+        <p>Responza is an AI-powered inbox for businesses. Current core features include:</p>
         <LegalList
           items={[
-            'A unified inbox aggregating messages from all connected channels',
-            'AI-powered daily insights on customer interactions, volumes, and channel performance',
-            'Real-time message translation across Hindi, Telugu, English, and Spanish',
-            'Automated intent detection and smart routing of messages (e.g., customer support, sales enquiry, complaint)',
-            'AI-assisted response suggestions and workflow automation tools',
+            'Connecting WhatsApp Business and Instagram business messaging',
+            'A unified inbox to read and reply to customer conversations',
+            'AI-assisted tools such as draft replies, conversation summaries, translation, and an in-app assistant',
+            'Optional Responza Pro subscription features gated behind a free trial and/or paid plan',
           ]}
         />
         <p>
-          Responza is part of the Grupo.in family of products and is built for businesses —
-          particularly Indian MSMEs and social commerce sellers — operating across digital and offline
-          channels.
+          Some integrations (for example IndiaMART or Gmail) may appear as &quot;Coming soon&quot; and
+          are not part of the Service until enabled and connected.
+        </p>
+        <p>
+          Responza is independent and is not affiliated with, endorsed, or sponsored by Meta,
+          WhatsApp, Instagram, or Google.
         </p>
       </LegalSectionBlock>
 
-      <LegalSectionBlock title="2. Eligibility and Account Registration">
+      <LegalSectionBlock title="2. Eligibility">
         <LegalList
           items={[
-            'You must be at least 18 years of age and operate a legitimate business entity to use Responza.',
-            'You agree to provide accurate, current, and complete information during registration.',
-            'You are responsible for all activity that occurs under your account and for maintaining the security of your login credentials. Notify us immediately at support@responza.in if you suspect unauthorised access.',
-            'Responza reserves the right to verify your business identity and to decline or suspend registration at its sole discretion.',
-            'One account per business entity. Creating multiple accounts to circumvent usage limits or policies is prohibited.',
+            'You must be at least 18 years old',
+            'You must use the Service for a legitimate business purpose',
+            'You must provide accurate registration information',
+            'You are responsible for activity under your Account and for keeping login credentials secure',
+            'Notify us at contact@responza.in if you suspect unauthorised access',
           ]}
         />
       </LegalSectionBlock>
 
-      <LegalSectionBlock title="3. Connected Channels and API Authorisation">
-        <LegalSubsection title="3.1 WhatsApp Business API (Meta)">
+      <LegalSectionBlock title="3. Accounts and access">
+        <LegalList
+          items={[
+            'You may register with email and password and/or supported social login options offered in the app (currently Google, where available)',
+            'We may suspend or refuse Accounts that appear abusive, fraudulent, or in violation of these Terms',
+            'After onboarding, new Accounts typically receive a short free trial of paid features (currently 3 days). Trial length may change; the app will show your access status',
+          ]}
+        />
+      </LegalSectionBlock>
+
+      <LegalSectionBlock title="4. Connected channels">
+        <LegalSubsection title="4.1 WhatsApp">
           <p>
-            To use WhatsApp integration, you must hold a valid WhatsApp Business account and authorise
-            Responza as your Business Solutions Provider (BSP). By connecting WhatsApp, you agree to:
-          </p>
-          <LegalList
-            items={[
-              "WhatsApp's Business Policy (www.whatsapp.com/legal/business-policy)",
-              "Meta's Platform Terms (developers.facebook.com/terms)",
-              'Ensure all WhatsApp messaging via Responza complies with Meta\'s messaging guidelines, including opt-in requirements for promotional messages',
-            ]}
-          />
-        </LegalSubsection>
-        <LegalSubsection title="3.2 Instagram Messaging (Meta)">
-          <p>
-            Instagram DM integration requires you to authorise Responza through Meta&apos;s OAuth flow. You
-            must own or have administrative access to the Instagram Business or Creator account you
-            connect. Meta&apos;s Platform Terms apply to all Instagram data accessed through Responza.
+            WhatsApp features require a valid WhatsApp Business setup and your authorisation through
+            Meta&apos;s flows. You must comply with WhatsApp&apos;s Business Policy and Meta&apos;s
+            Platform Terms. You are responsible for required customer opt-ins for
+            promotional/template messaging.
           </p>
         </LegalSubsection>
-        <LegalSubsection title="3.3 IndiaMart">
+        <LegalSubsection title="4.2 Instagram">
           <p>
-            IndiaMart integration requires a valid IndiaMart seller subscription with API access
-            enabled. You are responsible for complying with IndiaMart&apos;s platform terms. Responza is
-            not affiliated with IndiaMart and cannot guarantee API availability or continuity.
+            Instagram messaging requires an eligible Instagram professional account and your
+            authorisation through Meta. Meta&apos;s Platform Terms apply.
           </p>
         </LegalSubsection>
-        <LegalSubsection title="3.4 Channel Availability">
+        <LegalSubsection title="4.3 Channel limits">
           <p>
-            Responza does not guarantee uninterrupted access to any third-party channel. If Meta or
-            IndiaMart changes or restricts their API terms, Responza may need to modify, suspend, or
-            discontinue an integration. We will notify you as promptly as possible in such events.
+            We do not control Meta platforms. API outages, policy changes, or account restrictions by
+            Meta may limit or interrupt a channel. We may modify or discontinue an integration if a
+            partner&apos;s rules require it.
           </p>
         </LegalSubsection>
       </LegalSectionBlock>
 
-      <LegalSectionBlock title="4. AI Features — Scope and Limitations">
-        <LegalSubsection title="4.1 Message Translation">
-          <p>
-            Responza provides real-time message translation between Hindi, Telugu, English, and
-            Spanish. Translations are AI-generated and provided for convenience. Responza does not
-            guarantee translation accuracy and is not liable for misunderstandings arising from
-            translated communications. Business Users should review AI translations before sending
-            critical responses.
-          </p>
-        </LegalSubsection>
-        <LegalSubsection title="4.2 Intent Detection and Smart Routing">
-          <p>
-            Responza&apos;s AI classifies incoming messages by intent and suggests routing. These
-            classifications are probabilistic in nature. Responza does not guarantee 100% accuracy and
-            is not liable for messages routed incorrectly. Business Users are responsible for
-            supervising AI routing and maintaining final approval over customer communications.
-          </p>
-        </LegalSubsection>
-        <LegalSubsection title="4.3 Customer Insights">
-          <p>
-            Daily and periodic analytics are generated from your message data. These insights are
-            provided for informational and decision-support purposes. Responza does not guarantee the
-            accuracy or completeness of analytics and is not liable for business decisions made on the
-            basis of Platform-generated insights.
-          </p>
-        </LegalSubsection>
-        <LegalSubsubsection title="4.4 AI Response Suggestions">
-          <p>
-            Where Responza provides AI-generated response suggestions, these are suggestions only.
-            Business Users retain full responsibility for the content of all communications sent to
-            their End Customers.
-          </p>
-        </LegalSubsubsection>
+      <LegalSectionBlock title="5. AI features — scope and limits">
+        <p>
+          AI outputs (drafts, summaries, translations, assistant answers) are assistive only. They
+          may be inaccurate or incomplete.
+        </p>
+        <p>
+          You remain solely responsible for every message you send to End Customers, including any
+          AI-assisted content you choose to send.
+        </p>
+        <p>Do not rely on AI features for legal, medical, or other high-risk advice.</p>
       </LegalSectionBlock>
 
-      <LegalSectionBlock title="5. Subscription Plans and Billing">
+      <LegalSectionBlock title="6. Subscriptions and billing (Google Play)">
         <LegalList
           items={[
-            'Responza offers subscription-based pricing plans. Current pricing is available at responza.in/#pricing and may be updated from time to time.',
-            'Subscriptions are billed monthly or annually as selected. Payments are due in advance.',
-            'All prices are in Indian Rupees (INR) unless otherwise stated. Applicable GST will be added to all invoices.',
-            'Responza will notify Business Users at least 30 days before implementing any price changes.',
-            'Payments are non-refundable except as required by applicable Indian consumer law or as explicitly stated in our Refund Policy.',
-            "In the event of non-payment, Responza may suspend access to the Platform with 7 days' written notice.",
+            'Paid plans (Responza Pro) are offered as auto-renewing subscriptions through Google Play Billing',
+            'Prices and plan options shown in the app / Play Store apply. Google may display prices in your local currency',
+            'Payment is charged to your Google account. Renewals are handled by Google Play until you cancel',
+            'Manage or cancel in Google Play (Subscriptions) or via Manage in the Responza Profile screen when subscribed',
+            'Restoring purchases may be required after reinstall or device change',
+            'Except where required by law or Google Play’s refund policies, fees are non-refundable by Responza directly',
+            'If access lapses for non-payment or expiry, inbox/AI features may be locked until a valid subscription or trial applies',
+          ]}
+        />
+        <p>
+          Website pricing pages, if any, are informational and do not override the price Google Play
+          shows at purchase time for the Android app.
+        </p>
+      </LegalSectionBlock>
+
+      <LegalSectionBlock title="7. Acceptable use">
+        <p>You agree not to:</p>
+        <LegalList
+          items={[
+            'Send spam or messages that violate WhatsApp, Instagram, or Meta policies',
+            'Harass, abuse, defraud, or exploit others through the Service',
+            'Upload malware or attempt to disrupt the Service or third-party APIs',
+            'Misuse AI features to process unlawful content or content you have no right to process',
+            'Reverse engineer or abuse the Service beyond permitted use',
+            'Resell or white-label the Service without our written consent',
+            'Use the Service in violation of Indian law or other applicable law',
+          ]}
+        />
+        <p>
+          We may suspend or terminate Accounts for violations, with or without notice where needed to
+          protect users, partners, or the Service.
+        </p>
+      </LegalSectionBlock>
+
+      <LegalSectionBlock title="8. Data ownership and licence">
+        <LegalList
+          items={[
+            'You retain ownership of your business data and End Customer conversation content you submit to the Service',
+            'You grant us a limited licence to host, process, transmit, and display that data solely to provide and secure the Service',
+            'We own the Service software, branding, and aggregated/anonymised insights that do not identify you or End Customers',
+            'For End Customer personal data, you are the primary business responsible for that relationship; we process it to provide the Service to you',
           ]}
         />
       </LegalSectionBlock>
 
-      <LegalSectionBlock title="6. Acceptable Use Policy">
-        <p>By using Responza, you agree NOT to:</p>
+      <LegalSectionBlock title="9. Your responsibilities to End Customers">
+        <p>You agree that:</p>
         <LegalList
           items={[
-            'Send spam, bulk unsolicited messages, or use Responza to conduct mass marketing without proper end-customer opt-in in violation of platform policies',
-            'Use Responza to harass, abuse, threaten, or defraud any person',
-            'Use the Platform to transmit malware, viruses, or harmful code',
-            'Process sensitive personal data categories — including health data, financial account information, national identification numbers, or data relating to minors — through Responza\'s messaging channels without appropriate safeguards',
-            'Attempt to reverse-engineer, scrape, or extract data from the Platform beyond what is available through official APIs',
-            'Use Responza to conduct activities that violate Indian law or the laws of any jurisdiction in which your End Customers are located',
-            "Resell, sublicense, or white-label access to the Platform without Responza's prior written consent",
-            'Use Responza in a manner that could damage, overload, or impair our infrastructure or third-party APIs',
-          ]}
-        />
-        <p>
-          Violation of this Acceptable Use Policy may result in immediate suspension or termination of
-          your account without refund.
-        </p>
-      </LegalSectionBlock>
-
-      <LegalSectionBlock title="7. Data Ownership and Licence">
-        <LegalList
-          items={[
-            'Business Users retain ownership of their business data and End Customer conversation data processed through Responza.',
-            'You grant Responza a limited, non-exclusive licence to process, transmit, and store your data for the sole purpose of providing the Platform services.',
-            'Responza retains ownership of all Platform software, AI models, algorithms, insights methodologies, interface designs, and aggregated anonymised data derived from Platform use.',
-            'Business Users may export their conversation data at any time through the Platform dashboard.',
+            'You are responsible for lawful use of End Customer data',
+            'You must obtain any required consents/opt-ins for messaging',
+            'You should maintain your own privacy disclosures for your customers',
+            'You will comply with applicable law, including India’s Digital Personal Data Protection Act, 2023 where it applies',
           ]}
         />
       </LegalSectionBlock>
 
-      <LegalSectionBlock title="8. Business User Responsibilities Regarding End Customers">
-        <p>You acknowledge and agree that:</p>
+      <LegalSectionBlock title="10. Intellectual property">
+        <p>
+          Responza name, logo, and software are owned by Grupo Technologies Private Limited / its
+          licensors. We grant you a limited, non-exclusive, non-transferable right to use the Service
+          for your internal business purposes while your Account is in good standing.
+        </p>
+      </LegalSectionBlock>
+
+      <LegalSectionBlock title="11. Third-party services">
+        <p>
+          The Service depends on third parties including Meta, Google Play, RevenueCat, and AI
+          providers. Their terms and privacy policies also apply to their services. We are not
+          responsible for third-party outages or policy enforcement against your channel accounts.
+        </p>
+      </LegalSectionBlock>
+
+      <LegalSectionBlock title="12. Disclaimers">
+        <p>
+          THE SERVICE IS PROVIDED &quot;AS IS&quot; AND &quot;AS AVAILABLE&quot;. TO THE MAXIMUM EXTENT
+          ALLOWED BY LAW, WE DISCLAIM WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,
+          AND NON-INFRINGEMENT. WE DO NOT WARRANT UNINTERRUPTED OR ERROR-FREE OPERATION OR PERFECT AI
+          ACCURACY.
+        </p>
+      </LegalSectionBlock>
+
+      <LegalSectionBlock title="13. Limitation of liability">
+        <p>
+          TO THE MAXIMUM EXTENT ALLOWED BY INDIAN LAW, OUR TOTAL LIABILITY FOR CLAIMS ARISING OUT OF
+          THE SERVICE OR THESE TERMS IS LIMITED TO THE AMOUNTS YOU PAID TO US / THROUGH GOOGLE PLAY
+          FOR RESPONZA SUBSCRIPTION ACCESS IN THE 3 MONTHS BEFORE THE CLAIM.
+        </p>
+        <p>
+          WE ARE NOT LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR
+          FOR LOST PROFITS, LOST DATA, OR BUSINESS INTERRUPTION, EVEN IF ADVISED OF THE POSSIBILITY.
+        </p>
+      </LegalSectionBlock>
+
+      <LegalSectionBlock title="14. Indemnity">
+        <p>
+          You will indemnify and hold harmless the Company and its officers, directors, employees,
+          and agents from claims, losses, and expenses (including reasonable legal fees) arising from:
+          (a) your use of the Service; (b) messages you send; (c) your violation of these Terms, law,
+          or platform policies; or (d) your infringement of third-party rights.
+        </p>
+      </LegalSectionBlock>
+
+      <LegalSectionBlock title="15. Termination">
         <LegalList
           items={[
-            'You are the data controller for your End Customers\' personal data and Responza acts as your data processor',
-            'You are responsible for obtaining valid consent from your End Customers to receive messages and to process their data through third-party platforms including Responza',
-            'You must maintain and publish a privacy policy for your own business that discloses your use of messaging platforms, AI-powered tools, and data processors',
-            'You will handle End Customer data in compliance with all applicable laws, including the Digital Personal Data Protection Act, 2023',
-            'You will promptly notify Responza if you become aware of any data breach involving your connected channels',
+            'You may stop using the Service at any time',
+            'To cancel paid auto-renewal, cancel in Google Play',
+            'To delete your Account and associated Service data, use https://responza.in/delete-account (also linked in the app) and follow the instructions',
+            'We may suspend or terminate access for breach, risk, non-payment/expiry, or legal reasons',
+            'After termination, export or recovery of data may be limited; contact contact@responza.in promptly if you need help retrieving data we still hold',
           ]}
         />
       </LegalSectionBlock>
 
-      <LegalSectionBlock title="9. Confidentiality">
+      <LegalSectionBlock title="16. Changes">
         <p>
-          Each party agrees to keep confidential any non-public information of the other party
-          disclosed in the course of using the Platform, including pricing, technical systems, and
-          business strategy. This obligation does not apply to information that is publicly
-          available, independently developed, or required to be disclosed by law.
+          We may change the Service or these Terms. We will post updates on this page and update the
+          effective date. Material changes may also be notified in-app or by email. Continued use
+          after changes means you accept the updated Terms.
         </p>
       </LegalSectionBlock>
 
-      <LegalSectionBlock title="10. Intellectual Property">
+      <LegalSectionBlock title="17. Governing law">
         <p>
-          Responza, its logo, AI engine, dashboard design, and all related technology are the
-          intellectual property of Grupo.in. You are granted a limited, non-exclusive,
-          non-transferable licence to use the Platform for your business purposes. You may not copy,
-          adapt, reverse-engineer, or create derivative works from any element of the Platform.
+          These Terms are governed by the laws of India. Courts in Hyderabad, Telangana, India have
+          exclusive jurisdiction, without limiting any mandatory consumer protections that cannot be
+          waived.
         </p>
       </LegalSectionBlock>
 
-      <LegalSectionBlock title="11. Disclaimer of Warranties">
+      <LegalSectionBlock title="18. Contact">
+        <p>Grupo Technologies Private Limited (Responza)</p>
         <p>
-          Responza is provided on an &quot;as is&quot; and &quot;as available&quot; basis. We make no warranties,
-          express or implied, including warranties of merchantability, fitness for a particular
-          purpose, or non-infringement. We do not warrant that the Platform will be error-free,
-          uninterrupted, or that AI-generated content (translations, insights, intent
-          classifications) will be 100% accurate.
-        </p>
-      </LegalSectionBlock>
-
-      <LegalSectionBlock title="12. Limitation of Liability">
-        <p>
-          To the fullest extent permitted under Indian law, Responza&apos;s total aggregate liability for
-          any claim arising from these Terms shall not exceed the subscription fees paid by you in the
-          3 months immediately preceding the claim.
+          Email: <MailLink />
         </p>
         <p>
-          Responza shall not be liable for indirect, incidental, consequential, or punitive damages,
-          including lost revenue, business interruption, reputational harm, or loss of customer data,
-          even if advised of the possibility of such damages.
+          Website:{' '}
+          <a
+            href="https://responza.in"
+            className="font-medium text-ink underline underline-offset-2 hover:text-accent"
+          >
+            https://responza.in
+          </a>
         </p>
-        <p>
-          Responza is not liable for the actions, policies, or downtime of third-party platforms
-          including Meta (WhatsApp/Instagram) and IndiaMart.
-        </p>
-      </LegalSectionBlock>
-
-      <LegalSectionBlock title="13. Indemnification">
-        <p>
-          You agree to indemnify, defend, and hold harmless Responza, Grupo.in, and their respective
-          officers, directors, employees, and agents from and against any claims, liabilities,
-          damages, losses, and expenses (including reasonable legal fees) arising from: (a) your use
-          of the Platform in violation of these Terms; (b) your communications sent to End Customers
-          via Responza; (c) your violation of any applicable law or third-party platform terms; or (d)
-          infringement of third-party rights.
-        </p>
-      </LegalSectionBlock>
-
-      <LegalSectionBlock title="14. Term and Termination">
-        <LegalList
-          items={[
-            'These Terms are effective from the date you create an account and remain in effect until terminated.',
-            'You may cancel your subscription at any time from the dashboard. Cancellation takes effect at the end of the current billing period.',
-            'Responza may suspend or terminate your account immediately for material breach of these Terms, violation of the Acceptable Use Policy, non-payment, or conduct that harms other users or the Platform.',
-            'Upon termination, your access to the Platform ceases. You may export your data within 30 days of termination, after which identifiable data is deleted per the retention policy.',
-            'Provisions relating to intellectual property, confidentiality, limitation of liability, indemnification, and dispute resolution survive termination.',
-          ]}
-        />
-      </LegalSectionBlock>
-
-      <LegalSectionBlock title="15. Modifications to the Platform and Terms">
-        <p>
-          Responza reserves the right to modify, suspend, or discontinue any feature of the Platform
-          at any time, with reasonable notice where possible. We may update these Terms at any time.
-          Material changes will be communicated by email and in-dashboard notification at least 15 days
-          before taking effect. Continued use after the effective date constitutes acceptance.
-        </p>
-      </LegalSectionBlock>
-
-      <LegalSectionBlock title="16. Dispute Resolution">
-        <p>
-          Users may bring any disputes to the Company who will try to resolve them amicably.
-        </p>
-        <p>
-          While User&apos;s right to take legal action shall always remain unaffected, in the event of any
-          controversy regarding the use of Responza or the Service, Users are asked to contact the
-          Company at the contact details provided in this document.
-        </p>
-        <p>
-          The user may submit the complaint including a brief description and if applicable, the
-          details of the related order, purchase, or account to the Company&apos;s email address specified
-          in this document.
-        </p>
-      </LegalSectionBlock>
-
-      <LegalSectionBlock title="17. Governing Law and Jurisdiction">
-        <p>
-          These Terms are governed by the laws of India. Subject to the arbitration clause, you
-          submit to the exclusive jurisdiction of the courts of Hyderabad, Telangana, India.
-        </p>
-      </LegalSectionBlock>
-
-      <LegalSectionBlock title="18. General Provisions">
-        <LegalList
-          items={[
-            'Entire Agreement: These Terms, together with the Privacy Policy and any applicable order forms, constitute the entire agreement between you and Responza.',
-            'Severability: If any provision is found unenforceable, the remaining provisions remain in full force.',
-            'Waiver: Failure to enforce any right under these Terms does not constitute a waiver of that right.',
-            "Assignment: You may not assign your rights under these Terms without Responza's written consent. Responza may assign its rights in connection with a merger or acquisition.",
-            'Force Majeure: Responza is not liable for delays or failures caused by circumstances beyond its reasonable control, including API platform outages, internet failures, or acts of government.',
-          ]}
-        />
-      </LegalSectionBlock>
-
-      <LegalSectionBlock title="19. Contact — Legal Enquiries">
-        <p>Responza (by Grupo.in)</p>
-        <p>Email: contact@grupo.in</p>
-        <p>Registered in India</p>
       </LegalSectionBlock>
     </LegalPageLayout>
   )

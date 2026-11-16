@@ -24,21 +24,22 @@ export const SEO_PAGES = {
     path: '/privacy-policy',
     title: 'Privacy Policy | Responza AI',
     description:
-      'How Responza AI, operated by Grupo Technologies Private Limited, collects, uses and protects your personal data and business conversations.',
-    lastModified: '2026-07-15',
+      'How Grupo Technologies Private Limited collects, uses and protects Responza account, conversation and subscription data for the Android app and website.',
+    lastModified: '2026-11-16',
   },
   terms: {
     path: '/terms-conditions',
     title: 'Terms & Conditions | Responza AI',
     description:
-      'The terms and conditions that govern your use of Responza AI, including accounts, subscriptions, acceptable use and data handling.',
-    lastModified: '2026-07-15',
+      'Terms for using the Responza Android app and website, including accounts, WhatsApp and Instagram channels, AI features and Google Play billing.',
+    lastModified: '2026-11-16',
   },
   deleteAccount: {
     path: '/delete-account',
     title: 'Delete Your Account | Responza AI',
-    description: 'How to request deletion of your Responza AI account and associated data by contacting contact@responza.in.',
-    lastModified: '2026-11-13',
+    description:
+      'How to delete your Responza account via the app or by emailing contact@responza.in, and how that differs from cancelling Google Play billing.',
+    lastModified: '2026-11-16',
   },
   /** Prerendered to dist/404.html, which Vercel serves with a 404 status for unknown URLs. */
   notFound: {

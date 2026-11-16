@@ -3,373 +3,296 @@ import {
   LegalPageLayout,
   LegalSectionBlock,
   LegalSubsection,
-  LegalSubsubsection,
 } from '@/features/landing/components/LegalPageLayout'
 import { SEO_PAGES } from '@/shared/seo/seo.constants'
 import { usePageMeta } from '@/shared/seo/usePageMeta'
+
+const CONTACT_EMAIL = 'contact@responza.in'
+
+function MailLink({ children = CONTACT_EMAIL }: { readonly children?: string }) {
+  return (
+    <a
+      href={`mailto:${CONTACT_EMAIL}`}
+      className="font-medium text-ink underline underline-offset-2 hover:text-accent"
+    >
+      {children}
+    </a>
+  )
+}
 
 export function PrivacyPolicyPage() {
   usePageMeta(SEO_PAGES.privacy)
 
   return (
-    <LegalPageLayout title="Privacy Policy" lastUpdated="May 22, 2026">
+    <LegalPageLayout title="Privacy Policy" lastUpdated="November 16, 2026">
       <div className="space-y-3 text-sm leading-relaxed text-ink-muted">
         <p>
-          This Privacy Policy describes Our policies and procedures on the collection, use, and
-          disclosure of Your information when You use the Service and tells You about Your privacy
-          rights and how the law protects You.
+          This Privacy Policy describes how Grupo Technologies Private Limited (&quot;Company&quot;,
+          &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) collects, uses, and discloses information when you use
+          Responza (the &quot;Service&quot;).
         </p>
-        <p>
-          We use Your Personal Data to provide and improve the Service. By using the Service, You
-          agree to the collection and use of information in accordance with this Privacy Policy.
-        </p>
+        <p>By using the Service, you agree to this Privacy Policy.</p>
       </div>
 
-      <LegalSectionBlock title="Interpretation and Definitions">
-        <LegalSubsection title="Interpretation">
-          <p>
-            The words of which the initial letter is capitalized have meanings defined under the
-            following conditions. The following definitions shall have the same meaning regardless
-            of whether they appear in singular or in plural.
-          </p>
-        </LegalSubsection>
-        <LegalSubsection title="Definitions">
-          <p>For the purposes of this Privacy Policy:</p>
+      <LegalSectionBlock title="1. What Responza is">
+        <p>
+          Responza is an AI-powered business inbox available primarily as a mobile application on
+          Google Play (package: in.responza.app), together with our backend APIs and website at
+          responza.in.
+        </p>
+        <p>
+          Business Users use Responza to manage customer conversations from connected messaging
+          channels and to use AI tools such as draft replies, summaries, translation, and an in-app
+          assistant.
+        </p>
+      </LegalSectionBlock>
+
+      <LegalSectionBlock title="2. Definitions">
+        <LegalList
+          items={[
+            'Account: your Responza user account.',
+            'Business User: the business or individual who registers for Responza.',
+            'End Customer: a person who messages a Business User on a connected channel (for example WhatsApp or Instagram).',
+            'Personal Data: information that identifies or can identify a person.',
+            'Service: the Responza mobile app, website, APIs, and related services.',
+            'Country: India.',
+          ]}
+        />
+      </LegalSectionBlock>
+
+      <LegalSectionBlock title="3. Whose data we process">
+        <p>
+          A) Business User data — we process this as a data fiduciary / controller for operating
+          your Account.
+        </p>
+        <p>
+          B) End Customer conversation data — we process this on behalf of Business Users to provide
+          the inbox and related features. For that data, Business Users are responsible for having a
+          lawful basis and for their own privacy disclosures to End Customers.
+        </p>
+      </LegalSectionBlock>
+
+      <LegalSectionBlock title="4. Information we collect from Business Users">
+        <LegalSubsection title="4.1 Account and profile">
           <LegalList
             items={[
-              'Account means a unique account created for You to access our Service or parts of our Service.',
-              'Company (referred to as either "the Company", "We", "Us", or "Our" in this Agreement) refers to Grupo Technologies Private Limited, the operator of Responza.',
-              'Business User means a business or individual who registers for and uses Responza to manage customer conversations.',
-              'End Customer means an individual who messages a Business User through Instagram, Facebook, or IndiaMART.',
-              'Cookies are small files placed on Your computer, mobile device, or any other device by a website, containing details of Your browsing history on that website among its many uses.',
-              'Country refers to: India',
-              'Device means any device that can access the Service such as a computer, a cellphone, or a digital tablet.',
-              'Personal Data is any information that relates to an identified or identifiable individual.',
-              'Service refers to the Responza website, dashboard, APIs, and related products and services.',
-              'Service Provider means any natural or legal person who processes the data on behalf of the Company. It refers to third-party companies or individuals employed by the Company to facilitate the Service, to provide the Service on behalf of the Company, to perform services related to the Service, or to assist the Company in analyzing how the Service is used.',
-              'Third-party Social Media Service refers to any website or any social network website through which a User can log in or create an account to use the Service.',
-              'Usage Data refers to data collected automatically, either generated by the use of the Service or from the Service infrastructure itself (for example, the duration of a page visit).',
-              'Website refers to Responza, accessible from responza.in',
-              'You means the individual accessing or using the Service, or the company or other legal entity on behalf of which such individual is accessing or using the Service, as applicable.',
+              'Email address',
+              'Authentication data (for example password hashes managed by our auth provider, or Google account identifiers if you sign in with Google)',
+              'Business profile details you provide (brand/business name, website, business description, account type, optional referral code)',
+              'Preferred translation language (if you set one)',
             ]}
           />
         </LegalSubsection>
-      </LegalSectionBlock>
 
-      <LegalSectionBlock title="Collecting and Using Your Personal Data">
-        <LegalSubsection title="Types of Data Collected">
-          <LegalSubsubsection title="Personal Data">
-            <p>
-              While using Our Service, We may ask You to provide Us with certain personally
-              identifiable information that can be used to contact or identify You. Personally
-              identifiable information may include, but is not limited to:
-            </p>
-            <LegalList
-              items={[
-                'Email address',
-                'First name and last name',
-                'Phone number',
-                'Business name, address, State, Province, ZIP/Postal code, City',
-                'Billing and payment information (processed via secure third-party gateways)',
-                'Usage Data',
-              ]}
-            />
-          </LegalSubsubsection>
-          <LegalSubsubsection title="Usage Data">
-            <p>Usage Data is collected automatically when using the Service.</p>
-            <p>
-              Usage Data may include information such as Your Device&apos;s Internet Protocol address
-              (e.g. IP address), browser type, browser version, the pages of our Service that You
-              visit, the time and date of Your visit, the time spent on those pages, unique device
-              identifiers, and other diagnostic data.
-            </p>
-            <p>
-              When You access the Service by or through a mobile device, We may collect certain
-              information automatically, including, but not limited to, the type of mobile device
-              You use, Your mobile device unique ID, the IP address of Your mobile device, Your
-              mobile operating system, the type of mobile Internet browser You use, unique device
-              identifiers, and other diagnostic data.
-            </p>
-            <p>
-              We may also collect information that Your browser sends whenever You visit our Service
-              or when You access the Service by or through a mobile device.
-            </p>
-          </LegalSubsubsection>
-          <LegalSubsubsection title="Information from Third-Party Social Media Services">
-            <p>
-              The Company allows You to create an account and use the Service by connecting the
-              following Third-party Social Media Services:
-            </p>
-            <LegalList
-              items={['Google', 'Facebook (Meta)', 'Instagram (Meta)', 'X', 'WhatsApp', 'LinkedIn']}
-            />
-            <p>
-              If You decide to register through or otherwise grant Us access to a Third-Party Social
-              Media Service, We may collect Personal Data that is already associated with Your
-              Third-Party Social Media Service&apos;s account, such as Your name, Your email address,
-              Your profile information, and messaging data made available through Meta&apos;s official
-              APIs (including Instagram Direct Messages and Facebook Page messaging, as permitted by
-              Your authorization).
-            </p>
-            <p>
-              You may also have the option of sharing additional information with the Company through
-              Your Third-Party Social Media Service&apos;s account. If You choose to provide such
-              information and Personal Data, during registration or otherwise, You are giving the
-              Company permission to use, share, and store it in a manner consistent with this Privacy
-              Policy and Meta&apos;s applicable Platform Terms.
-            </p>
-            <p>
-              We access Meta platform data only through Meta&apos;s official APIs. We do not sell Meta
-              platform data, use it for purposes unrelated to providing the Service, or transfer it
-              to third parties except as described in this Privacy Policy and as permitted by
-              Meta&apos;s Platform Terms.
-            </p>
-          </LegalSubsubsection>
-          <LegalSubsubsection title="Information from IndiaMART">
-            <p>
-              If You connect an IndiaMART account, We may receive enquiry messages, buyer contact
-              details, and lead data made available through IndiaMART&apos;s official APIs, subject to
-              IndiaMART&apos;s terms of service and Your authorization. We use this data solely to
-              provide the unified inbox and related features of the Service.
-            </p>
-          </LegalSubsubsection>
-          <LegalSubsubsection title="End Customer Conversation Data">
-            <p>
-              When Business Users connect channels, We process data about End Customers on behalf of
-              Business Users, including message content, sender identifiers (such as Instagram or
-              Facebook user IDs, handles, or IndiaMART buyer IDs), timestamps, and channel origin.
-              For this data, Responza acts as a data processor on behalf of Business Users. Business
-              Users are responsible for having a lawful basis to process End Customer data and for
-              maintaining their own privacy disclosures.
-            </p>
-          </LegalSubsubsection>
-          <LegalSubsubsection title="Tracking Technologies and Cookies">
-            <p>
-              We use Cookies and similar tracking technologies to track activity on Our Service and
-              store certain information. Tracking technologies used include beacons, tags, and
-              scripts to collect and track information and to improve and analyze Our Service.
-            </p>
-            <LegalList
-              items={[
-                'Cookies or Browser Cookies. A cookie is a small file placed on Your Device. You can instruct Your browser to refuse all Cookies or to indicate when a Cookie is being sent. However, if You do not accept Cookies, You may not be able to use some parts of our Service.',
-                'Web Beacons. Certain sections of our Service and our emails may contain small electronic files known as web beacons that permit the Company to count users who have visited those pages or opened an email and for other related website statistics.',
-              ]}
-            />
-            <p>We use both Session and Persistent Cookies for the purposes set out below:</p>
-            <LegalList
-              items={[
-                'Necessary / Essential Cookies Type: Session Cookies by Us — Purpose: These Cookies are essential to provide You with services available through the Website and to enable You to use some of its features, including authentication and preventing fraudulent use of user accounts.',
-                'Cookies Policy / Notice Acceptance Cookies Type: Persistent Cookies by Us — Purpose: These Cookies identify if users have accepted the use of cookies on the Website.',
-                'Functionality Cookies Type: Persistent Cookies by Us — Purpose: These Cookies allow us to remember choices You make when You use the Website, such as remembering your login details or language preference.',
-              ]}
-            />
-          </LegalSubsubsection>
-        </LegalSubsection>
-      </LegalSectionBlock>
-
-      <LegalSectionBlock title="Use of Your Personal Data">
-        <p>The Company may use Personal Data for the following purposes:</p>
-        <LegalList
-          items={[
-            'To provide and maintain our Service, including to monitor the usage of our Service and to unify messages from Instagram, Facebook, and IndiaMART in one inbox.',
-            'To manage Your Account: to manage Your registration as a user of the Service. The Personal Data You provide can give You access to different functionalities of the Service that are available to You as a registered user.',
-            'For the performance of a contract: the development, compliance and undertaking of the purchase contract for the products, items or services You have purchased or of any other contract with Us through the Service.',
-            'To contact You: To contact You by email, telephone calls, SMS, or other equivalent forms of electronic communication regarding updates or informative communications related to the functionalities, products or contracted services, including security updates, when necessary or reasonable for their implementation.',
-            'To provide You with news, special offers and general information about other goods, services and events which we offer that are similar to those that you have already purchased or enquired about unless You have opted not to receive such information.',
-            'To manage Your requests: To attend and manage Your requests to Us.',
-            'For business transfers: We may use Your information to evaluate or conduct a merger, divestiture, restructuring, reorganization, dissolution, or other sale or transfer of some or all of Our assets.',
-            'For other purposes: We may use Your information for other purposes, such as data analysis, identifying usage trends, determining the effectiveness of our promotional campaigns, and to evaluate and improve our Service, products, services, marketing and your experience.',
-          ]}
-        />
-        <p>We may share Your personal information in the following situations:</p>
-        <LegalList
-          items={[
-            'With Service Providers: We may share Your personal information with Service Providers to monitor and analyze the use of our Service, to provide cloud hosting, payment processing, translation, email delivery, and customer support.',
-            'With channel platforms: Data flows through Meta (Facebook and Instagram) and IndiaMART APIs as necessary to send and receive messages on Your behalf, in accordance with each platform\'s terms.',
-            'For business transfers: We may share or transfer Your personal information in connection with, or during negotiations of, any merger, sale of Company assets, financing, or acquisition of all or a portion of Our business to another company.',
-            'With Affiliates: We may share Your information with Our affiliates, in which case we will require those affiliates to honor this Privacy Policy.',
-            'With Your consent: We may disclose Your personal information for any other purpose with Your consent.',
-          ]}
-        />
-        <p>
-          We do not sell Your Personal Data or Meta platform data. We do not use Meta platform data
-          to train general-purpose AI models without Your explicit consent.
-        </p>
-      </LegalSectionBlock>
-
-      <LegalSectionBlock title="Meta Platform Data — Facebook, Instagram, & WhatsApp">
-        <p>
-          Responza integrates with Meta platforms (Facebook, Instagram & WhatsApp) through
-          Meta&apos;s official APIs. The following additional provisions apply:
-        </p>
-        <LegalList
-          items={[
-            'We collect and use Meta platform data only to provide the Service (for example, receiving and sending messages, displaying conversations in Your inbox, and AI-assisted replies You authorize).',
-            'We access Meta data only through official APIs and do not circumvent Meta\'s rate limits, privacy controls, or Platform Terms.',
-            'You must comply with Meta\'s Platform Terms, Instagram Terms of Use, and applicable messaging policies when using Responza.',
-            'Meta has independent access to data on its platforms. We are not responsible for Meta\'s data practices. Please review Meta\'s Privacy Policy at www.meta.com/privacy.',
-            'We do not share Meta platform data with third parties except with Service Providers that help Us operate the Service (under contractual safeguards), as required by law, or with Your consent.',
-            'You may not use Responza\'s Meta integration to send spam, unsolicited messages, or content that violates Meta policies.',
-            'You may request deletion of data We have obtained from Meta by contacting Us (see Contact Us below) or by removing Responza\'s access to Your Facebook or Instagram account in Your Meta account settings.',
-          ]}
-        />
-      </LegalSectionBlock>
-
-      <LegalSectionBlock title="Retention of Your Personal Data">
-        <p>
-          The Company will retain Your Personal Data only for as long as is necessary for the
-          purposes set out in this Privacy Policy. We will retain and use Your Personal Data to the
-          extent necessary to comply with our legal obligations (for example, if we are required to
-          retain your data to comply with applicable laws), resolve disputes, and enforce our legal
-          agreements and policies.
-        </p>
-        <p>
-          The Company will also retain Usage Data for internal analysis purposes. Usage Data is
-          generally retained for a shorter period of time, except when this data is used to
-          strengthen the security or to improve the functionality of Our Service, or We are legally
-          obligated to retain this data for longer time periods.
-        </p>
-        <p>
-          Conversation data is retained for up to 12 months by default unless You configure a shorter
-          period or delete it through the Service. Upon account termination, identifiable data is
-          deleted within 60 days, subject to legal retention requirements.
-        </p>
-      </LegalSectionBlock>
-
-      <LegalSectionBlock title="Transfer of Your Personal Data">
-        <p>
-          Your information, including Personal Data, is processed at the Company&apos;s operating offices
-          and in any other places where the parties involved in the processing are located. It means
-          that this information may be transferred to — and maintained on — computers located outside
-          of Your state, province, country or other governmental jurisdiction where the data
-          protection laws may differ than those from Your jurisdiction.
-        </p>
-        <p>
-          Your consent to this Privacy Policy followed by Your submission of such information
-          represents Your agreement to that transfer.
-        </p>
-        <p>
-          The Company will take all steps reasonably necessary to ensure that Your data is treated
-          securely and in accordance with this Privacy Policy and no transfer of Your Personal Data
-          will take place to an organization or a country unless there are adequate controls in place
-          including the security of Your data and other personal information.
-        </p>
-      </LegalSectionBlock>
-
-      <LegalSectionBlock title="Delete Your Personal Data">
-        <p>
-          You have the right to delete or request that We assist in deleting the Personal Data that
-          We have collected about You.
-        </p>
-        <p>
-          Our Service may give You the ability to delete certain information about You from within
-          the Service.
-        </p>
-        <p>
-          You may update, amend, or delete Your information at any time by signing in to Your
-          Account, if you have one, and visiting the account settings section that allows you to
-          manage Your personal information. You may also contact Us to request access to, correct,
-          or delete any personal information that You have provided to Us.
-        </p>
-        <p>
-          To delete data obtained from Facebook or Instagram, You may also revoke Responza&apos;s access
-          in Your Meta account settings under Apps and Websites.
-        </p>
-        <p>
-          Please note, however, that We may need to retain certain information when we have a legal
-          obligation or lawful basis to do so.
-        </p>
-      </LegalSectionBlock>
-
-      <LegalSectionBlock title="Disclosure of Your Personal Data">
-        <LegalSubsection title="Business Transactions">
+        <LegalSubsection title="4.2 Connected channels">
           <p>
-            If the Company is involved in a merger, acquisition or asset sale, Your Personal Data
-            may be transferred. We will provide notice before Your Personal Data is transferred and
-            becomes subject to a different Privacy Policy.
-          </p>
-        </LegalSubsection>
-        <LegalSubsection title="Law enforcement">
-          <p>
-            Under certain circumstances, the Company may be required to disclose Your Personal Data
-            if required to do so by law or in response to valid requests by public authorities (e.g.
-            a court or a government agency).
-          </p>
-        </LegalSubsection>
-        <LegalSubsection title="Other legal requirements">
-          <p>
-            The Company may disclose Your Personal Data in the good faith belief that such action is
-            necessary to:
+            When you connect a channel, we receive credentials and metadata needed to send and
+            receive messages, for example:
           </p>
           <LegalList
             items={[
-              'Comply with a legal obligation',
-              'Protect and defend the rights or property of the Company',
-              'Prevent or investigate possible wrongdoing in connection with the Service',
-              'Protect the personal safety of Users of the Service or the public',
-              'Protect against legal liability',
+              'WhatsApp Business phone number / phone number ID, WhatsApp Business Account IDs, display name, and access tokens issued through Meta',
+              'Instagram Business account ID, username, profile picture URL, and access tokens issued through Meta',
             ]}
           />
         </LegalSubsection>
+
+        <LegalSubsection title="4.3 Conversation and media data">
+          <p>On your behalf we store and process:</p>
+          <LegalList
+            items={[
+              'Message content (text and supported media such as images, videos, documents, stickers, and similar attachments)',
+              'Sender/recipient identifiers used by the channel (for example WhatsApp phone numbers / wa_ids, Instagram-scoped user IDs, names/handles)',
+              'Timestamps, delivery/read status where provided by the channel',
+              'Media files needed to display or send attachments',
+            ]}
+          />
+        </LegalSubsection>
+
+        <LegalSubsection title="4.4 Device and usage data">
+          <p>When you use the app or website we may collect:</p>
+          <LegalList
+            items={[
+              'App version, device type/OS, approximate diagnostics needed to keep the Service working',
+              'IP address and basic request logs on our servers',
+              'Crash or error information if/when we enable crash reporting',
+            ]}
+          />
+          <p>
+            We do not use the Google Advertising ID. The Android app blocks the AD_ID permission.
+          </p>
+        </LegalSubsection>
+
+        <LegalSubsection title="4.5 Photos and camera">
+          <p>
+            If you grant permission, the app may access your camera or photo library only so you can
+            attach media to chats. We do not use that access for advertising.
+          </p>
+        </LegalSubsection>
+
+        <LegalSubsection title="4.6 Subscription and billing data">
+          <p>
+            Subscriptions are sold through Google Play Billing and managed with RevenueCat. We store
+            subscription status on your Account (for example product identifier, expiry, whether it
+            will renew, and sync timestamps).
+          </p>
+          <p>
+            We do not receive or store your full payment card number. Payment is handled by Google
+            Play.
+          </p>
+        </LegalSubsection>
+
+        <LegalSubsection title="4.7 Website cookies">
+          <p>
+            Our website may use necessary cookies for basic operation and preferences. The mobile
+            app does not rely on website cookies for core inbox features.
+          </p>
+        </LegalSubsection>
       </LegalSectionBlock>
 
-      <LegalSectionBlock title="Security of Your Personal Data">
-        <p>
-          The security of Your Personal Data is important to Us, but remember that no method of
-          transmission over the Internet, or method of electronic storage is 100% secure. While We
-          strive to use commercially acceptable means to protect Your Personal Data (including
-          encryption in transit and at rest, access controls, and security monitoring), We cannot
-          guarantee its absolute security.
-        </p>
-      </LegalSectionBlock>
-
-      <LegalSectionBlock title="Children's Privacy">
-        <p>
-          Our Service does not address anyone under the age of 13. We do not knowingly collect
-          personally identifiable information from anyone under the age of 13. If You are a parent or
-          guardian and You are aware that Your child has provided Us with Personal Data, please
-          contact Us. If We become aware that We have collected Personal Data from anyone under the
-          age of 13 without verification of parental consent, We take steps to remove that
-          information from Our servers.
-        </p>
-        <p>
-          If We need to rely on consent as a legal basis for processing Your information and Your
-          country requires consent from a parent, We may require Your parent&apos;s consent before We
-          collect and use that information.
-        </p>
-      </LegalSectionBlock>
-
-      <LegalSectionBlock title="Links to Other Websites">
-        <p>
-          Our Service may contain links to other websites that are not operated by Us. If You click
-          on a third party link, You will be directed to that third party&apos;s site. We strongly advise
-          You to review the Privacy Policy of every site You visit.
-        </p>
-        <p>
-          We have no control over and assume no responsibility for the content, privacy policies or
-          practices of any third party sites or services.
-        </p>
-      </LegalSectionBlock>
-
-      <LegalSectionBlock title="Changes to this Privacy Policy">
-        <p>
-          We may update Our Privacy Policy from time to time. We will notify You of any changes by
-          posting the new Privacy Policy on this page.
-        </p>
-        <p>
-          You are advised to review this Privacy Policy periodically for any changes. Changes to this
-          Privacy Policy are effective when they are posted on this page.
-        </p>
-      </LegalSectionBlock>
-
-      <LegalSectionBlock title="Contact Us">
-        <p>If you have any questions about this Privacy Policy, You can contact us:</p>
+      <LegalSectionBlock title="5. Information we do NOT intentionally collect">
         <LegalList
           items={[
-            'By email: contact@responza.in',
-            'By visiting our website: responza.in',
+            'We do not sell Personal Data.',
+            'We do not use End Customer conversation data to train general-purpose AI models for unrelated products.',
+            'Channels shown as “Coming soon” in the app (for example IndiaMART or Gmail) are not active data sources until you connect them after we enable them.',
           ]}
         />
+      </LegalSectionBlock>
+
+      <LegalSectionBlock title="6. How we use Personal Data">
+        <p>We use Business User and related Service data to:</p>
+        <LegalList
+          items={[
+            'Create and manage your Account',
+            'Provide the unified inbox and send/receive messages on connected channels',
+            'Provide AI features you use (draft replies, summaries, translation, assistant)',
+            'Enforce free-trial and subscription access',
+            'Provide customer support and security monitoring',
+            'Improve reliability and features of the Service',
+            'Comply with law and enforce our Terms',
+          ]}
+        />
+        <p>
+          We process End Customer conversation data only to provide the Service to the Business User
+          who connected the channel (and as otherwise required by law).
+        </p>
+      </LegalSectionBlock>
+
+      <LegalSectionBlock title="7. AI processing (important)">
+        <p>
+          When you use AI features, relevant conversation text and related context may be sent to
+          our AI service provider (currently OpenAI) to generate outputs such as drafts, summaries,
+          translations, or assistant replies.
+        </p>
+        <p>
+          That content is processed to provide the feature you requested. Do not use Responza AI
+          features to process data you are not allowed to share with service providers.
+        </p>
+      </LegalSectionBlock>
+
+      <LegalSectionBlock title="8. How we share information">
+        <p>We may share information with:</p>
+        <LegalList
+          items={[
+            'Infrastructure and platform providers that host or operate the Service (for example cloud database/auth hosting, media storage, and our API host)',
+            'Meta Platforms, to the extent needed to connect WhatsApp / Instagram and send or receive messages through Meta’s official APIs',
+            'OpenAI, for AI features described above',
+            'RevenueCat and Google, for subscription validation and Play Billing',
+            'Professional advisers or authorities when required by law',
+            'A buyer or successor if we undergo a merger, acquisition, or asset sale (with notice where required)',
+          ]}
+        />
+        <p>We do not sell Personal Data or Meta platform data.</p>
+      </LegalSectionBlock>
+
+      <LegalSectionBlock title="9. Meta platform data (WhatsApp and Instagram)">
+        <p>
+          Responza integrates with WhatsApp and Instagram using Meta&apos;s official APIs and product
+          flows (including Embedded Signup / OAuth where applicable).
+        </p>
+        <LegalList
+          items={[
+            'We use Meta platform data only to provide the Service you authorised',
+            'You must follow Meta’s Platform Terms and WhatsApp/Instagram policies',
+            'Meta has its own privacy practices; see https://www.meta.com/privacy',
+            'You can disconnect a channel in the app. You may also revoke Responza’s access in your Meta account settings where Meta provides that control',
+          ]}
+        />
+      </LegalSectionBlock>
+
+      <LegalSectionBlock title="10. Retention">
+        <LegalList
+          items={[
+            'We retain Account and conversation data while your Account is active and as needed to provide the Service',
+            'Conversation data is retained for up to 12 months by default unless deleted earlier or required longer by law',
+            'After account deletion is completed, we delete or anonymise identifiable Account data within 60 days, except where we must retain records for legal, tax, security, or dispute purposes',
+          ]}
+        />
+      </LegalSectionBlock>
+
+      <LegalSectionBlock title="11. Your choices and deletion">
+        <p>You may:</p>
+        <LegalList
+          items={[
+            'Update business profile details in the app',
+            'Connect or disconnect WhatsApp / Instagram in Integrations',
+            'Cancel a paid subscription in Google Play (Play → Payments & subscriptions, or the Manage link in the Responza Profile screen)',
+            'Request deletion of your Responza Account by using Delete account in the app (Profile) or by visiting https://responza.in/delete-account and emailing us from your Account email',
+          ]}
+        />
+        <p>
+          Account deletion removes your Account and associated Service data as described above. It
+          does not automatically delete copies of messages that remain on WhatsApp, Instagram, or End
+          Customer devices. Cancelling Play Billing is separate from deleting your Responza Account.
+        </p>
+      </LegalSectionBlock>
+
+      <LegalSectionBlock title="12. International transfers">
+        <p>
+          We may process data on servers outside your state or country (including outside India)
+          where our providers operate. We take reasonable steps to protect Personal Data in line with
+          this Policy.
+        </p>
+      </LegalSectionBlock>
+
+      <LegalSectionBlock title="13. Security">
+        <p>
+          We use commercially reasonable safeguards, including encryption in transit (HTTPS) and
+          access controls. No method of transmission or storage is 100% secure.
+        </p>
+      </LegalSectionBlock>
+
+      <LegalSectionBlock title="14. Children’s privacy">
+        <p>
+          Responza is for businesses and adults. The Service is not directed to anyone under 18, and
+          we do not knowingly collect Personal Data from children under 18. If you believe a minor
+          has created an Account, contact us and we will take steps to delete it.
+        </p>
+      </LegalSectionBlock>
+
+      <LegalSectionBlock title="15. Changes">
+        <p>
+          We may update this Privacy Policy by posting a new version on this page and updating the
+          &quot;Last updated&quot; date. Material changes may also be communicated in the app or by
+          email where appropriate.
+        </p>
+      </LegalSectionBlock>
+
+      <LegalSectionBlock title="16. Contact">
+        <p>Grupo Technologies Private Limited (Responza)</p>
+        <p>
+          Email: <MailLink />
+        </p>
+        <p>
+          Website:{' '}
+          <a
+            href="https://responza.in"
+            className="font-medium text-ink underline underline-offset-2 hover:text-accent"
+          >
+            https://responza.in
+          </a>
+        </p>
       </LegalSectionBlock>
     </LegalPageLayout>
   )
