@@ -41,6 +41,13 @@ export const SEO_PAGES = {
       'How to delete your Responza account via the app or by emailing contact@responza.in, and how that differs from cancelling Google Play billing.',
     lastModified: '2026-11-16',
   },
+  childSafety: {
+    path: '/child-safety',
+    title: 'Child Safety Standards | Responza AI',
+    description:
+      'Responza child safety standards against CSAE and CSAM, including how to report concerns to contact@responza.in for Google Play compliance.',
+    lastModified: '2026-11-16',
+  },
   /** Prerendered to dist/404.html, which Vercel serves with a 404 status for unknown URLs. */
   notFound: {
     path: '/404',

@@ -18,6 +18,9 @@ const TermsPage = lazyWithRetry(() =>
 const DeleteAccountPage = lazyWithRetry(() =>
   import('@/features/landing/pages/DeleteAccountPage').then((m) => ({ default: m.DeleteAccountPage })),
 )
+const ChildSafetyPage = lazyWithRetry(() =>
+  import('@/features/landing/pages/ChildSafetyPage').then((m) => ({ default: m.ChildSafetyPage })),
+)
 const BlogIndexPage = lazyWithRetry(() =>
   import('@/features/blog/pages/BlogIndexPage').then((m) => ({ default: m.BlogIndexPage })),
 )
@@ -56,6 +59,14 @@ export const publicRoutes: RouteObject[] = [
     element: (
       <PageSuspense>
         <DeleteAccountPage />
+      </PageSuspense>
+    ),
+  },
+  {
+    path: SEO_PAGES.childSafety.path,
+    element: (
+      <PageSuspense>
+        <ChildSafetyPage />
       </PageSuspense>
     ),
   },
