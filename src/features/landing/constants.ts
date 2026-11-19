@@ -1,168 +1,198 @@
-export type LandingPlatform =
-  | 'whatsapp'
-  | 'instagram'
-  | 'indiamart'
-  | 'gmail'
-  | 'tally'
-  | 'tiktok'
-  | 'shopify'
-
-const LANDING_INTEGRATION_PLATFORMS: readonly LandingPlatform[] = [
-  'whatsapp',
-  'instagram',
-  'indiamart',
-  'gmail',
-  'tally',
-  'tiktok',
-  'shopify',
-]
-
-const LANDING_PLATFORM_LABELS: Record<LandingPlatform, string> = {
-  whatsapp: 'WhatsApp',
-  instagram: 'Instagram',
-  indiamart: 'IndiaMART',
-  gmail: 'Gmail',
-  tally: 'Tally',
-  tiktok: 'TikTok',
-  shopify: 'Shopify',
-}
-
-const LANDING_PLATFORM_LOGOS: Record<LandingPlatform, { src: string; width: number; height: number }> = {
-  whatsapp: { src: '/whatsapp.webp', width: 128, height: 128 },
-  instagram: { src: '/instagram.webp', width: 128, height: 128 },
-  indiamart: { src: '/indiamart.webp', width: 199, height: 128 },
-  gmail: { src: '/gmail.webp', width: 177, height: 128 },
-  tally: { src: '/tally.webp', width: 295, height: 128 },
-  tiktok: { src: '/tiktok.webp', width: 128, height: 128 },
-  shopify: { src: '/shopify.webp', width: 128, height: 128 },
-}
-
-export const LANDING_PLATFORMS = LANDING_INTEGRATION_PLATFORMS.map((platform) => ({
-  platform,
-  label: LANDING_PLATFORM_LABELS[platform],
-  logo: LANDING_PLATFORM_LOGOS[platform],
-}))
-
-export const PLATFORM_GLOW: Record<LandingPlatform, string> = {
-  whatsapp: 'shadow-[0_8px_24px_rgb(37_211_102/0.18)]',
-  instagram: 'shadow-[0_8px_24px_rgb(225_48_108/0.16)]',
-  indiamart: 'shadow-[0_8px_24px_rgb(245_158_11/0.16)]',
-  gmail: 'shadow-[0_8px_24px_rgb(234_67_53/0.18)]',
-  tally: 'shadow-[0_8px_24px_rgb(220_38_38/0.16)]',
-  tiktok: 'shadow-[0_8px_24px_rgb(236_72_153/0.16)]',
-  shopify: 'shadow-[0_8px_24px_rgb(34_197_94/0.18)]',
-}
-
-export const PLATFORM_RING: Record<LandingPlatform, string> = {
-  whatsapp: 'ring-emerald-500/20',
-  instagram: 'ring-pink-500/15',
-  indiamart: 'ring-amber-500/20',
-  gmail: 'ring-red-500/20',
-  tally: 'ring-red-500/20',
-  tiktok: 'ring-pink-500/15',
-  shopify: 'ring-emerald-500/20',
-}
-
-export function landingPlatformLogoClass(platform: LandingPlatform): string {
-  if (platform === 'indiamart' || platform === 'tally' || platform === 'shopify') {
-    return 'h-8 w-auto max-w-full object-contain'
-  }
-
-  return 'h-full w-full object-contain'
-}
-
-export const LANDING_AVATARS = {
-  priya: '/avatars/priya.jpg',
-  alex: '/avatars/alex.jpg',
-  maya: '/avatars/maya.jpg',
-  natasha: '/avatars/notification.jpg',
-} as const
+/** Google Play open-testing listing. Swap for the production listing URL once the app is public. */
+export const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=in.responza.app'
 
 export const WAITLIST_HREF = '/#waitlist'
 
-export const PRICING_PLANS = [
-  {
-    key: 'basic',
-    label: 'Basic',
-    amountInr: 499,
-    conversationLimit: 1_000,
-    interval: 'monthly' as const,
-    highlight: false,
-    description: 'For businesses getting started with WhatsApp and Instagram on the go.',
-  },
-  {
-    key: 'premium',
-    label: 'Responza Annual',
-    amountInr: 4_999,
-    conversationLimit: 30_000,
-    interval: 'yearly' as const,
-    highlight: true,
-    description: 'Best value. A full year of Responza with a higher conversation quota.',
-  },
+export const NAV_LINKS = [
+  { href: '/#features', label: 'Features' },
+  { href: '/#how-it-works', label: 'How it works' },
+  { href: '/#pricing', label: 'Pricing' },
+  { href: '/#faqs', label: 'FAQs' },
+  { href: '/blog', label: 'Blog' },
 ] as const
 
-export const PLAN_FEATURES = [
-  'WhatsApp & Instagram in one app',
-  'AI draft replies & translation',
-  'Conversation summaries',
-  'Instant push notifications',
+export type LandingPlatform = 'whatsapp' | 'instagram' | 'indiamart' | 'gmail' | 'tally' | 'shopify' | 'tiktok'
+
+export const LIVE_CHANNELS = [
+  { platform: 'whatsapp', label: 'WhatsApp Business', logo: '/whatsapp.webp' },
+  { platform: 'instagram', label: 'Instagram DMs', logo: '/instagram.webp' },
 ] as const
+
+export const ROADMAP_CHANNELS = [
+  { platform: 'indiamart', label: 'IndiaMART', logo: '/indiamart.webp' },
+  { platform: 'gmail', label: 'Gmail', logo: '/gmail.webp' },
+  { platform: 'tally', label: 'Tally', logo: '/tally.webp' },
+  { platform: 'shopify', label: 'Shopify', logo: '/shopify.webp' },
+  { platform: 'tiktok', label: 'TikTok', logo: '/tiktok.webp' },
+] as const
+
+export type ShowcaseTone = 'mint' | 'violet' | 'amber' | 'sky'
+
+export const SHOWCASE_GLOW: Record<ShowcaseTone, string> = {
+  mint: 'rgb(52 224 161 / 0.34)',
+  violet: 'rgb(164 147 255 / 0.4)',
+  amber: 'rgb(255 184 107 / 0.34)',
+  sky: 'rgb(98 200 255 / 0.34)',
+}
 
 export const LANDING_FEATURES = [
   {
     id: 'inbox',
-    label: 'One inbox',
-    tone: 'teal' as const,
-    title: 'Every chat',
-    titleAccent: 'in your pocket.',
+    eyebrow: 'One inbox',
+    title: 'All your customer chats, finally in one place.',
     description:
-      'WhatsApp and Instagram conversations live side by side in one app, sorted by latest activity, so you can switch channels without losing context.',
+      'WhatsApp Business and Instagram DMs sit side by side. Filter by channel, see unread counts and delivery status in real time, and send text, photos, videos and documents without switching apps.',
+    points: ['Filter by channel', 'Live unread & delivery status', 'Photos, videos & documents'],
+    screen: '/mockups/app-inbox.webp',
+    alt: 'Responza inbox showing WhatsApp and Instagram conversations together',
+    tone: 'mint' as ShowcaseTone,
   },
   {
     id: 'replies',
-    label: 'AI replies',
-    tone: 'violet' as const,
-    title: 'Reply in seconds with',
-    titleAccent: 'AI draft replies.',
+    eyebrow: 'AI draft replies',
+    title: 'Reply in seconds, in your own voice.',
     description:
-      'Responza AI drafts replies from your business knowledge right in the composer. Review, edit and tap send when you are ready.',
+      'Responza reads the conversation and your business details, then drafts the reply right in the composer. Edit it or send it as it is. Nothing goes out until you tap send.',
+    points: ['Drafts from the live conversation', 'Sounds like your brand', 'You approve every message'],
+    screen: '/mockups/app-draft.webp',
+    alt: 'An AI drafted reply waiting in the Responza chat composer',
+    tone: 'violet' as ShowcaseTone,
   },
   {
     id: 'translation',
-    label: 'Translation',
-    tone: 'warm' as const,
-    title: "Speak your",
-    titleAccent: "customer's language.",
+    eyebrow: 'Translation',
+    title: 'Understand every customer, whatever they write in.',
     description:
-      'Incoming messages are translated instantly so you can reply confidently, with no copy-pasting into other apps.',
+      'Translate any incoming message with one tap and reply with confidence. No copy-pasting into other apps, no guessing what a message means.',
+    points: ['One-tap message translation', 'Works inside the chat', 'Reply in the same thread'],
+    screen: '/mockups/app-translate.webp',
+    alt: 'A customer message translated into Hindi inside a Responza chat',
+    tone: 'amber' as ShowcaseTone,
   },
   {
-    id: 'analytics',
-    label: 'Summaries',
-    tone: 'teal' as const,
-    title: 'Know what customers want',
-    titleAccent: 'at a glance.',
+    id: 'summaries',
+    eyebrow: 'Summaries',
+    title: 'Catch up on a long chat in a glance.',
     description:
-      'AI-generated summaries and topic labels help you spot urgent chats and prepare before you reply, even between meetings.',
+      'Get an instant summary of any conversation: what the customer wants, what you quoted and what is still open. Perfect before a reply, or between meetings.',
+    points: ['What the customer wants', 'What you already said', 'What is still open'],
+    screen: '/mockups/app-summary.webp',
+    alt: 'A Responza conversation summary sheet over a customer chat',
+    tone: 'sky' as ShowcaseTone,
   },
+  {
+    id: 'assistant',
+    eyebrow: 'AI assistant',
+    title: 'Ask your inbox anything.',
+    description:
+      'Find out which chats need a reply and who to follow up with, or get help with captions, follow-ups and quick business answers.',
+    points: ['Which chats need a reply?', 'Who should I follow up with?', 'Captions & follow-ups'],
+    screen: '/mockups/app-ai.webp',
+    alt: 'The Responza AI assistant home screen with suggested questions',
+    tone: 'violet' as ShowcaseTone,
+  },
+] as const
+
+export const HOW_IT_WORKS = [
+  {
+    step: '01',
+    title: 'Install the app',
+    description: 'Join the open test on Google Play and create your account in a minute.',
+  },
+  {
+    step: '02',
+    title: 'Connect your channels',
+    description: 'Link your WhatsApp Business number and Instagram account. No developer setup needed.',
+  },
+  {
+    step: '03',
+    title: 'Reply with AI',
+    description: 'Add your business details once. Responza drafts, translates and summarises, and you stay in control.',
+  },
+] as const
+
+export const TRUST_POINTS = [
+  {
+    id: 'control',
+    title: 'You stay in control',
+    description: 'AI only drafts. Every reply waits for your approval, so nothing is ever sent automatically.',
+  },
+  {
+    id: 'voice',
+    title: 'Your brand voice',
+    description: 'Add your business details once and drafts follow your tone, products and policies.',
+  },
+  {
+    id: 'meta',
+    title: 'Official Meta integration',
+    description:
+      'Responza is a Meta Tech Provider with Advanced Access, so WhatsApp and Instagram connect the approved way.',
+  },
+  {
+    id: 'secure',
+    title: 'Secure by design',
+    description:
+      'Channel credentials stay on our servers and data is encrypted in transit. Your conversations are never sold.',
+  },
+  {
+    id: 'notifications',
+    title: 'Instant notifications',
+    description: 'Push alerts the moment a customer messages, so the first reply is never the slow one.',
+  },
+  {
+    id: 'delete',
+    title: 'Delete anytime',
+    description: 'Remove your account and data from the app or on request. No lock-in.',
+  },
+] as const
+
+export const PRICING_PLANS = [
+  {
+    key: 'monthly',
+    label: 'Monthly',
+    amountInr: 499,
+    conversationLimit: 1_000,
+    interval: 'monthly' as const,
+    highlight: false,
+    description: 'Flexible month-to-month for businesses getting started with chat-first selling.',
+    badge: null,
+  },
+  {
+    key: 'annual',
+    label: 'Annual',
+    amountInr: 4_999,
+    conversationLimit: 30_000,
+    interval: 'yearly' as const,
+    highlight: true,
+    description: 'Best value. A full year of Responza with 2.5× the conversations of twelve monthly plans.',
+    badge: 'Save ₹989 a year',
+  },
+] as const
+
+export const PLAN_FEATURES = [
+  'WhatsApp Business & Instagram in one inbox',
+  'AI draft replies you approve',
+  'Translation & conversation summaries',
+  'AI business assistant',
+  'Instant push notifications',
 ] as const
 
 export const LANDING_FAQS = [
   {
     q: 'What is Responza AI?',
-    a: 'Responza is an upcoming mobile app that brings your WhatsApp and Instagram business chats into one inbox, with AI draft replies, instant translation and conversation summaries.',
+    a: 'Responza is a mobile app that brings your WhatsApp Business and Instagram conversations into one inbox, with AI draft replies, instant translation and conversation summaries.',
   },
   {
-    q: 'When does the app launch?',
-    a: 'Responza is coming soon. Join the waitlist and we will email you as soon as it is available to download.',
+    q: 'Is the app available yet?',
+    a: 'Responza is in open testing on Google Play, so you can install and use it today. The public launch follows once testing wraps up.',
   },
   {
-    q: 'How do I join the waitlist?',
-    a: 'Enter your email in the waitlist form at the bottom of this page. We will add you to the list and share early access updates.',
+    q: 'How do I get the app?',
+    a: 'Open the Google Play open-testing link on your Android phone and tap to join. If you are not on Android, join the waitlist and we will email you when more platforms are ready.',
   },
   {
     q: 'How do AI draft replies work?',
-    a: 'When a customer messages you on WhatsApp or Instagram, Responza drafts a reply in the composer from your business knowledge. You review and send it yourself. Nothing goes out automatically.',
+    a: 'When a customer messages you on WhatsApp or Instagram, Responza drafts a reply in the composer from the conversation and your business details. You review, edit and send it yourself. Nothing goes out automatically.',
   },
   {
     q: 'Can I still reply from WhatsApp or Instagram directly?',
@@ -170,15 +200,19 @@ export const LANDING_FAQS = [
   },
   {
     q: 'Is my data private and secure?',
-    a: 'Your conversations are stored securely and scoped to your business. We use industry-standard encryption and never sell your data.',
+    a: 'Your conversations are stored securely and scoped to your business. Channel credentials stay on our servers, data is encrypted in transit and we never sell your data. You can delete your account at any time.',
   },
   {
-    q: 'How much will Responza cost?',
-    a: 'Planned launch pricing is ₹499/month for 1,000 conversations, or ₹4,999/year for 30,000 conversations. Both include every feature and GST. Pricing may change before launch.',
+    q: 'How much does Responza cost?',
+    a: 'Plans are ₹499 a month for 1,000 conversations or ₹4,999 a year for 30,000 conversations. Both include every feature and GST, are billed through Google Play, and new accounts get a free trial. Pricing may change before the public launch.',
   },
   {
     q: 'Will Responza work with IndiaMART or Tally?',
-    a: 'WhatsApp and Instagram are supported at launch. IndiaMART, Tally, Gmail and more are on our roadmap.',
+    a: 'WhatsApp Business and Instagram are supported today. IndiaMART, Gmail, Tally, Shopify and TikTok are on our roadmap.',
+  },
+  {
+    q: 'Is Responza connected to Meta?',
+    a: 'Responza is a Meta Tech Provider with Advanced Access, which is how it connects to WhatsApp Business and Instagram. It is an independent product and is not endorsed or sponsored by Meta, WhatsApp or Instagram.',
   },
 ] as const
 
@@ -189,11 +223,3 @@ export const LANDING_YOUTUBE_SHORT_URL = `https://www.youtube.com/shorts/${LANDI
 
 export const LANDING_YOUTUBE_SHORT_EMBED_URL =
   `https://www.youtube-nocookie.com/embed/${LANDING_YOUTUBE_SHORT_ID}?rel=0&modestbranding=1&playsinline=1`
-
-const NAV_LINKS = [
-  { href: '#features', label: 'Features' },
-  { href: '#pricing', label: 'Pricing' },
-  { href: '#faqs', label: 'FAQs' },
-] as const
-
-export { NAV_LINKS }

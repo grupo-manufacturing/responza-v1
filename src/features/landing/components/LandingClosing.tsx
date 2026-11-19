@@ -1,40 +1,31 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 
-import { LEGAL_FOOTER_LINKS } from '../legal.constants'
-import { LANDING_FAQS, WAITLIST_HREF } from '@/features/landing/constants'
-import { LandingLogo, Reveal, SectionDivider } from '@/shared/ui/brand-ui'
+import { LANDING_FAQS, PLAY_STORE_URL } from '@/features/landing/constants'
+import { PhoneMockup, PhoneScreenImage, PlayStoreButton, Reveal, SectionHeading } from '@/shared/ui/brand-ui'
 
 import { WaitlistForm } from './WaitlistForm'
 
 export function LandingClosing() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null)
+  const [openIndex, setOpenIndex] = useState<number | null>(0)
 
   return (
     <>
-      <section id="faqs" className="relative overflow-hidden bg-grid-dark py-20 sm:py-28">
-        <div
-          className="pointer-events-none absolute bottom-0 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-accent/10 blur-3xl"
-          aria-hidden
-        />
+      <section id="faqs" className="relative scroll-mt-16 overflow-hidden border-t border-border-dark py-20 sm:py-28">
         <div className="relative mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          <Reveal>
-            <SectionDivider label="FAQs" variant="dark" />
-            <h2 className="mt-10 text-center text-2xl font-semibold tracking-tight text-on-dark sm:text-4xl">
-              Frequently asked questions
-            </h2>
-            <p className="mt-4 text-center text-base text-on-dark-muted">
-              Everything you need to know about the Responza app and its launch.
-            </p>
-          </Reveal>
-          <div className="mt-10 divide-y divide-border-dark border-y border-border-dark sm:mt-12">
+          <SectionHeading
+            badge="FAQs"
+            tone="sky"
+            title="Questions, answered."
+            description="Everything you need to know about Responza and the open test."
+          />
+          <div className="mt-12 divide-y divide-border-dark border-y border-border-dark">
             {LANDING_FAQS.map((faq, index) => {
               const isOpen = openIndex === index
               const panelId = `faq-panel-${index}`
               const buttonId = `faq-button-${index}`
 
               return (
-                <Reveal key={faq.q} delay={index * 60}>
+                <Reveal key={faq.q} delay={Math.min(index, 4) * 50}>
                   <div>
                     <button
                       id={buttonId}
@@ -42,35 +33,32 @@ export function LandingClosing() {
                       aria-expanded={isOpen}
                       aria-controls={panelId}
                       onClick={() => setOpenIndex(isOpen ? null : index)}
-                      className="flex w-full items-center justify-between gap-4 py-4 text-left transition-colors hover:text-accent-soft sm:py-5"
+                      className="flex w-full items-center justify-between gap-4 py-5 text-left transition-colors hover:text-accent sm:py-6"
                     >
-                      <span className="text-sm font-medium text-on-dark sm:text-base">{faq.q}</span>
-                      <svg
+                      <span className="text-[15px] font-medium text-on-dark sm:text-lg">{faq.q}</span>
+                      <span
                         className={[
-                          'h-4 w-4 shrink-0 text-on-dark-muted transition-transform duration-200',
-                          isOpen ? 'rotate-180 text-accent-soft' : '',
+                          'flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border-strong text-on-dark-muted transition-all duration-300',
+                          isOpen ? 'rotate-45 border-accent/50 bg-accent/10 text-accent' : '',
                         ].join(' ')}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
                         aria-hidden
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
+                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M12 5v14M5 12h14" />
+                        </svg>
+                      </span>
                     </button>
                     <div
                       id={panelId}
                       role="region"
                       aria-labelledby={buttonId}
                       className={[
-                        'grid transition-[grid-template-rows] duration-200 ease-out',
+                        'grid transition-[grid-template-rows] duration-300 ease-out',
                         isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
                       ].join(' ')}
                     >
                       <div className="overflow-hidden">
-                        <p className="pb-4 text-sm leading-relaxed text-on-dark-muted sm:pb-5 sm:pr-10">
-                          {faq.a}
-                        </p>
+                        <p className="pb-6 text-sm leading-relaxed text-on-dark-muted sm:pr-12 sm:text-base">{faq.a}</p>
                       </div>
                     </div>
                   </div>
@@ -81,77 +69,49 @@ export function LandingClosing() {
         </div>
       </section>
 
-      <section id="waitlist" className="relative scroll-mt-20 overflow-hidden bg-grid-dark py-20 sm:py-28">
-        <div
-          className="pointer-events-none absolute top-1/2 left-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-accent/15 to-accent-violet/10 blur-3xl"
-          aria-hidden
-        />
-        <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
-          <Reveal>
-            <h2 className="text-2xl font-semibold tracking-tight text-on-dark sm:text-4xl">
-              Stop juggling apps. Be first to{' '}
-              <span className="text-accent-gradient-dark">try Responza.</span>
-            </h2>
-            <p className="mt-4 text-base text-on-dark-muted">
-              Join the waitlist and we&apos;ll let you know the moment Responza is ready to download.
-            </p>
-            <div className="mt-8">
-              <WaitlistForm />
-            </div>
-            <p className="mt-4 text-xs text-on-dark-muted">
-              Coming soon · No spam, just launch updates
-            </p>
-          </Reveal>
+      <section id="get-the-app" className="relative scroll-mt-16 overflow-hidden px-4 pb-20 sm:px-6 sm:pb-28 lg:px-8">
+        <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] border border-border-strong bg-surface-dark sm:rounded-[2.5rem]">
+          <div className="bg-grid-dark mask-fade-grid pointer-events-none absolute inset-0 opacity-70" aria-hidden />
+          <div
+            className="animate-aurora pointer-events-none absolute -top-32 -left-24 h-[28rem] w-[28rem] rounded-full bg-glow-mint/25 blur-[120px]"
+            aria-hidden
+          />
+          <div
+            className="animate-aurora pointer-events-none absolute -right-24 -bottom-40 h-[30rem] w-[30rem] rounded-full bg-glow-violet/25 blur-[120px]"
+            style={{ animationDelay: '-7s' }}
+            aria-hidden
+          />
+
+          <div className="relative grid items-center gap-12 px-6 py-14 sm:px-12 sm:py-20 lg:grid-cols-[1.15fr_0.85fr] lg:gap-6">
+            <Reveal className="text-center lg:text-left">
+              <h2 className="text-4xl leading-[1.04] font-semibold tracking-[-0.04em] text-ink sm:text-6xl">
+                Your customers are already messaging.{' '}
+                <span className="text-accent-gradient">Reply like a pro.</span>
+              </h2>
+              <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-ink-muted sm:text-lg lg:mx-0">
+                Join the open test on Google Play and give every chat a fast, thoughtful answer, from one inbox.
+              </p>
+              <div className="mt-9 flex flex-col items-center gap-3 lg:items-start">
+                <PlayStoreButton href={PLAY_STORE_URL} />
+              </div>
+
+              <div id="waitlist" className="mt-12 scroll-mt-24 border-t border-border-dark pt-8">
+                <p className="text-sm font-medium text-on-dark">Not on Android? Get launch updates.</p>
+                <p className="mt-1 text-xs text-ink-faint">Join the waitlist. No spam, just launch news.</p>
+                <div className="mt-4">
+                  <WaitlistForm align="left" />
+                </div>
+              </div>
+            </Reveal>
+
+            <Reveal delay={150} className="mx-auto w-[240px] sm:w-[290px]">
+              <PhoneMockup glow="rgb(52 224 161 / 0.4)">
+                <PhoneScreenImage src="/mockups/app-welcome.webp" alt="Responza welcome screen" />
+              </PhoneMockup>
+            </Reveal>
+          </div>
         </div>
       </section>
-
-      <footer className="border-t border-border-dark bg-surface-dark py-12">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <LandingLogo variant="dark" />
-              <p className="mt-3 max-w-xs text-sm leading-relaxed text-on-dark-muted">
-                WhatsApp and Instagram business chats in one mobile app. Coming soon.
-              </p>
-            </div>
-            <div className="flex gap-10 text-sm sm:gap-12">
-              <div className="space-y-2">
-                <p className="font-medium text-on-dark">Product</p>
-                <a href="#watch" className="block text-on-dark-muted transition-colors hover:text-accent-soft">
-                  Watch
-                </a>
-                <a href="#features" className="block text-on-dark-muted transition-colors hover:text-accent-soft">
-                  Features
-                </a>
-                <a href="#pricing" className="block text-on-dark-muted transition-colors hover:text-accent-soft">
-                  Pricing
-                </a>
-                <a href={WAITLIST_HREF} className="block text-on-dark-muted transition-colors hover:text-accent-soft">
-                  Join waitlist
-                </a>
-                <Link to="/blog" className="block text-on-dark-muted transition-colors hover:text-accent-soft">
-                  Blog
-                </Link>
-              </div>
-              <div className="space-y-2">
-                <p className="font-medium text-on-dark">Legal</p>
-                {LEGAL_FOOTER_LINKS.map((link) => (
-                  <Link
-                    key={link.to}
-                    to={link.to}
-                    className="block text-on-dark-muted transition-colors hover:text-accent-soft"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </div>
-          <p className="mt-10 text-center text-xs text-on-dark-muted">
-            © {new Date().getFullYear()} Responza AI. All rights reserved.
-          </p>
-        </div>
-      </footer>
     </>
   )
 }

@@ -1,5 +1,5 @@
-import { PLAN_FEATURES, PRICING_PLANS, WAITLIST_HREF } from '@/features/landing/constants'
-import { Reveal, SectionBadge } from '@/shared/ui/brand-ui'
+import { PLAN_FEATURES, PLAY_STORE_URL, PRICING_PLANS } from '@/features/landing/constants'
+import { CheckIcon, LandingButton, PlayIcon, Reveal, SectionHeading } from '@/shared/ui/brand-ui'
 
 type BillingPlanInterval = 'monthly' | 'yearly'
 
@@ -20,123 +20,94 @@ function formatInr(amount: number): string {
   }).format(amount)
 }
 
-function CheckIcon({ className }: { readonly className: string }) {
-  return (
-    <svg className={`h-4 w-4 shrink-0 ${className}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-    </svg>
-  )
-}
-
-function PricingCard({
-  label,
-  description,
-  amountInr,
-  conversationLimit,
-  interval,
-  highlight = false,
-}: {
-  readonly label: string
-  readonly description: string
-  readonly amountInr: number
-  readonly conversationLimit: number
-  readonly interval: BillingPlanInterval
-  readonly highlight?: boolean
-}) {
-  const mutedClass = highlight ? 'text-on-dark-muted' : 'text-ink-muted'
-  const faintClass = highlight ? 'text-on-dark-muted' : 'text-ink-faint'
-  const checkClass = highlight ? 'text-accent-soft' : 'text-accent'
-  const quotaPeriodLabel = interval === 'yearly' ? 'Annual quota' : 'Monthly quota'
-
-  return (
-    <article
-      className={[
-        'hover-lift relative flex h-full flex-col rounded-[var(--radius-card-lg)] border p-6 sm:p-7',
-        highlight
-          ? 'z-10 border-accent/35 bg-gradient-to-b from-ink via-ink to-surface-dark text-on-dark shadow-card ring-1 ring-accent/25'
-          : 'border-border bg-white shadow-soft',
-      ].join(' ')}
-    >
-      {highlight && (
-        <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-[var(--radius-pill)] bg-accent px-3 py-1 text-[10px] font-semibold tracking-wide text-white uppercase">
-          Best value
-        </span>
-      )}
-      <p className={`text-sm font-semibold tracking-wide uppercase ${mutedClass}`}>{label}</p>
-      <p className={`mt-2 text-sm leading-relaxed ${mutedClass}`}>{description}</p>
-      <div className="mt-4">
-        <p className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          {formatInr(amountInr)}
-          <span className={`text-sm font-normal ${faintClass}`}>{billingIntervalSuffix(interval)}</span>
-        </p>
-        <p className={`mt-1 text-xs ${faintClass}`}>GST inclusive · planned price</p>
-      </div>
-      <div
-        className={[
-          'mt-4 rounded-xl px-3 py-2.5',
-          highlight ? 'border border-accent/20 bg-white/5' : 'border border-accent/15 bg-accent/5',
-        ].join(' ')}
-      >
-        <p className={`text-xs font-medium uppercase tracking-wide ${highlight ? 'text-accent-soft' : 'text-accent'}`}>
-          {quotaPeriodLabel}
-        </p>
-        <p className={`mt-0.5 text-sm font-medium ${highlight ? 'text-on-dark' : 'text-ink'}`}>
-          {conversationQuotaLabel(interval, conversationLimit)}
-        </p>
-      </div>
-      <ul className="mt-5 flex-1 space-y-2.5">
-        {PLAN_FEATURES.map((feature) => (
-          <li key={feature} className={`flex items-start gap-2 text-sm ${mutedClass}`}>
-            <CheckIcon className={`mt-0.5 ${checkClass}`} />
-            <span>{feature}</span>
-          </li>
-        ))}
-      </ul>
-      <a
-        href={WAITLIST_HREF}
-        className={[
-          'mt-6 inline-flex h-11 items-center justify-center rounded-[var(--radius-pill)] text-sm font-medium transition-colors',
-          highlight ? 'bg-on-dark text-ink hover:bg-on-dark/90' : 'bg-ink text-on-dark hover:bg-ink/90',
-        ].join(' ')}
-      >
-        Join the waitlist
-      </a>
-    </article>
-  )
-}
-
 export function LandingPricing() {
   return (
-    <section id="pricing" className="bg-surface-muted py-20 sm:py-28">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <Reveal className="mx-auto max-w-2xl text-center">
-          <SectionBadge variant="light" tone="teal">
-            Planned launch pricing
-          </SectionBadge>
-          <h2 className="mt-4 text-2xl font-semibold tracking-tight text-ink sm:text-4xl">
-            Two simple plans. Every feature included.
-          </h2>
-          <p className="mt-4 text-base text-ink-muted">
-            Here is what we plan to charge when Responza launches. Every plan gets the full
-            inbox, AI draft replies and translation. Only conversation volume changes. Pricing may
-            change before launch.
-          </p>
-        </Reveal>
+    <section id="pricing" className="relative scroll-mt-16 overflow-hidden py-20 sm:py-28">
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[34rem] bg-[radial-gradient(ellipse_60%_55%_at_50%_100%,rgb(52_224_161/0.16),transparent)]"
+        aria-hidden
+      />
+      <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <SectionHeading
+          badge="Pricing"
+          title={
+            <>
+              Simple pricing. <span className="text-accent-gradient">Every feature included.</span>
+            </>
+          }
+          description="Pick monthly or save with annual. Only the conversation quota changes, never the features."
+        />
 
-        <div className="mt-12 grid items-stretch gap-5 sm:mt-16 sm:grid-cols-2 sm:gap-6 lg:mx-auto lg:max-w-4xl">
+        <div className="mx-auto mt-14 grid max-w-4xl gap-5 md:grid-cols-2">
           {PRICING_PLANS.map((plan, index) => (
-            <Reveal key={plan.key} delay={index * 80} className="h-full">
-              <PricingCard
-                label={plan.label}
-                description={plan.description}
-                amountInr={plan.amountInr}
-                conversationLimit={plan.conversationLimit}
-                interval={plan.interval}
-                highlight={plan.highlight}
-              />
+            <Reveal key={plan.key} delay={index * 110}>
+              <div
+                className={[
+                  'relative flex h-full flex-col overflow-hidden rounded-[var(--radius-card-lg)] p-7 sm:p-8',
+                  plan.highlight
+                    ? 'border border-accent/40 bg-[linear-gradient(160deg,rgb(52_224_161/0.14),rgb(164_147_255/0.08)_55%,rgb(255_255_255/0.02))] shadow-[0_30px_90px_-30px_rgb(52_224_161/0.45)]'
+                    : 'card-surface',
+                ].join(' ')}
+              >
+                {plan.highlight && (
+                  <div
+                    className="pointer-events-none absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/70 to-transparent dark:via-white/[0.07]"
+                    style={{ animation: 'sheen 6s ease-in-out infinite' }}
+                    aria-hidden
+                  />
+                )}
+
+                <div className="relative flex items-center justify-between gap-3">
+                  <h3 className="text-lg font-semibold text-ink">{plan.label}</h3>
+                  {plan.badge !== null && (
+                    <span className="rounded-full bg-brand px-3 py-1 text-[11px] font-semibold tracking-wide text-black">
+                      {plan.badge}
+                    </span>
+                  )}
+                </div>
+
+                <p className="relative mt-5 flex items-end gap-1.5">
+                  <span className="text-5xl font-semibold tracking-[-0.04em] text-ink">{formatInr(plan.amountInr)}</span>
+                  <span className="pb-1.5 text-sm text-ink-muted">{billingIntervalSuffix(plan.interval)}</span>
+                </p>
+                <p className="relative mt-1 text-xs text-ink-faint">
+                  {conversationQuotaLabel(plan.interval, plan.conversationLimit)} · GST included
+                </p>
+                <p className="relative mt-5 text-sm leading-relaxed text-ink-muted">{plan.description}</p>
+
+                <ul className="relative mt-7 space-y-3.5 border-t border-border-dark pt-7">
+                  {PLAN_FEATURES.map((feature) => (
+                    <li key={feature} className="flex items-start gap-3 text-sm text-on-dark">
+                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent/15 text-accent">
+                        <CheckIcon className="h-3 w-3" />
+                      </span>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="relative mt-auto pt-9">
+                  <LandingButton
+                    to={PLAY_STORE_URL}
+                    variant={plan.highlight ? 'accent' : 'secondary'}
+                    size="lg"
+                    className="w-full"
+                  >
+                    <PlayIcon className="h-5 w-5" />
+                    Start free trial
+                  </LandingButton>
+                </div>
+              </div>
             </Reveal>
           ))}
         </div>
+
+        <Reveal delay={200}>
+          <p className="mx-auto mt-8 max-w-xl text-center text-xs leading-relaxed text-ink-faint">
+            New accounts get a free trial. Subscriptions are billed through Google Play and renew until you cancel.
+            Pricing may change before the public launch.
+          </p>
+        </Reveal>
       </div>
     </section>
   )

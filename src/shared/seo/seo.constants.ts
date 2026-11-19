@@ -1,7 +1,7 @@
 export const SITE_URL = 'https://responza.in'
 
 const SITE_DESCRIPTION =
-  'Responza is the upcoming mobile app that puts your WhatsApp and Instagram business chats in one inbox, with AI replies and translation. Join the waitlist.'
+  'Responza puts WhatsApp Business and Instagram DMs in one AI inbox. Draft replies, translate and summarise chats in seconds. Join the open test on Google Play.'
 
 export type SeoPage = {
   readonly path: string
@@ -16,9 +16,9 @@ export type SeoPage = {
 export const SEO_PAGES = {
   home: {
     path: '/',
-    title: 'WhatsApp & Instagram Inbox App, Coming Soon | Responza AI',
+    title: 'Responza AI: WhatsApp & Instagram Inbox | Open Testing',
     description: SITE_DESCRIPTION,
-    lastModified: '2026-11-04',
+    lastModified: '2026-11-19',
   },
   privacy: {
     path: '/privacy-policy',

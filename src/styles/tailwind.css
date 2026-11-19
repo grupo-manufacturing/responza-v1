@@ -16,33 +16,23 @@
   }
 }
 
-@keyframes message-in {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(200%);
-  }
-}
-
 @keyframes float-gentle {
   0%,
   100% {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-8px);
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--r, 0deg));
+  }
+  50% {
+    transform: translateY(-14px) rotate(var(--r, 0deg));
   }
 }
 
@@ -52,120 +42,242 @@
     opacity: 1;
   }
   50% {
-    opacity: 0.45;
+    opacity: 0.4;
   }
 }
 
-@keyframes toast-in {
-  from {
-    opacity: 0;
-    transform: translateX(1.25rem);
+@keyframes ping-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
   }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes typing-dot {
-  0%,
-  60%,
   100% {
-    opacity: 0.35;
-    transform: translateY(0);
-  }
-  30% {
-    opacity: 1;
-    transform: translateY(-3px);
+    transform: scale(2.6);
+    opacity: 0;
   }
 }
+
+@keyframes aurora {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(3%, -4%, 0) scale(1.08);
+  }
+}
+
+@keyframes sheen {
+  0% {
+    transform: translateX(-120%) skewX(-18deg);
+  }
+  100% {
+    transform: translateX(260%) skewX(-18deg);
+  }
+}
+
+/* `dark:` utilities follow the data-theme attribute (set before first paint by the script in index.html). */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
 @theme {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
 
-  --color-surface-dark: #0a0a0a;
-  --color-surface-dark-elevated: #141414;
-  --color-surface-light: #ffffff;
-  --color-surface-muted: #f7f7f5;
+  --radius-pill: 9999px;
+  --radius-card: 1.25rem;
+  --radius-card-lg: 1.75rem;
 
-  --color-ink: #0a0a0a;
-  --color-ink-muted: #6b6b6b;
-  --color-ink-faint: #9ca3af;
-
-  --color-on-dark: #fafafa;
-  --color-on-dark-muted: #a1a1aa;
-
-  --color-accent: #5b8a85;
-  --color-accent-soft: #8fb5b0;
-  --color-accent-warm: #c4a484;
-  --color-accent-violet: #9b8fb8;
-
+  --color-brand: #34e0a1;
+  --color-glow-mint: #34e0a1;
+  --color-glow-violet: #a493ff;
+  --color-glow-amber: #ffb86b;
+  --color-glow-sky: #62c8ff;
   --color-brand-whatsapp: #25d366;
   --color-brand-instagram: #e1306c;
 
-  --color-border: #e8e8e6;
-  --color-border-dark: rgb(255 255 255 / 0.1);
-
-  --radius-pill: 9999px;
-  --radius-card: 1.25rem;
-  --radius-card-lg: 1.5rem;
-
-  --shadow-soft: 0 4px 24px rgb(0 0 0 / 0.06);
-  --shadow-card: 0 12px 40px rgb(0 0 0 / 0.08);
-
   --animate-step-in: step-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
-  --animate-message-in: message-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
-  --animate-float-gentle: float-gentle 5s ease-in-out infinite;
+  --animate-float-gentle: float-gentle 7s ease-in-out infinite;
+  --animate-float-slow: float-slow 9s ease-in-out infinite;
   --animate-pulse-soft: pulse-soft 2.4s ease-in-out infinite;
-  --animate-toast-in: toast-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
-  --animate-typing-dot: typing-dot 1.2s ease-in-out infinite;
+  --animate-ping-ring: ping-ring 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  --animate-aurora: aurora 16s ease-in-out infinite;
+}
+
+/* Colours resolve through CSS variables so one set of utilities serves both themes. */
+@theme inline {
+  --color-surface-dark: var(--c-surface-alt);
+  --color-surface-dark-elevated: var(--c-surface-card);
+  --color-surface-light: var(--c-surface);
+  --color-surface-muted: var(--c-surface-muted);
+  --color-surface-card: var(--c-surface-card);
+
+  --color-ink: var(--c-ink);
+  --color-ink-muted: var(--c-ink-muted);
+  --color-ink-faint: var(--c-ink-faint);
+  --color-on-dark: var(--c-ink);
+  --color-on-dark-muted: var(--c-ink-muted);
+
+  --color-accent: var(--c-accent);
+  --color-accent-soft: var(--c-accent-soft);
+  --color-accent-warm: var(--c-warm);
+  --color-accent-violet: var(--c-violet);
+  --color-accent-sky: var(--c-sky);
+
+  --color-btn: var(--c-btn);
+  --color-btn-fg: var(--c-btn-fg);
+  --color-btn-hover: var(--c-btn-hover);
+
+  --color-border: var(--c-border);
+  --color-border-dark: var(--c-border);
+  --color-border-strong: var(--c-border-strong);
+
+  --shadow-soft: var(--sh-soft);
+  --shadow-card: var(--sh-card);
+}
+
+/* ---------- Light theme (default) ---------- */
+:root {
+  --c-surface: #ffffff;
+  --c-surface-alt: #f5f5f7;
+  --c-surface-muted: #f7f7f9;
+  --c-surface-card: #ffffff;
+
+  --c-ink: #0b0b10;
+  --c-ink-muted: #52525e;
+  --c-ink-faint: #6e6e7a;
+
+  --c-accent: #078a5d;
+  --c-accent-soft: #0fa876;
+  --c-warm: #b45f06;
+  --c-violet: #6a4de0;
+  --c-sky: #0a74b0;
+
+  --c-btn: #0b0b10;
+  --c-btn-fg: #ffffff;
+  --c-btn-hover: #26262e;
+
+  --c-border: rgb(11 11 16 / 0.1);
+  --c-border-strong: rgb(11 11 16 / 0.18);
+
+  --sh-soft: 0 1px 2px rgb(11 11 16 / 0.05), 0 8px 24px -12px rgb(11 11 16 / 0.14);
+  --sh-card: 0 2px 4px rgb(11 11 16 / 0.04), 0 28px 60px -24px rgb(11 11 16 / 0.22);
+
+  --glass-bg: rgb(255 255 255 / 0.62);
+  --glass-border: rgb(11 11 16 / 0.09);
+  --glass-strong-bg: rgb(255 255 255 / 0.78);
+  --grid-line: rgb(11 11 16 / 0.05);
+  --card-top: #ffffff;
+  --card-bottom: #fbfbfc;
+  --phone-drop: 0 44px 70px -30px rgb(11 11 16 / 0.5);
+  --phone-ring: rgb(11 11 16 / 0.14);
+  --glow-boost: 0.55;
+
+  --grad-a: #078a5d;
+  --grad-b: #0aa774;
+  --grad-c: #6a4de0;
+
+  color-scheme: light;
+}
+
+/* ---------- Dark theme ---------- */
+[data-theme='dark'] {
+  --c-surface: #060608;
+  --c-surface-alt: #000000;
+  --c-surface-muted: #0b0b0f;
+  --c-surface-card: #101015;
+
+  --c-ink: #f5f5f7;
+  --c-ink-muted: #a1a1aa;
+  --c-ink-faint: #71717a;
+
+  --c-accent: #34e0a1;
+  --c-accent-soft: #86f2cb;
+  --c-warm: #ffb86b;
+  --c-violet: #a493ff;
+  --c-sky: #62c8ff;
+
+  --c-btn: #fafafa;
+  --c-btn-fg: #000000;
+  --c-btn-hover: #ffffff;
+
+  --c-border: rgb(255 255 255 / 0.1);
+  --c-border-strong: rgb(255 255 255 / 0.18);
+
+  --sh-soft: 0 4px 24px rgb(0 0 0 / 0.35);
+  --sh-card: 0 24px 60px rgb(0 0 0 / 0.5);
+
+  --glass-bg: rgb(255 255 255 / 0.04);
+  --glass-border: rgb(255 255 255 / 0.1);
+  --glass-strong-bg: rgb(14 14 18 / 0.72);
+  --grid-line: rgb(255 255 255 / 0.035);
+  --card-top: rgb(255 255 255 / 0.045);
+  --card-bottom: rgb(255 255 255 / 0.012);
+  --phone-drop: 0 50px 90px -30px rgb(0 0 0 / 0.9);
+  --phone-ring: rgb(255 255 255 / 0.1);
+  --glow-boost: 1;
+
+  --grad-a: #86f2cb;
+  --grad-b: #34e0a1;
+  --grad-c: #a493ff;
+
+  color-scheme: dark;
+}
+
+@layer base {
+  html {
+    background: var(--c-surface);
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--c-surface);
+    color: var(--c-ink);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: 'cv11', 'ss03';
+  }
+
+  ::selection {
+    background: rgb(52 224 161 / 0.35);
+    color: inherit;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
 }
 
 @utility bg-grid-dark {
-  background-color: var(--color-surface-dark);
+  background-color: var(--c-surface);
   background-image:
-    linear-gradient(rgb(255 255 255 / 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(255 255 255 / 0.07) 1px, transparent 1px);
-  background-size: 40px 40px;
-}
-
-@utility bg-grid-light {
-  background-color: var(--color-surface-light);
-  background-image:
-    linear-gradient(rgb(0 0 0 / 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(0 0 0 / 0.04) 1px, transparent 1px);
-  background-size: 48px 48px;
-}
-
-@utility bg-hero-gradient {
-  background:
-    radial-gradient(ellipse 70% 55% at 15% 25%, rgb(143 181 176 / 0.22), transparent),
-    radial-gradient(ellipse 60% 50% at 85% 20%, rgb(196 164 132 / 0.18), transparent),
-    radial-gradient(ellipse 50% 40% at 70% 80%, rgb(155 143 184 / 0.1), transparent),
-    var(--color-surface-light);
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 56px 56px;
 }
 
 @utility glass-dark {
-  border: 1px solid var(--color-border-dark);
-  background: rgb(255 255 255 / 0.04);
-  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
-@utility glass-light {
-  border: 1px solid rgb(0 0 0 / 0.06);
-  background: rgb(255 255 255 / 0.72);
-  backdrop-filter: blur(12px);
+@utility glass-strong {
+  border: 1px solid var(--c-border-strong);
+  background: var(--glass-strong-bg);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
 }
 
 @utility text-accent-gradient {
-  background: linear-gradient(135deg, var(--color-accent-soft), var(--color-accent-warm));
+  background: linear-gradient(110deg, var(--grad-a) 0%, var(--grad-b) 38%, var(--grad-c) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
 @utility text-accent-gradient-dark {
-  background: linear-gradient(135deg, var(--color-accent-soft), var(--color-accent-violet));
+  background: linear-gradient(110deg, var(--grad-a) 0%, var(--grad-b) 38%, var(--grad-c) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -173,11 +285,136 @@
 
 @utility hover-lift {
   transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
+    transform 0.3s ease,
+    border-color 0.3s ease,
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
 
   &:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-card);
+    transform: translateY(-4px);
+    border-color: var(--c-border-strong);
   }
+}
+
+@utility card-surface {
+  border: 1px solid var(--c-border);
+  background: linear-gradient(180deg, var(--card-top), var(--card-bottom)), var(--c-surface-card);
+  box-shadow: var(--sh-soft);
+}
+
+/* Theme-switched content (CSS only, so server and client markup always match). */
+@utility only-light {
+  [data-theme='dark'] & {
+    display: none;
+  }
+}
+
+@utility only-dark {
+  display: none;
+
+  [data-theme='dark'] & {
+    display: inline-block;
+  }
+}
+
+/* ---------- Phone mockup (frame drawn in CSS; screens are app screenshots) ---------- */
+
+.phone-wrap {
+  container-type: inline-size;
+  width: 100%;
+}
+
+.phone {
+  position: relative;
+  border-radius: 15.5cqw;
+  padding: 1.3cqw;
+  background: linear-gradient(
+    150deg,
+    #8d8d96 0%,
+    #3a3a42 14%,
+    #121216 38%,
+    #121216 62%,
+    #44444c 86%,
+    #9a9aa3 100%
+  );
+  box-shadow:
+    0 0 0 0.25cqw var(--phone-ring),
+    var(--phone-drop),
+    0 0 130px -34px color-mix(in srgb, var(--glow, rgb(52 224 161 / 0.3)) calc(var(--glow-boost) * 100%), transparent);
+  transition: box-shadow 0.8s ease;
+}
+
+.phone-bezel {
+  border-radius: 14.4cqw;
+  background: #030304;
+  padding: 2.5cqw;
+}
+
+.phone-screen {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12cqw;
+  aspect-ratio: 900 / 1955;
+  background: #fff;
+  isolation: isolate;
+}
+
+.phone-screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(118deg, rgb(255 255 255 / 0.14) 0%, rgb(255 255 255 / 0) 34%);
+}
+
+.phone-island {
+  position: absolute;
+  z-index: 4;
+  top: 2.3cqw;
+  left: 50%;
+  width: 24cqw;
+  height: 7cqw;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: #000;
+}
+
+.phone-btn {
+  position: absolute;
+  width: 0.9cqw;
+  border-radius: 0.5cqw;
+  background: linear-gradient(90deg, #55555d, #202026);
+}
+
+.phone-btn-l1 {
+  left: -0.6cqw;
+  top: 19cqw;
+  height: 6cqw;
+}
+.phone-btn-l2 {
+  left: -0.6cqw;
+  top: 30cqw;
+  height: 11cqw;
+}
+.phone-btn-l3 {
+  left: -0.6cqw;
+  top: 44cqw;
+  height: 11cqw;
+}
+.phone-btn-r1 {
+  right: -0.6cqw;
+  top: 36cqw;
+  height: 17cqw;
+  background: linear-gradient(270deg, #55555d, #202026);
+}
+
+.mask-fade-b {
+  -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
+}
+
+.mask-fade-grid {
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 30%, transparent 75%);
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 30%, transparent 75%);
 }

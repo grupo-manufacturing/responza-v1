@@ -17,10 +17,10 @@ import {
   type BlogSlug,
 } from '@/features/blog/blog.posts'
 import { BlogLayout } from '@/features/blog/components/BlogLayout'
-import { WAITLIST_HREF } from '@/features/landing/constants'
+import { PLAY_STORE_URL } from '@/features/landing/constants'
 import { NotFoundPage } from '@/features/landing/pages/NotFoundPage'
 import { usePageMeta } from '@/shared/seo/usePageMeta'
-import { LandingButton } from '@/shared/ui/brand-ui'
+import { PlayStoreButton } from '@/shared/ui/brand-ui'
 /** Imported eagerly: a nested lazy() here would make the prerender emit the body out of order behind a script. */
 const ARTICLE_BODIES: Record<BlogSlug, ComponentType> = {
   'manage-whatsapp-instagram-messages-one-place': ManageWhatsappInstagramOnePlace,
@@ -56,7 +56,7 @@ function BlogPostContent({ post }: { readonly post: BlogPost }) {
           </Link>
         </nav>
 
-        <h1 className="mt-4 text-3xl font-semibold tracking-tight text-ink sm:text-[2.5rem] sm:leading-tight">
+        <h1 className="mt-4 text-3xl font-semibold tracking-[-0.03em] text-ink sm:text-[2.75rem] sm:leading-[1.1]">
           {post.title}
         </h1>
         <p className="mt-4 text-sm text-ink-muted">
@@ -82,15 +82,19 @@ function BlogPostContent({ post }: { readonly post: BlogPost }) {
           </dl>
         </section>
 
-        <aside className="mt-14 rounded-2xl bg-surface-dark px-6 py-8 text-center sm:px-10">
-          <p className="text-xl font-semibold text-on-dark">WhatsApp and Instagram, in one app</p>
-          <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-on-dark-muted">
-            AI draft replies you approve and in-chat translation, all in one mobile app. Responza is coming
-            soon.
+        <aside className="relative mt-14 overflow-hidden rounded-[var(--radius-card-lg)] border border-border-strong bg-surface-dark px-6 py-10 text-center sm:px-10">
+          <div
+            className="pointer-events-none absolute -top-24 left-1/2 h-56 w-96 -translate-x-1/2 rounded-full bg-glow-mint/20 blur-[90px]"
+            aria-hidden
+          />
+          <p className="relative text-2xl font-semibold tracking-tight text-on-dark">WhatsApp and Instagram, in one AI inbox</p>
+          <p className="relative mx-auto mt-3 max-w-lg text-sm leading-relaxed text-on-dark-muted">
+            AI draft replies you approve and in-chat translation, all in one mobile app. Responza is in open testing on
+            Google Play.
           </p>
-          <LandingButton to={WAITLIST_HREF} variant="secondary" showChevron className="mt-6">
-            Join the waitlist
-          </LandingButton>
+          <div className="relative mt-6 flex justify-center">
+            <PlayStoreButton href={PLAY_STORE_URL} />
+          </div>
         </aside>
       </article>
 

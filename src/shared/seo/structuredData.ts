@@ -6,7 +6,7 @@ import {
   type BlogFaq,
   type BlogPost,
 } from '@/features/blog/blog.posts'
-import { LANDING_FAQS } from '@/features/landing/constants'
+import { LANDING_FAQS, PLAY_STORE_URL } from '@/features/landing/constants'
 import { SEO_PAGES, SITE_URL } from '@/shared/seo/seo.constants'
 
 const ORGANIZATION_ID = `${SITE_URL}/#organization`
@@ -37,7 +37,18 @@ function softwareApplication(): JsonLd {
     '@type': 'SoftwareApplication',
     name: 'Responza AI',
     applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Android',
+    downloadUrl: PLAY_STORE_URL,
+    installUrl: PLAY_STORE_URL,
     url: `${SITE_URL}/`,
+    image: `${SITE_URL}/og-image.jpg`,
+    offers: {
+      '@type': 'AggregateOffer',
+      priceCurrency: 'INR',
+      lowPrice: '499',
+      highPrice: '4999',
+      offerCount: 2,
+    },
     description: SEO_PAGES.home.description,
     publisher: { '@id': ORGANIZATION_ID },
   }

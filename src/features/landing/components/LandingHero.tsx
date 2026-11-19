@@ -1,139 +1,30 @@
-import { useEffect, useState } from 'react'
-
+import { LIVE_CHANNELS, PLAY_STORE_URL, ROADMAP_CHANNELS } from '@/features/landing/constants'
 import {
-  LANDING_PLATFORMS,
-  NAV_LINKS,
-  PLATFORM_GLOW,
-  PLATFORM_RING,
-  WAITLIST_HREF,
-  landingPlatformLogoClass,
-} from '@/features/landing/constants'
-import { LandingButton, LandingLogo, Reveal, SectionBadge } from '@/shared/ui/brand-ui'
+  LandingButton,
+  MetaTechProviderBadge,
+  PhoneMockup,
+  PhoneScreenImage,
+  PlayStoreButton,
+  Reveal,
+  SectionBadge,
+  SparkleIcon,
+} from '@/shared/ui/brand-ui'
 
-function LandingNavbar({ variant = 'dark' }: { readonly variant?: 'light' | 'dark' }) {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const shellClass = variant === 'dark' ? 'glass-dark' : 'glass-light shadow-soft'
-  const menuBorderClass = variant === 'dark' ? 'border-border-dark' : 'border-border/60'
-  const linkClass =
-    variant === 'dark' ? 'text-on-dark-muted hover:text-on-dark' : 'text-ink-muted hover:text-ink'
-  const closeMenu = () => setMenuOpen(false)
-
-  useEffect(() => {
-    if (!menuOpen) return
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') closeMenu()
-    }
-    const onResize = () => {
-      if (window.matchMedia('(min-width: 1024px)').matches) closeMenu()
-    }
-
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-
-    window.addEventListener('keydown', onKeyDown)
-    window.addEventListener('resize', onResize)
-
-    return () => {
-      document.body.style.overflow = previousOverflow
-      window.removeEventListener('keydown', onKeyDown)
-      window.removeEventListener('resize', onResize)
-    }
-  }, [menuOpen])
-
+function FloatingChip({
+  className,
+  children,
+  delay = '0s',
+}: {
+  readonly className: string
+  readonly children: React.ReactNode
+  readonly delay?: string
+}) {
   return (
-    <header className="fixed top-0 right-0 left-0 z-50 px-3 pt-3 sm:px-6 sm:pt-4">
-      <div
-        className={[
-          'mx-auto max-w-6xl rounded-2xl lg:rounded-[var(--radius-pill)]',
-          shellClass,
-          menuOpen ? 'shadow-card' : '',
-        ].join(' ')}
-      >
-        <div className="flex h-14 items-center gap-3 px-3 sm:gap-4 sm:px-5">
-          <div className="min-w-0 shrink-0">
-            <LandingLogo variant={variant} />
-          </div>
-
-          <nav className="hidden items-center justify-center gap-6 lg:flex lg:flex-1">
-            {NAV_LINKS.map((link) => (
-              <a key={link.href} href={link.href} className={`text-sm transition-colors ${linkClass}`}>
-                {link.label}
-              </a>
-            ))}
-          </nav>
-
-          <div className="hidden shrink-0 items-center gap-2 lg:flex">
-            <LandingButton to={WAITLIST_HREF} variant="primary" showChevron className="px-4">
-              Join waitlist
-            </LandingButton>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setMenuOpen((prev) => !prev)}
-            className={`ml-auto inline-flex shrink-0 rounded-lg p-2 touch-manipulation lg:hidden ${linkClass}`}
-            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={menuOpen}
-            aria-controls="landing-mobile-nav"
-          >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-              {menuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
-        </div>
-
-        {menuOpen && (
-          <div id="landing-mobile-nav" className={`border-t px-4 py-3 lg:hidden ${menuBorderClass}`}>
-            <nav className="flex flex-col gap-1">
-              {NAV_LINKS.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={closeMenu}
-                  className={`rounded-lg px-3 py-2.5 text-sm ${linkClass}`}
-                >
-                  {link.label}
-                </a>
-              ))}
-            </nav>
-            <div className={`mt-3 flex flex-col gap-2 border-t pt-3 ${menuBorderClass}`}>
-              <LandingButton to={WAITLIST_HREF} variant="primary" showChevron className="w-full" onClick={closeMenu}>
-                Join waitlist
-              </LandingButton>
-            </div>
-          </div>
-        )}
-      </div>
-    </header>
-  )
-}
-
-function MetaVerifiedBadge() {
-  return (
-    <div className="mb-4 inline-flex items-center gap-2 rounded-[var(--radius-pill)] border border-[#0081FB]/20 bg-white/90 px-3 py-1.5 shadow-soft backdrop-blur-sm sm:mb-5 md:mb-6">
-      <img
-        src="/meta-icon.webp"
-        alt="Meta logo"
-        width={16}
-        height={16}
-        className="h-4 w-4 shrink-0 object-contain"
-        aria-hidden
-      />
-      <span className="text-[11px] font-semibold tracking-wide text-[#0081FB]">Meta Verified</span>
-    </div>
-  )
-}
-
-function ComingSoonBadge() {
-  return (
-    <div className="mb-4 inline-flex items-center gap-2 rounded-[var(--radius-pill)] border border-accent/25 bg-white/90 px-3 py-1.5 shadow-soft backdrop-blur-sm sm:mb-5 md:mb-6">
-      <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse-soft" aria-hidden />
-      <span className="text-[11px] font-semibold tracking-wide text-accent">Coming soon</span>
+    <div
+      className={`glass-strong animate-float-gentle absolute z-30 hidden items-center gap-2.5 rounded-2xl px-3.5 py-2.5 text-xs font-medium text-on-dark shadow-card md:flex ${className}`}
+      style={{ animationDelay: delay }}
+    >
+      {children}
     </div>
   )
 }
@@ -141,136 +32,185 @@ function ComingSoonBadge() {
 export function LandingHero() {
   return (
     <>
-      <section className="bg-hero-gradient bg-grid-light relative flex items-center overflow-x-hidden pt-28 pb-20 sm:pt-32 sm:pb-24 md:min-h-[100svh]">
-        <LandingNavbar variant="light" />
-        <div className="mx-auto w-full max-w-4xl px-4 sm:px-6 lg:px-8">
-          <Reveal className="flex min-w-0 flex-col items-center text-center">
-            <div className="flex flex-wrap items-center justify-center gap-2">
-              <MetaVerifiedBadge />
-              <ComingSoonBadge />
-            </div>
-            <h1 className="text-[2rem] leading-tight font-semibold tracking-tight text-ink sm:text-5xl md:text-6xl lg:text-[4rem]">
-              Every customer chat, <span className="text-accent-gradient">in your pocket.</span>
-            </h1>
-            <p className="mt-4 text-base font-medium tracking-tight text-ink sm:mt-5 sm:text-lg md:text-xl">
-              The WhatsApp &amp; Instagram inbox app for Indian businesses.
-            </p>
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-muted sm:mt-4 sm:text-base md:text-lg">
-              Responza brings WhatsApp and Instagram into one mobile app, with AI draft replies,
-              instant translation and chat summaries, so you can answer customers from anywhere.
-            </p>
-            <div className="mt-8 flex w-full max-w-sm flex-col gap-3 sm:mt-10 sm:max-w-none sm:flex-row sm:items-center sm:justify-center">
-              <LandingButton to={WAITLIST_HREF} variant="primary" showChevron className="w-full py-2.5 sm:w-auto">
-                Join the waitlist
-              </LandingButton>
-            </div>
-            <p className="mt-4 text-xs text-ink-faint">Coming soon · Be the first to know</p>
-          </Reveal>
-        </div>
-      </section>
-
-      <section className="relative overflow-x-hidden border-y border-border bg-surface-light py-14 sm:py-16 md:py-24">
+      <section className="relative overflow-hidden pt-28 sm:pt-32">
+        {/* atmosphere */}
+        <div className="bg-grid-dark mask-fade-grid pointer-events-none absolute inset-0" aria-hidden />
         <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgb(91_138_133/0.08),transparent_60%)]"
+          className="animate-aurora pointer-events-none absolute -top-40 left-[8%] h-[34rem] w-[34rem] rounded-full bg-glow-mint/20 blur-[130px]"
           aria-hidden
         />
-        <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <Reveal className="mx-auto max-w-2xl text-center">
-            <SectionBadge variant="light" tone="teal">
-              Integrations
-            </SectionBadge>
-            <h2 className="mt-4 text-xl font-semibold tracking-tight text-ink sm:text-2xl md:text-3xl">
+        <div
+          className="animate-aurora pointer-events-none absolute -top-24 right-[4%] h-[30rem] w-[30rem] rounded-full bg-glow-violet/20 blur-[130px]"
+          style={{ animationDelay: '-8s' }}
+          aria-hidden
+        />
+
+        <div className="relative mx-auto max-w-5xl px-4 text-center sm:px-6 lg:px-8">
+          <Reveal className="flex flex-col items-center">
+            <a
+              href={PLAY_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="glass-dark group inline-flex items-center gap-2.5 rounded-[var(--radius-pill)] py-1.5 pr-4 pl-3 text-xs font-medium text-on-dark transition-colors hover:bg-white/10"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping-ring absolute inline-flex h-full w-full rounded-full bg-accent" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
+              </span>
+              Now in open testing on Google Play
+              <svg
+                className="h-3 w-3 text-on-dark-muted transition-transform group-hover:translate-x-0.5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.4} d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+
+            <h1 className="mt-6 text-[2.2rem] leading-[1.04] min-[400px]:text-[2.5rem] font-semibold tracking-[-0.045em] text-ink sm:text-7xl lg:text-[5rem]">
+              Every customer chat.
+              <br />
+              <span className="text-accent-gradient">One AI inbox.</span>
+            </h1>
+
+            <p className="mt-5 max-w-2xl text-base leading-relaxed text-ink-muted sm:text-xl sm:leading-relaxed">
+              Responza brings WhatsApp Business and Instagram into one app, then drafts replies, translates messages
+              and summarises chats, so you answer customers in seconds, not hours.
+            </p>
+
+            <div className="mt-8 flex w-full max-w-md flex-col items-stretch gap-3 sm:max-w-none sm:flex-row sm:items-center sm:justify-center">
+              <PlayStoreButton href={PLAY_STORE_URL} />
+              <LandingButton to="/#features" variant="secondary" size="lg" showChevron>
+                See how it works
+              </LandingButton>
+            </div>
+
+            <div className="mt-7 flex flex-wrap items-center justify-center gap-x-5 gap-y-3">
+              <MetaTechProviderBadge />
+              <p className="text-xs text-ink-faint">Free to try · Billed via Google Play · Cancel anytime</p>
+            </div>
+          </Reveal>
+        </div>
+
+        {/* phone fan */}
+        <Reveal delay={150} className="relative mx-auto mt-12 max-w-6xl sm:mt-14">
+          <div
+            className="pointer-events-none absolute top-[6%] left-1/2 h-[26rem] w-[26rem] -translate-x-1/2 rounded-full bg-glow-mint/15 blur-[110px] sm:h-[40rem] sm:w-[40rem]"
+            aria-hidden
+          />
+          <div className="mask-fade-b relative mx-auto h-[420px] sm:h-[560px] lg:h-[620px]">
+            {/* left */}
+            <div
+              className="absolute top-[12%] left-1/2 z-10 hidden w-[200px] sm:block md:w-[230px] lg:w-[260px]"
+              style={{ transform: 'translateX(calc(-50% - 245px)) rotate(-8deg)' }}
+            >
+              <PhoneMockup glow="rgb(164 147 255 / 0.35)" className="animate-float-slow">
+                <PhoneScreenImage src="/mockups/app-draft.webp" alt="Responza AI draft reply in a WhatsApp chat" />
+              </PhoneMockup>
+            </div>
+            {/* right */}
+            <div
+              className="absolute top-[12%] left-1/2 z-10 hidden w-[200px] sm:block md:w-[230px] lg:w-[260px]"
+              style={{ transform: 'translateX(calc(-50% + 245px)) rotate(8deg)' }}
+            >
+              <PhoneMockup glow="rgb(98 200 255 / 0.3)" className="animate-float-slow">
+                <PhoneScreenImage src="/mockups/app-summary.webp" alt="Responza conversation summary" />
+              </PhoneMockup>
+            </div>
+            {/* center */}
+            <div className="absolute top-4 left-1/2 z-20 w-[250px] -translate-x-1/2 sm:w-[290px] lg:w-[320px]">
+              <PhoneMockup glow="rgb(52 224 161 / 0.38)" className="animate-float-gentle">
+                <PhoneScreenImage
+                  src="/mockups/app-inbox.webp"
+                  alt="Responza inbox with WhatsApp and Instagram conversations"
+                  priority
+                />
+              </PhoneMockup>
+            </div>
+
+            <FloatingChip className="top-[20%] left-[1%] lg:left-[3%]" delay="-1s">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent-violet/20 text-accent-violet">
+                <SparkleIcon className="h-3.5 w-3.5" />
+              </span>
+              <span>
+                AI draft ready
+                <span className="block text-[10px] font-normal text-on-dark-muted">Review, edit, send</span>
+              </span>
+            </FloatingChip>
+            <FloatingChip className="top-[42%] right-[1%] lg:right-[3%]" delay="-3s">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent-warm/20 text-[13px] text-accent-warm">
+                अ
+              </span>
+              <span>
+                Translated to Hindi
+                <span className="block text-[10px] font-normal text-on-dark-muted">One tap, in the chat</span>
+              </span>
+            </FloatingChip>
+            <FloatingChip className="top-[64%] left-[3%] lg:left-[6%]" delay="-5s">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent/20 text-accent">
+                <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.4} d="M5 13l4 4L19 7" />
+                </svg>
+              </span>
+              <span>
+                Chat summarised
+                <span className="block text-[10px] font-normal text-on-dark-muted">Caught up in seconds</span>
+              </span>
+            </FloatingChip>
+          </div>
+        </Reveal>
+      </section>
+
+      <section className="relative border-y border-border-dark bg-surface-dark/60 py-14 sm:py-16">
+        <div className="mx-auto max-w-5xl px-4 text-center sm:px-6">
+          <Reveal>
+            <SectionBadge>Channels</SectionBadge>
+            <h2 className="mt-5 text-2xl font-semibold tracking-[-0.03em] text-ink sm:text-3xl">
               Connect the channels your customers already use.
             </h2>
-            <p className="mt-3 text-sm leading-relaxed text-ink-muted sm:text-base">
-              WhatsApp and Instagram are supported from day one. IndiaMART, Tally, Gmail and more
-              are on the roadmap.
-            </p>
           </Reveal>
 
-          <div className="mt-10 sm:mt-12 md:mt-14">
-            <Reveal>
-              <p className="text-center text-[10px] font-medium tracking-widest text-ink-faint uppercase">
-                At launch
-              </p>
-              <div className="mt-5 flex flex-wrap items-center justify-center gap-3 sm:gap-4 md:gap-5">
-                {LANDING_PLATFORMS.filter(({ platform }) => platform === 'whatsapp' || platform === 'instagram').map(
-                  ({ platform, label, logo }, index) => (
-                    <Reveal key={platform} delay={index * 70} className="inline-block">
-                      <div
-                        className={[
-                          'flex w-[5.25rem] flex-col items-center gap-1.5 rounded-2xl border border-border bg-white px-2.5 py-3 shadow-soft transition-shadow duration-300 sm:w-[5.75rem] sm:px-3 sm:py-3.5 md:w-24',
-                          PLATFORM_RING[platform],
-                          'ring-1',
-                          PLATFORM_GLOW[platform],
-                          'hover:shadow-card',
-                        ].join(' ')}
-                      >
-                        <div className="flex h-9 w-9 items-center justify-center sm:h-10 sm:w-10 md:h-11 md:w-11">
-                          <img
-                            src={logo.src}
-                            alt={`${label} logo`}
-                            width={36}
-                            height={36}
-                            loading="lazy"
-                            decoding="async"
-                            className={landingPlatformLogoClass(platform)}
-                            style={{ height: 36, width: 36 }}
-                          />
-                        </div>
-                        <span className="text-[11px] font-medium text-ink">{label}</span>
-                      </div>
-                    </Reveal>
-                  ),
-                )}
+          <Reveal delay={100} className="mt-9 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+            {LIVE_CHANNELS.map((channel) => (
+              <div
+                key={channel.platform}
+                className="card-surface flex items-center gap-3 rounded-2xl py-3 pr-6 pl-3.5 shadow-soft"
+              >
+                <img src={channel.logo} alt="" width={36} height={36} className="h-9 w-9 object-contain" aria-hidden />
+                <div className="text-left">
+                  <p className="text-sm font-medium text-on-dark">{channel.label}</p>
+                  <p className="flex items-center gap-1.5 text-[11px] text-accent">
+                    <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden />
+                    Live
+                  </p>
+                </div>
               </div>
-            </Reveal>
+            ))}
+          </Reveal>
 
-            <Reveal delay={120} className="mt-8 sm:mt-10 md:mt-12">
-              <div className="mx-auto flex max-w-xl items-center gap-3">
-                <div className="h-px flex-1 bg-border" />
-                <p className="shrink-0 text-[10px] font-medium tracking-widest text-ink-faint uppercase">
-                  On the roadmap
-                </p>
-                <div className="h-px flex-1 bg-border" />
-              </div>
-              <div className="mt-5 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 md:gap-4">
-                {LANDING_PLATFORMS.filter(
-                  ({ platform }) => platform !== 'whatsapp' && platform !== 'instagram',
-                ).map(({ platform, label, logo }, index) => (
-                  <Reveal key={platform} delay={140 + index * 60} className="inline-block">
-                    <div
-                      className={[
-                        'flex w-[4.75rem] flex-col items-center gap-2 rounded-2xl border border-border/80 bg-white/80 px-2 py-3 sm:w-[5.5rem] sm:px-2.5 sm:py-3.5 md:w-24 md:px-3 md:py-4',
-                        PLATFORM_RING[platform],
-                        'ring-1',
-                      ].join(' ')}
-                    >
-                      <div className="flex h-9 w-9 items-center justify-center opacity-80 sm:h-10 sm:w-10 md:h-11 md:w-11">
-                        <img
-                          src={logo.src}
-                          alt={`${label} logo`}
-                          width={logo.width}
-                          height={logo.height}
-                          loading="lazy"
-                          decoding="async"
-                          className={landingPlatformLogoClass(platform)}
-                          style={
-                            platform === 'indiamart' || platform === 'tally' || platform === 'shopify'
-                              ? { maxHeight: 36 }
-                              : { height: 36, width: 36 }
-                          }
-                        />
-                      </div>
-                      <span className="text-center text-[10px] font-medium text-ink-muted sm:text-[11px]">
-                        {label}
-                      </span>
-                    </div>
-                  </Reveal>
-                ))}
-              </div>
-            </Reveal>
-          </div>
+          <Reveal delay={180} className="mt-8">
+            <p className="text-[11px] font-medium tracking-[0.16em] text-ink-faint uppercase">On the roadmap</p>
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-2.5">
+              {ROADMAP_CHANNELS.map((channel) => (
+                <div
+                  key={channel.platform}
+                  className="flex items-center gap-2 rounded-full border border-border-dark bg-ink/[0.03] py-1.5 pr-3.5 pl-2 text-xs text-on-dark-muted"
+                >
+                  <img
+                    src={channel.logo}
+                    alt=""
+                    width={20}
+                    height={20}
+                    className="h-5 w-5 rounded-full bg-white object-contain p-0.5 ring-1 ring-border"
+                    aria-hidden
+                  />
+                  {channel.label}
+                </div>
+              ))}
+            </div>
+          </Reveal>
         </div>
       </section>
     </>

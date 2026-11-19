@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en-IN">
+<html lang="en-IN" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,34 +7,44 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content="#5b8a85" />
-    <title>WhatsApp &amp; Instagram Inbox App, Coming Soon | Responza AI</title>
+    <meta name="theme-color" content="#ffffff" />
+    <script>
+      // Light is the default. Apply a saved choice before first paint so the page never flashes the wrong theme.
+      try {
+        var t = localStorage.getItem('responza-theme')
+        if (t === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark')
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#060608')
+        }
+      } catch (e) {}
+    </script>
+    <title>Responza AI: WhatsApp &amp; Instagram Inbox | Open Testing</title>
     <meta
       name="description"
-      content="Responza is the upcoming mobile app that puts your WhatsApp and Instagram business chats in one inbox, with AI replies and translation. Join the waitlist."
+      content="Responza puts WhatsApp Business and Instagram DMs in one AI inbox. Draft replies, translate and summarise chats in seconds. Join the open test on Google Play."
     />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Responza AI" />
     <meta property="og:locale" content="en_IN" />
-    <meta property="og:title" content="WhatsApp &amp; Instagram Inbox App, Coming Soon | Responza AI" />
+    <meta property="og:title" content="Responza AI: WhatsApp &amp; Instagram Inbox | Open Testing" />
     <meta
       property="og:description"
-      content="Responza is the upcoming mobile app that puts your WhatsApp and Instagram business chats in one inbox, with AI replies and translation. Join the waitlist."
+      content="Responza puts WhatsApp Business and Instagram DMs in one AI inbox. Draft replies, translate and summarise chats in seconds. Join the open test on Google Play."
     />
     <meta property="og:url" content="https://responza.in/" />
     <meta property="og:image" content="https://responza.in/og-image.jpg" />
     <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Responza AI: the WhatsApp and Instagram inbox app" />
+    <meta property="og:image:alt" content="Responza AI: one AI inbox for WhatsApp Business and Instagram" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="WhatsApp &amp; Instagram Inbox App, Coming Soon | Responza AI" />
+    <meta name="twitter:title" content="Responza AI: WhatsApp &amp; Instagram Inbox | Open Testing" />
     <meta
       name="twitter:description"
-      content="Responza is the upcoming mobile app that puts your WhatsApp and Instagram business chats in one inbox, with AI replies and translation. Join the waitlist."
+      content="Responza puts WhatsApp Business and Instagram DMs in one AI inbox. Draft replies, translate and summarise chats in seconds. Join the open test on Google Play."
     />
     <meta name="twitter:image" content="https://responza.in/og-image.jpg" />
-    <meta name="twitter:image:alt" content="Responza AI: the WhatsApp and Instagram inbox app" />
+    <meta name="twitter:image:alt" content="Responza AI: one AI inbox for WhatsApp Business and Instagram" />
   </head>
   <body>
     <div id="root"></div>

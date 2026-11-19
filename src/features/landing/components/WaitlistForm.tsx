@@ -8,7 +8,8 @@ type Status =
   | { readonly kind: 'joined' }
   | { readonly kind: 'error'; readonly message: string }
 
-export function WaitlistForm() {
+export function WaitlistForm({ align = 'center' }: { readonly align?: 'center' | 'left' }) {
+  const alignClass = align === 'center' ? 'mx-auto' : ''
   const [status, setStatus] = useState<Status>({ kind: 'idle' })
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -46,7 +47,7 @@ export function WaitlistForm() {
 
   if (status.kind === 'joined') {
     return (
-      <div className="glass-dark mx-auto max-w-lg rounded-[var(--radius-card-lg)] px-6 py-8 text-center" role="status">
+      <div className={`glass-dark ${alignClass} max-w-lg rounded-[var(--radius-card-lg)] px-6 py-6 ${align === 'center' ? 'text-center' : 'text-left'}`} role="status">
         <p className="text-lg font-semibold text-on-dark">You&apos;re on the list!</p>
         <p className="mt-2 text-sm text-on-dark-muted">
           Thanks for your interest. We&apos;ll email you as soon as Responza is ready to download.
@@ -58,7 +59,7 @@ export function WaitlistForm() {
   const submitting = status.kind === 'submitting'
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="mx-auto max-w-lg">
+    <form onSubmit={handleSubmit} noValidate className={`relative ${alignClass} max-w-lg`}>
       <div className="flex flex-col gap-3 sm:flex-row">
         <label htmlFor="waitlist-email" className="sr-only">
           Email address
@@ -73,12 +74,12 @@ export function WaitlistForm() {
           placeholder="you@business.com"
           aria-invalid={status.kind === 'error'}
           aria-describedby={status.kind === 'error' ? 'waitlist-error' : undefined}
-          className="h-12 min-w-0 flex-1 rounded-[var(--radius-pill)] border border-border-dark bg-white/5 px-5 text-sm text-on-dark outline-none transition-colors placeholder:text-on-dark-muted/70 focus:border-accent/60 focus:bg-white/10"
+          className="h-12 min-w-0 flex-1 rounded-[var(--radius-pill)] border border-border-dark bg-ink/[0.04] px-5 text-sm text-on-dark outline-none transition-colors placeholder:text-on-dark-muted/70 focus:border-accent/60 focus:bg-ink/[0.07] sm:h-12"
         />
         <button
           type="submit"
           disabled={submitting}
-          className="inline-flex h-12 shrink-0 items-center justify-center rounded-[var(--radius-pill)] bg-on-dark px-6 text-sm font-medium text-ink transition-colors hover:bg-on-dark/90 disabled:cursor-not-allowed disabled:opacity-70"
+          className="inline-flex h-12 shrink-0 items-center justify-center rounded-[var(--radius-pill)] bg-btn px-6 text-sm font-medium text-btn-fg transition-colors hover:bg-btn-hover disabled:cursor-not-allowed disabled:opacity-70"
         >
           {submitting ? 'Joining…' : 'Join the waitlist'}
         </button>
@@ -90,7 +91,11 @@ export function WaitlistForm() {
       </div>
 
       {status.kind === 'error' && (
-        <p id="waitlist-error" className="mt-3 text-center text-sm text-accent-warm" role="alert">
+        <p
+          id="waitlist-error"
+          className={`mt-3 text-sm text-accent-warm ${align === 'center' ? 'text-center' : ''}`}
+          role="alert"
+        >
           {status.message}
         </p>
       )}
