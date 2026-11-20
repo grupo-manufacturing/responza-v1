@@ -55,4 +55,10 @@ export const SEO_PAGES = {
     description: 'The page you are looking for does not exist.',
     noindex: true,
   },
+  waitlistAdmin: {
+    path: '/admin/waitlist',
+    title: 'Waitlist Admin | Responza',
+    description: 'Private waitlist signup list for Responza operators.',
+    noindex: true,
+  },
 } as const satisfies Record<string, SeoPage>

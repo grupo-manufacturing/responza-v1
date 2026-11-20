@@ -21,6 +21,9 @@ const DeleteAccountPage = lazyWithRetry(() =>
 const ChildSafetyPage = lazyWithRetry(() =>
   import('@/features/landing/pages/ChildSafetyPage').then((m) => ({ default: m.ChildSafetyPage })),
 )
+const WaitlistAdminPage = lazyWithRetry(() =>
+  import('@/features/landing/pages/WaitlistAdminPage').then((m) => ({ default: m.WaitlistAdminPage })),
+)
 const BlogIndexPage = lazyWithRetry(() =>
   import('@/features/blog/pages/BlogIndexPage').then((m) => ({ default: m.BlogIndexPage })),
 )
@@ -28,7 +31,6 @@ const BlogPostPage = lazyWithRetry(() =>
   import('@/features/blog/pages/BlogPostPage').then((m) => ({ default: m.BlogPostPage })),
 )
 
-/** Pre-rendered to static HTML at build time (see scripts/prerender.mjs), so they must stay SSR-safe. */
 export const publicRoutes: RouteObject[] = [
   {
     path: SEO_PAGES.home.path,
@@ -67,6 +69,14 @@ export const publicRoutes: RouteObject[] = [
     element: (
       <PageSuspense>
         <ChildSafetyPage />
+      </PageSuspense>
+    ),
+  },
+  {
+    path: SEO_PAGES.waitlistAdmin.path,
+    element: (
+      <PageSuspense>
+        <WaitlistAdminPage />
       </PageSuspense>
     ),
   },

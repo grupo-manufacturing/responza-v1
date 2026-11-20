@@ -226,6 +226,12 @@
   html {
     background: var(--c-surface);
     scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  html::-webkit-scrollbar {
+    display: none;
   }
 
   body {
@@ -233,6 +239,12 @@
     color: var(--c-ink);
     -webkit-font-smoothing: antialiased;
     font-feature-settings: 'cv11', 'ss03';
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  body::-webkit-scrollbar {
+    display: none;
   }
 
   ::selection {
@@ -271,6 +283,13 @@
 
 @utility text-accent-gradient {
   background: linear-gradient(110deg, var(--grad-a) 0%, var(--grad-b) 38%, var(--grad-c) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility text-waitlist-count {
+  background: linear-gradient(180deg, #f0c4a0 0%, #d97745 48%, #b84a28 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;

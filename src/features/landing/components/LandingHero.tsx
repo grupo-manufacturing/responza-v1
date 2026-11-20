@@ -1,14 +1,14 @@
-import { LIVE_CHANNELS, PLAY_STORE_URL, ROADMAP_CHANNELS } from '@/features/landing/constants'
+import { LIVE_CHANNELS, ROADMAP_CHANNELS } from '@/features/landing/constants'
 import {
-  LandingButton,
   MetaTechProviderBadge,
   PhoneMockup,
   PhoneScreenImage,
-  PlayStoreButton,
   Reveal,
   SectionBadge,
   SparkleIcon,
 } from '@/shared/ui/brand-ui'
+
+import { WaitlistForm } from './WaitlistForm'
 
 function FloatingChip({
   className,
@@ -47,27 +47,7 @@ export function LandingHero() {
 
         <div className="relative mx-auto max-w-5xl px-4 text-center sm:px-6 lg:px-8">
           <Reveal className="flex flex-col items-center">
-            <a
-              href={PLAY_STORE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="glass-dark group inline-flex items-center gap-2.5 rounded-[var(--radius-pill)] py-1.5 pr-4 pl-3 text-xs font-medium text-on-dark transition-colors hover:bg-white/10"
-            >
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping-ring absolute inline-flex h-full w-full rounded-full bg-accent" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
-              </span>
-              Now in open testing on Google Play
-              <svg
-                className="h-3 w-3 text-on-dark-muted transition-transform group-hover:translate-x-0.5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.4} d="M9 5l7 7-7 7" />
-              </svg>
-            </a>
+            <MetaTechProviderBadge />
 
             <h1 className="mt-6 text-[2.2rem] leading-[1.04] min-[400px]:text-[2.5rem] font-semibold tracking-[-0.045em] text-ink sm:text-7xl lg:text-[5rem]">
               Every customer chat.
@@ -80,16 +60,8 @@ export function LandingHero() {
               and summarises chats, so you answer customers in seconds, not hours.
             </p>
 
-            <div className="mt-8 flex w-full max-w-md flex-col items-stretch gap-3 sm:max-w-none sm:flex-row sm:items-center sm:justify-center">
-              <PlayStoreButton href={PLAY_STORE_URL} />
-              <LandingButton to="/#features" variant="secondary" size="lg" showChevron>
-                See how it works
-              </LandingButton>
-            </div>
-
-            <div className="mt-7 flex flex-wrap items-center justify-center gap-x-5 gap-y-3">
-              <MetaTechProviderBadge />
-              <p className="text-xs text-ink-faint">Free to try · Billed via Google Play · Cancel anytime</p>
+            <div id="waitlist" className="mt-8 w-full max-w-lg scroll-mt-28">
+              <WaitlistForm />
             </div>
           </Reveal>
         </div>

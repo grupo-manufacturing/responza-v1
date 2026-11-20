@@ -232,12 +232,12 @@ export function LandingLogo({ className = 'h-[15px]' }: { readonly className?: s
 export function MetaTechProviderBadge({ className = '' }: { readonly className?: string }) {
   return (
     <div
-      className={`inline-flex items-center gap-2.5 rounded-[var(--radius-pill)] border border-border-dark bg-ink/[0.04] py-1.5 pr-4 pl-2 ${className}`}
+      className={`inline-flex items-center gap-3 rounded-[var(--radius-pill)] border border-border-dark bg-ink/[0.04] py-2.5 pr-5 pl-2.5 ${className}`}
     >
-      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white ring-1 ring-border">
-        <img src="/meta-icon.webp" alt="" width={14} height={14} className="h-3.5 w-3.5 object-contain" aria-hidden />
+      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white ring-1 ring-border">
+        <img src="/meta-icon.webp" alt="" width={18} height={18} className="h-[18px] w-[18px] object-contain" aria-hidden />
       </span>
-      <span className="text-xs font-medium text-on-dark">Meta Verified</span>
+      <span className="text-sm font-medium text-on-dark sm:text-[15px]">Meta Verified</span>
     </div>
   )
 }

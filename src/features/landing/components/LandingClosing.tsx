@@ -3,8 +3,6 @@ import { useState } from 'react'
 import { LANDING_FAQS, PLAY_STORE_URL } from '@/features/landing/constants'
 import { PhoneMockup, PhoneScreenImage, PlayStoreButton, Reveal, SectionHeading } from '@/shared/ui/brand-ui'
 
-import { WaitlistForm } from './WaitlistForm'
-
 export function LandingClosing() {
   const [openIndex, setOpenIndex] = useState<number | null>(0)
 
@@ -16,7 +14,7 @@ export function LandingClosing() {
             badge="FAQs"
             tone="sky"
             title="Questions, answered."
-            description="Everything you need to know about Responza and the open test."
+            description="Everything you need to know about Responza, pricing and Google Play."
           />
           <div className="mt-12 divide-y divide-border-dark border-y border-border-dark">
             {LANDING_FAQS.map((faq, index) => {
@@ -89,18 +87,10 @@ export function LandingClosing() {
                 <span className="text-accent-gradient">Reply like a pro.</span>
               </h2>
               <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-ink-muted sm:text-lg lg:mx-0">
-                Join the open test on Google Play and give every chat a fast, thoughtful answer, from one inbox.
+                Get Responza on Google Play and give every chat a fast, thoughtful answer, from one inbox.
               </p>
               <div className="mt-9 flex flex-col items-center gap-3 lg:items-start">
                 <PlayStoreButton href={PLAY_STORE_URL} />
-              </div>
-
-              <div id="waitlist" className="mt-12 scroll-mt-24 border-t border-border-dark pt-8">
-                <p className="text-sm font-medium text-on-dark">Not on Android? Get launch updates.</p>
-                <p className="mt-1 text-xs text-ink-faint">Join the waitlist. No spam, just launch news.</p>
-                <div className="mt-4">
-                  <WaitlistForm align="left" />
-                </div>
               </div>
             </Reveal>
 
