@@ -1,6 +1,7 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 
 const API_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:4000').replace(/\/+$/, '')
+const WAITLIST_COUNT = 2511
 
 type Status =
   | { readonly kind: 'idle' }
@@ -8,20 +9,12 @@ type Status =
   | { readonly kind: 'joined' }
   | { readonly kind: 'error'; readonly message: string }
 
-function randomWaitlistCount(): number {
-  return Math.floor(Math.random() * (30_000 - 5_000 + 1)) + 5_000
-}
-
-function WaitlistCountLine({ count }: { readonly count: number | null }) {
-  if (count === null) {
-    return <p className="mt-4 h-5" aria-hidden />
-  }
-
+function WaitlistCountLine() {
   return (
     <p className="mt-4 text-center text-sm text-ink sm:text-[15px]">
       Join{' '}
       <span className="text-[1.15em] font-bold tracking-tight text-waitlist-count">
-        {count.toLocaleString('en-IN')}
+        {WAITLIST_COUNT.toLocaleString('en-IN')}
       </span>{' '}
       others on the waitlist.
     </p>
@@ -31,11 +24,6 @@ function WaitlistCountLine({ count }: { readonly count: number | null }) {
 export function WaitlistForm({ align = 'center' }: { readonly align?: 'center' | 'left' }) {
   const alignClass = align === 'center' ? 'mx-auto' : ''
   const [status, setStatus] = useState<Status>({ kind: 'idle' })
-  const [count, setCount] = useState<number | null>(null)
-
-  useEffect(() => {
-    setCount(randomWaitlistCount())
-  }, [])
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -82,7 +70,7 @@ export function WaitlistForm({ align = 'center' }: { readonly align?: 'center' |
             Thanks for your interest. We&apos;ll email you as soon as Responza is ready to download.
           </p>
         </div>
-        <WaitlistCountLine count={count} />
+        <WaitlistCountLine />
       </div>
     )
   }
@@ -132,7 +120,7 @@ export function WaitlistForm({ align = 'center' }: { readonly align?: 'center' |
           </p>
         )}
       </form>
-      <WaitlistCountLine count={count} />
+      <WaitlistCountLine />
     </div>
   )
 }
